@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { SaluxLogo } from './SaluxLogo';
 import { usePresentationStore } from '@/store/presentationStore';
 import { tracksById } from '@/domain/tracks';
 import { EASE_BURST } from './logoMotion';
+import { isMobileViewport } from '@/utils/isMobileViewport';
 
 const TOTAL_MS = 2200;
 const REDUCED_MS = 220;
@@ -16,6 +17,15 @@ export function TransitionMorph({ onComplete }: Props) {
   const reduce = useReducedMotion();
   const trackId = usePresentationStore((s) => s.currentTrackId);
   const trackTitle = tracksById[trackId]?.meta.title ?? '';
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? isMobileViewport() : false,
+  );
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(isMobileViewport());
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   useEffect(() => {
     const t = window.setTimeout(onComplete, reduce ? REDUCED_MS : TOTAL_MS);
@@ -130,7 +140,11 @@ export function TransitionMorph({ onComplete }: Props) {
               symbolOnly
               animate
               idle={false}
-              effects={{ glowRing: true, shimmer: true, aberration: true }}
+              effects={{
+                glowRing: true,
+                shimmer: true,
+                aberration: !isMobile,
+              }}
             />
           </motion.div>
         </div>

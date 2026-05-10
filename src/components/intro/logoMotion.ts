@@ -62,3 +62,12 @@ export const IDLE_FLOAT = {
   scale: [1, 1.032, 1.014, 1.026, 1.008, 1] as const,
   times: [0, 0.22, 0.42, 0.62, 0.82, 1] as const,
 } as const;
+
+/** Respiração 3D no wrapper CSS (rotateX/Y), ciclo ~9s — compõe com IDLE_FLOAT no SVG. */
+export const IDLE_TILT_3D = {
+  duration: 9,
+  ease: [0.42, 0, 0.58, 1] as const,
+  rotateX: [0, 3, -1, -3, 1, 0] as const,
+  rotateY: [0, 3, -1, -3, 1, 0] as const,
+  times: [0, 0.2, 0.4, 0.6, 0.8, 1] as const,
+} as const;

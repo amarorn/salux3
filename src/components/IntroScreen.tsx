@@ -9,12 +9,15 @@ import {
 } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { CustomCursor } from './intro/CustomCursor';
+import { IntroEnergyLayer } from './intro/IntroEnergyLayer';
 import { SaluxLogo } from './intro/SaluxLogo';
+import { presentationMeta } from '@/domain/presentation';
 import { tracks } from '@/domain/tracks';
 import type { TrackPresentation, TrackId } from '@/domain/tracks';
 import { usePresentationStore } from '@/store/presentationStore';
 import { theme } from '@/domain/theme';
 import type { Accent } from '@/domain/types';
+import { isMobileViewport } from '@/utils/isMobileViewport';
 
 const TRACK_ACCENTS: Accent[] = ['cyan', 'violet', 'emerald', 'amber', 'rose'];
 
@@ -24,7 +27,17 @@ export function IntroScreen() {
   const setShowCornerLogo = usePresentationStore((s) => s.setShowCornerLogo);
   const [logoReady, setLogoReady] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const [highlightedTrackIndex, setHighlightedTrackIndex] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? isMobileViewport() : false,
+  );
   const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(isMobileViewport());
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -48,6 +61,7 @@ export function IntroScreen() {
 
   const handleTrackSelect = (trackId: TrackId) => {
     if (isExiting) return;
+    setHighlightedTrackIndex(null);
     setIsExiting(true);
     setShowCornerLogo(true);
     setTrack(trackId);
@@ -59,9 +73,21 @@ export function IntroScreen() {
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: 0.22, ease: [0.4, 0, 0.2, 1] } }}
-      className="absolute inset-0 z-50 overflow-hidden text-white outline-none"
+      className="absolute bottom-0 right-0 z-50 h-full w-full overflow-hidden text-white outline-none"
+      style={{ left: '-1px', top: '1px' }}
     >
       {!reduceMotion && <CustomCursor />}
+
+      <IntroEnergyLayer
+        highlightedTrackIndex={highlightedTrackIndex}
+        highlightColor={
+          highlightedTrackIndex !== null
+            ? theme.accents[TRACK_ACCENTS[highlightedTrackIndex % TRACK_ACCENTS.length]!].base
+            : null
+        }
+        reduceMotion={!!reduceMotion}
+        logoReady={logoReady}
+      />
 
       {/* Header */}
       <header className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between p-8">
@@ -93,21 +119,33 @@ export function IntroScreen() {
         </motion.div>
       </header>
 
+      <motion.div
+        aria-labelledby="intro-deck-title"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.12, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+        className="pointer-events-none absolute left-0 top-0 z-10 w-full max-w-[min(36rem,calc(100vw-12rem))] px-8 pb-4 pt-[calc(env(safe-area-inset-top)+5.5rem)] sm:max-w-xl md:pt-[calc(env(safe-area-inset-top)+6rem)]"
+      >
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.36em] text-white/35">
+          A apresentação
+        </p>
+        <h1
+          id="intro-deck-title"
+          className="text-balance text-[clamp(1.2rem,3vw,1.85rem)] font-semibold leading-[1.18] tracking-tight text-white/[0.94]"
+        >
+          {presentationMeta.title}
+        </h1>
+        <p className="mt-3 max-w-prose text-[12px] leading-relaxed text-white/38 sm:text-[13px]">
+          {presentationMeta.subtitle}
+        </p>
+      </motion.div>
+
       {/* Logo — acima do centro para dar respiro aos cards */}
       <motion.div
         className="absolute left-1/2 top-[40%] z-10 -translate-x-1/2 -translate-y-1/2"
         style={{ x: parallaxX, y: parallaxY }}
       >
-        <div className="flex flex-col items-center gap-7">
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="text-[10px] font-semibold uppercase tracking-[0.36em] text-white/35"
-          >
-            ◆ A apresentação
-          </motion.div>
-
+        <div className="flex flex-col items-center">
           <motion.div
             className="relative"
             animate={{
@@ -143,7 +181,11 @@ export function IntroScreen() {
               animate
               idle={!isExiting}
               exiting={isExiting}
-              effects={{ glowRing: true, shimmer: true, aberration: true }}
+              effects={{
+                glowRing: true,
+                shimmer: true,
+                aberration: !isMobile,
+              }}
               onComplete={() => setLogoReady(true)}
             />
           </motion.div>
@@ -174,6 +216,7 @@ export function IntroScreen() {
                   index={i}
                   accent={TRACK_ACCENTS[i % TRACK_ACCENTS.length]!}
                   disabled={isExiting}
+                  onHoverChange={setHighlightedTrackIndex}
                   onClick={() => handleTrackSelect(track.id as TrackId)}
                 />
               ))}
@@ -209,11 +252,12 @@ interface TrackCardProps {
   index: number;
   accent: Accent;
   disabled: boolean;
+  onHoverChange?: (index: number | null) => void;
   onClick: () => void;
 }
 
 
-function TrackCard({ track, index, accent, disabled, onClick }: TrackCardProps) {
+function TrackCard({ track, index, accent, disabled, onHoverChange, onClick }: TrackCardProps) {
   const [hovered, setHovered] = useState(false);
   const ac = theme.accents[accent];
 
@@ -224,8 +268,14 @@ function TrackCard({ track, index, accent, disabled, onClick }: TrackCardProps) 
       initial={{ opacity: 0, y: 20, scale: 0.97, filter: 'blur(6px)' }}
       animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
       transition={{ delay: 0.08 + index * 0.06, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
+      onHoverStart={() => {
+        setHovered(true);
+        onHoverChange?.(index);
+      }}
+      onHoverEnd={() => {
+        setHovered(false);
+        onHoverChange?.(null);
+      }}
       onClick={onClick}
       className="group relative flex flex-col overflow-hidden rounded-2xl p-5 text-left outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-40"
       style={{

@@ -1,6 +1,13 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { motion, useReducedMotion, type Transition } from 'framer-motion';
-import { EASE_SETTLE, IDLE_FLOAT, LOGO_TIMING, petalInitial, petalTransition } from './logoMotion';
+import {
+  EASE_SETTLE,
+  IDLE_FLOAT,
+  IDLE_TILT_3D,
+  LOGO_TIMING,
+  petalInitial,
+  petalTransition,
+} from './logoMotion';
 
 interface LogoEffects {
   shimmer?: boolean;
@@ -115,19 +122,20 @@ export function SaluxLogo({
   const fxAberration = effects?.aberration ?? false;
 
   const [assembled, setAssembled] = useState(!animate);
+  const assembledOnceRef = useRef(false);
 
   useEffect(() => {
-    if (!animate) {
+    if (!animate || reduceMotion) {
       setAssembled(true);
-      return;
+      assembledOnceRef.current = true;
     }
-    if (reduceMotion) {
-      setAssembled(true);
-      return;
-    }
-    const t = window.setTimeout(() => setAssembled(true), LOGO_TIMING.totalAssemblyMs);
-    return () => window.clearTimeout(t);
   }, [animate, reduceMotion]);
+
+  const markBurstAssembled = () => {
+    if (assembledOnceRef.current) return;
+    assembledOnceRef.current = true;
+    setAssembled(true);
+  };
 
   // viewBox e dimensões do símbolo (versão symbolOnly = só pétalas)
   const symbolViewBox = '0 30 200 220';
@@ -298,6 +306,9 @@ export function SaluxLogo({
           animate={petalAnimateFor()}
           transition={petalTransitionFor(i)}
           style={{ transformOrigin: `${SYMBOL_CENTER.cx}px ${SYMBOL_CENTER.cy}px`, transformBox: 'view-box' }}
+          onAnimationComplete={
+            i === 7 && wantBurst ? () => markBurstAssembled() : undefined
+          }
         />
       ))}
 
@@ -404,90 +415,124 @@ export function SaluxLogo({
     );
   }
 
+  const idleTiltActive = idleActive;
+
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox={symbolOnly ? symbolViewBox : fullViewBox}
-      width={width}
+    <div
       className={className}
-      aria-label="Salux"
-      role="img"
+      style={{
+        display: 'inline-block',
+        perspective: idleTiltActive ? '900px' : undefined,
+      }}
     >
-      <defs>
-        {symbolGradientDefs}
-        {sheenGradient}
-        {sheenMask}
-      </defs>
-
-      {symbolGroupTree}
-
-      {!symbolOnly && (
-        <motion.g
-          initial={wantBurst ? { opacity: 0, y: 16 } : false}
-          animate={exiting ? { opacity: 0, y: 8 } : { opacity: 1, y: 0 }}
-          transition={
-            exiting
-              ? { duration: LOGO_TIMING.exitDuration, ease: 'easeOut' }
-              : { delay: LOGO_TIMING.wordmarkDelay, duration: 0.7, ease: EASE_SETTLE }
-          }
+      <motion.div
+        style={{
+          display: 'inline-block',
+          transformStyle: 'preserve-3d',
+          willChange: idleTiltActive ? 'transform' : undefined,
+        }}
+        animate={
+          idleTiltActive
+            ? {
+                rotateX: [...IDLE_TILT_3D.rotateX],
+                rotateY: [...IDLE_TILT_3D.rotateY],
+              }
+            : { rotateX: 0, rotateY: 0 }
+        }
+        transition={
+          idleTiltActive
+            ? {
+                duration: IDLE_TILT_3D.duration,
+                repeat: Infinity,
+                ease: IDLE_TILT_3D.ease,
+                times: [...IDLE_TILT_3D.times],
+              }
+            : { duration: 0 }
+        }
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox={symbolOnly ? symbolViewBox : fullViewBox}
+          width={width}
+          aria-label="Salux"
+          role="img"
         >
-          {WORDMARK_PATHS.map((d, i) => (
-            <motion.path
-              key={i}
-              d={d}
-              fill={wordmarkFill}
-              initial={wantBurst ? { opacity: 0, y: 18 } : false}
+          <defs>
+            {symbolGradientDefs}
+            {sheenGradient}
+            {sheenMask}
+          </defs>
+
+          {symbolGroupTree}
+
+          {!symbolOnly && (
+            <motion.g
+              initial={wantBurst ? { opacity: 0, y: 16 } : false}
               animate={exiting ? { opacity: 0, y: 8 } : { opacity: 1, y: 0 }}
               transition={
                 exiting
                   ? { duration: LOGO_TIMING.exitDuration, ease: 'easeOut' }
-                  : {
-                      delay: LOGO_TIMING.wordmarkDelay + i * LOGO_TIMING.wordmarkStagger,
-                      duration: 0.65,
-                      ease: EASE_SETTLE,
-                    }
+                  : { delay: LOGO_TIMING.wordmarkDelay, duration: 0.7, ease: EASE_SETTLE }
               }
+            >
+              {WORDMARK_PATHS.map((d, i) => (
+                <motion.path
+                  key={i}
+                  d={d}
+                  fill={wordmarkFill}
+                  initial={wantBurst ? { opacity: 0, y: 18 } : false}
+                  animate={exiting ? { opacity: 0, y: 8 } : { opacity: 1, y: 0 }}
+                  transition={
+                    exiting
+                      ? { duration: LOGO_TIMING.exitDuration, ease: 'easeOut' }
+                      : {
+                          delay: LOGO_TIMING.wordmarkDelay + i * LOGO_TIMING.wordmarkStagger,
+                          duration: 0.65,
+                          ease: EASE_SETTLE,
+                        }
+                  }
+                />
+              ))}
+            </motion.g>
+          )}
+
+          {!symbolOnly && (
+            <motion.g
+              initial={wantBurst ? { opacity: 0, y: 8 } : false}
+              animate={exiting ? { opacity: 0 } : { opacity: 0.95, y: 0 }}
+              transition={
+                exiting
+                  ? { duration: LOGO_TIMING.exitDuration, ease: 'easeOut' }
+                  : { delay: LOGO_TIMING.taglineDelay, duration: 0.6, ease: 'easeOut' }
+              }
+              onAnimationComplete={() => {
+                if (!exiting && assembled && onComplete) onComplete();
+              }}
+            >
+              {TAGLINE_PATHS.map((d, i) => (
+                <path key={i} d={d} fill={taglineFill} />
+              ))}
+            </motion.g>
+          )}
+
+          {symbolOnly && wantBurst && (
+            <motion.rect
+              x={0}
+              y={0}
+              width={1}
+              height={1}
+              fill="transparent"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0 }}
+              transition={{ duration: LOGO_TIMING.totalAssemblyMs / 1000 }}
+              onAnimationComplete={() => {
+                if (onComplete) onComplete();
+              }}
             />
-          ))}
-        </motion.g>
-      )}
-
-      {!symbolOnly && (
-        <motion.g
-          initial={wantBurst ? { opacity: 0, y: 8 } : false}
-          animate={exiting ? { opacity: 0 } : { opacity: 0.95, y: 0 }}
-          transition={
-            exiting
-              ? { duration: LOGO_TIMING.exitDuration, ease: 'easeOut' }
-              : { delay: LOGO_TIMING.taglineDelay, duration: 0.6, ease: 'easeOut' }
-          }
-          onAnimationComplete={() => {
-            if (!exiting && assembled && onComplete) onComplete();
-          }}
-        >
-          {TAGLINE_PATHS.map((d, i) => (
-            <path key={i} d={d} fill={taglineFill} />
-          ))}
-        </motion.g>
-      )}
-
-      {/* symbolOnly: dispara onComplete quando shimmer termina */}
-      {symbolOnly && wantBurst && (
-        <motion.rect
-          x={0}
-          y={0}
-          width={1}
-          height={1}
-          fill="transparent"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0 }}
-          transition={{ duration: LOGO_TIMING.totalAssemblyMs / 1000 }}
-          onAnimationComplete={() => {
-            if (onComplete) onComplete();
-          }}
-        />
-      )}
-    </svg>
+          )}
+        </svg>
+      </motion.div>
+    </div>
   );
 }
 

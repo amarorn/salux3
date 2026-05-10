@@ -12,7 +12,7 @@ export const steps: PresentationStep[] = [
     index: 0,
     title: 'PROTEÇÃO ECONÔMICA DA OPERAÇÃO EM SAÚDE',
     subtitle: 'Era agêntica como resposta ao limite da digitalização em saúde',
-    position: { x: 0, y: 0 },
+    position: { x: 126, y: 0 },
     scale: 1.0,
     kind: 'cover',
     accent: 'violet',
