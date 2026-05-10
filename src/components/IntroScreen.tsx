@@ -11,7 +11,6 @@ import { ArrowUpRight } from 'lucide-react';
 import { CustomCursor } from './intro/CustomCursor';
 import { IntroEnergyLayer } from './intro/IntroEnergyLayer';
 import { SaluxLogo } from './intro/SaluxLogo';
-import { presentationMeta } from '@/domain/presentation';
 import { tracks } from '@/domain/tracks';
 import type { TrackPresentation, TrackId } from '@/domain/tracks';
 import { usePresentationStore } from '@/store/presentationStore';
@@ -47,6 +46,11 @@ export function IntroScreen() {
   const parallaxY = useTransform(sy, (v) => v * 18);
   const counterParallaxX = useTransform(sx, (v) => v * -10);
   const counterParallaxY = useTransform(sy, (v) => v * -10);
+  const energyParallaxX = useTransform(sx, (v) => v * -6);
+  const energyParallaxY = useTransform(sy, (v) => v * -6);
+
+  const wheelEnergy = useMotionValue(0);
+  const wheelEnergySpring = useSpring(wheelEnergy, { stiffness: 90, damping: 16, mass: 0.55 });
 
   useEffect(() => {
     const handler = (e: PointerEvent) => {
@@ -58,6 +62,22 @@ export function IntroScreen() {
     window.addEventListener('pointermove', handler);
     return () => window.removeEventListener('pointermove', handler);
   }, [mx, my]);
+
+  useEffect(() => {
+    let decayTimer: number | null = null;
+    const onWheel = (e: WheelEvent) => {
+      const cur = wheelEnergy.get();
+      const kick = Math.min(Math.abs(e.deltaY) / 240, 0.55);
+      wheelEnergy.set(Math.min(cur + kick, 1.4));
+      if (decayTimer) window.clearTimeout(decayTimer);
+      decayTimer = window.setTimeout(() => wheelEnergy.set(0), 220);
+    };
+    window.addEventListener('wheel', onWheel, { passive: true });
+    return () => {
+      window.removeEventListener('wheel', onWheel);
+      if (decayTimer) window.clearTimeout(decayTimer);
+    };
+  }, [wheelEnergy]);
 
   const handleTrackSelect = (trackId: TrackId) => {
     if (isExiting) return;
@@ -87,58 +107,36 @@ export function IntroScreen() {
         }
         reduceMotion={!!reduceMotion}
         logoReady={logoReady}
+        parallaxX={energyParallaxX}
+        parallaxY={energyParallaxY}
+        wheelEnergy={wheelEnergySpring}
       />
 
       {/* Header */}
       <header className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between p-8">
         <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="flex items-center gap-2.5"
-        >
-          <span
-            aria-hidden
-            className="block h-1 w-1 rounded-full"
-            style={{ background: '#54c1ed', boxShadow: '0 0 6px #54c1ed88' }}
-          />
-          <span className="text-[10px] font-semibold uppercase tracking-[0.36em] text-white/35">
-            beAnalytic
-          </span>
-        </motion.div>
-
-        <motion.div
           initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="text-right text-[10px] font-semibold uppercase tracking-[0.32em] text-white/35"
+          animate={
+            reduceMotion
+              ? { opacity: 1, x: 0 }
+              : { opacity: [1, 0.78, 1, 0.85, 1], x: 0 }
+          }
+          transition={
+            reduceMotion
+              ? { delay: 0.3, duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+              : {
+                  delay: 0.3,
+                  x: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+                  opacity: { duration: 8.5, repeat: Infinity, ease: [0.45, 0, 0.55, 1] },
+                }
+          }
+          className="text-right text-[10px] font-semibold uppercase tracking-[0.36em] text-white/35"
         >
           Edição 01 · 2026
           <br />
           <span className="text-white/20">duração ~12 min</span>
         </motion.div>
       </header>
-
-      <motion.div
-        aria-labelledby="intro-deck-title"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.12, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-        className="pointer-events-none absolute left-0 top-0 z-10 w-full max-w-[min(36rem,calc(100vw-12rem))] px-8 pb-4 pt-[calc(env(safe-area-inset-top)+5.5rem)] sm:max-w-xl md:pt-[calc(env(safe-area-inset-top)+6rem)]"
-      >
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.36em] text-white/35">
-          A apresentação
-        </p>
-        <h1
-          id="intro-deck-title"
-          className="text-balance text-[clamp(1.2rem,3vw,1.85rem)] font-semibold leading-[1.18] tracking-tight text-white/[0.94]"
-        >
-          {presentationMeta.title}
-        </h1>
-        <p className="mt-3 max-w-prose text-[12px] leading-relaxed text-white/38 sm:text-[13px]">
-          {presentationMeta.subtitle}
-        </p>
-      </motion.div>
 
       {/* Logo — acima do centro para dar respiro aos cards */}
       <motion.div
@@ -216,6 +214,7 @@ export function IntroScreen() {
                   index={i}
                   accent={TRACK_ACCENTS[i % TRACK_ACCENTS.length]!}
                   disabled={isExiting}
+                  dimmed={highlightedTrackIndex !== null && highlightedTrackIndex !== i}
                   onHoverChange={setHighlightedTrackIndex}
                   onClick={() => handleTrackSelect(track.id as TrackId)}
                 />
@@ -252,12 +251,13 @@ interface TrackCardProps {
   index: number;
   accent: Accent;
   disabled: boolean;
+  dimmed?: boolean;
   onHoverChange?: (index: number | null) => void;
   onClick: () => void;
 }
 
 
-function TrackCard({ track, index, accent, disabled, onHoverChange, onClick }: TrackCardProps) {
+function TrackCard({ track, index, accent, disabled, dimmed, onHoverChange, onClick }: TrackCardProps) {
   const [hovered, setHovered] = useState(false);
   const ac = theme.accents[accent];
 
@@ -266,8 +266,13 @@ function TrackCard({ track, index, accent, disabled, onHoverChange, onClick }: T
       type="button"
       disabled={disabled}
       initial={{ opacity: 0, y: 20, scale: 0.97, filter: 'blur(6px)' }}
-      animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-      transition={{ delay: 0.08 + index * 0.06, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+      animate={{
+        opacity: dimmed ? 0.45 : 1,
+        y: 0,
+        scale: hovered ? 1.025 : dimmed ? 0.985 : 1,
+        filter: dimmed ? 'blur(2px)' : 'blur(0px)',
+      }}
+      transition={{ delay: hovered || dimmed ? 0 : 0.08 + index * 0.06, duration: hovered || dimmed ? 0.32 : 0.65, ease: [0.22, 1, 0.36, 1] }}
       onHoverStart={() => {
         setHovered(true);
         onHoverChange?.(index);

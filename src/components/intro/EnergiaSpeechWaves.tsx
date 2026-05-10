@@ -120,7 +120,7 @@ export function EnergiaSpeechWaves({ reduceMotion, boosted }: EnergiaSpeechWaves
             : layer.stroke;
 
         const base = layer.baseOpacity;
-        const yAmp = boosted ? 11 : 7;
+        const yAmp = boosted ? 26 : 18;
         const phase = i * 0.07;
 
         return (
@@ -135,7 +135,7 @@ export function EnergiaSpeechWaves({ reduceMotion, boosted }: EnergiaSpeechWaves
                 ? { y: 0, scaleY: 1, opacity: base }
                 : {
                     y: [0, -yAmp, yAmp * 0.55, -yAmp * 0.72, yAmp * 0.38, 0],
-                    scaleY: [1, 1.05, 0.97, 1.06, 0.99, 1],
+                    scaleY: [1, 1.18, 0.88, 1.22, 0.94, 1],
                     opacity: [
                       base,
                       Math.min(1, base + 0.22),
