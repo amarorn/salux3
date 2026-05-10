@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+body {
+  background: #05070d;
+  color: #e2e8f0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(42px);
+  filter: blur(8px);
+}
+
+body.presentation-body {
+  overscroll-behavior: none;
+}
+
+body.landing-body {
+  cursor: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: rgba(124, 58, 237, 0.18);
+  color: #1e1b4b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.2s !important;
+  }
+}
+
+@keyframes narrative-metric-glow {
+  0%, 100% {
+    opacity: 0.85;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.14);
+  }
+}
+
+@keyframes narrative-metric-sheen {
+  0% {
+    transform: translateX(-120%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-12deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .narrative-metric-value {
+    animation: narrative-metric-glow 3.2s ease-in-out infinite;
+  }
+
+  .narrative-metric-sheen {
+    animation: narrative-metric-sheen 2.8s ease-in-out infinite;
+  }
+}

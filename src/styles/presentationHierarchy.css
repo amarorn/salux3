@@ -1,0 +1,40 @@
+/**
+ * Hierarquia visual tipo deck: kicker → título display → corpo.
+ * Variáveis usadas pelos steps da apresentação (`body.presentation-body`).
+ */
+body.presentation-body {
+  --ppt-kicker-size: 10px;
+  --ppt-kicker-tracking: 0.32em;
+  --ppt-title-weight: 700;
+  --ppt-title-tracking: -0.03em;
+  --ppt-body-size: 15px;
+  --ppt-body-leading: 1.65;
+}
+
+.presentation-ppt-kicker {
+  font-size: var(--ppt-kicker-size);
+  letter-spacing: var(--ppt-kicker-tracking);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.42);
+}
+
+.presentation-ppt-title {
+  font-family: 'Inter Tight', Inter, system-ui, sans-serif;
+  font-weight: var(--ppt-title-weight);
+  letter-spacing: var(--ppt-title-tracking);
+  line-height: 1.08;
+  color: #fff;
+}
+
+.presentation-ppt-body {
+  font-size: var(--ppt-body-size);
+  line-height: var(--ppt-body-leading);
+  color: rgb(203 213 225);
+}
+
+.presentation-ppt-caption {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgb(148 163 184);
+}

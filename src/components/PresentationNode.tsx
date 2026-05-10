@@ -1,0 +1,151 @@
+import { memo, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { motion, useAnimation, useReducedMotion } from 'framer-motion';
+import type { PresentationStep } from '@/domain/types';
+import { CoverStep } from './steps/CoverStep';
+import { NarrativeStep } from './steps/NarrativeStep';
+import { ArchitectureStep } from './steps/ArchitectureStep';
+import { JourneyStep } from './steps/JourneyStep';
+import { IntegrationStep } from './steps/IntegrationStep';
+import { GovernanceStep } from './steps/GovernanceStep';
+import { RoadmapStep } from './steps/RoadmapStep';
+import { ClosingStep } from './steps/ClosingStep';
+import { FloatingCardContext } from './FloatingCard';
+
+function flipFromId(id: string): boolean {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = ((h << 5) - h + id.charCodeAt(i)) | 0;
+  return Math.abs(h) % 2 === 1;
+}
+
+interface PresentationNodeProps {
+  step: PresentationStep;
+  active: boolean;
+  /** Quando true, slides que não estão ativos ficam mais baixos em opacidade (efeito “fader” na trilha). */
+  dimNonActive?: boolean;
+}
+
+function StepBody({ step, active }: PresentationNodeProps) {
+  switch (step.kind) {
+    case 'cover':
+      return <CoverStep step={step} active={active} />;
+    case 'narrative':
+      return <NarrativeStep step={step} active={active} />;
+    case 'architecture':
+      return <ArchitectureStep step={step} active={active} />;
+    case 'journey':
+      return <JourneyStep step={step} active={active} />;
+    case 'integration':
+      return <IntegrationStep step={step} active={active} />;
+    case 'governance':
+      return <GovernanceStep step={step} active={active} />;
+    case 'roadmap':
+      return <RoadmapStep step={step} active={active} />;
+    case 'closing':
+      return <ClosingStep step={step} active={active} />;
+  }
+}
+
+function CardFlipShell({
+  active,
+  flipPhoto,
+  stepLabel,
+  children,
+}: {
+  active: boolean;
+  flipPhoto: boolean;
+  stepLabel: string;
+  children: ReactNode;
+}) {
+  const reduceMotion = useReducedMotion();
+  const flipControls = useAnimation();
+  const prevActive = useRef(active);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      void flipControls.set({ rotateY: 0, opacity: 1 });
+      prevActive.current = active;
+      return;
+    }
+
+    if (active && !prevActive.current) {
+      void flipControls.set({ rotateY: flipPhoto ? -82 : 82, opacity: 1 });
+      requestAnimationFrame(() => {
+        void flipControls.start({
+          rotateY: 0,
+          transition: { duration: 0.72, ease: [0.22, 1, 0.36, 1] },
+        });
+      });
+    }
+
+    prevActive.current = active;
+  }, [active, flipControls, reduceMotion, flipPhoto]);
+
+  const perspectiveOrigin = flipPhoto ? 'right center' : 'left center';
+
+  return (
+    <div
+      className="relative"
+      style={{
+        perspective: '1600px',
+        perspectiveOrigin,
+      }}
+    >
+      <motion.div
+        animate={flipControls}
+        initial={{ rotateY: reduceMotion ? 0 : 0, opacity: 1 }}
+        style={{
+          transformStyle: 'preserve-3d',
+          transformOrigin: flipPhoto ? 'right center' : 'left center',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          willChange: reduceMotion ? undefined : 'transform',
+        }}
+      >
+        <div
+          role="group"
+          aria-roledescription="Slide"
+          aria-current={active ? 'step' : undefined}
+          aria-label={stepLabel}
+          className="group block cursor-pointer rounded-3xl text-left outline-none focus-visible:ring-4 focus-visible:ring-violet-300/60"
+        >
+          {children}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function PresentationNodeComponent({ step, active, dimNonActive = true }: PresentationNodeProps) {
+  const flipPhoto = useMemo(() => flipFromId(step.id), [step.id]);
+  const stepLabel = `Etapa ${step.index + 1}: ${step.title}`;
+  const reducedMotion = useReducedMotion();
+  const faded = dimNonActive && !active;
+
+  return (
+    <motion.div
+      className="absolute"
+      style={{ left: step.position.x, top: step.position.y }}
+      initial={{ opacity: 0, y: 24 }}
+      animate={{
+        opacity: faded ? 0.34 : 1,
+        y: 0,
+        scale: faded && !reducedMotion ? 0.97 : 1,
+      }}
+      transition={{
+        opacity: { duration: 0.52, ease: [0.22, 1, 0.36, 1] },
+        scale: { duration: 0.52, ease: [0.22, 1, 0.36, 1] },
+        delay: step.index * 0.04,
+      }}
+    >
+      <div style={{ transform: 'translate(-50%, -50%)' }}>
+        <FloatingCardContext.Provider value={{ flipPhoto }}>
+          <CardFlipShell active={active} flipPhoto={flipPhoto} stepLabel={stepLabel}>
+            <StepBody step={step} active={active} />
+          </CardFlipShell>
+        </FloatingCardContext.Provider>
+      </div>
+    </motion.div>
+  );
+}
+
+export const PresentationNode = memo(PresentationNodeComponent);
