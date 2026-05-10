@@ -2,11 +2,26 @@ import type { CameraState, PresentationStep, ViewportSize } from '@/domain/types
 
 const NODE_PADDING = 480;
 
+/**
+ * Largura/altura máxima estimada do conteúdo de um step (FloatingCard:
+ * painel até 760px + foto lateral 240 + gap 12 ≈ 1012; mais um pouco de
+ * folga para badges e sombras). Usado para impedir que `step.scale`
+ * deixe o conteúdo maior que o palco em telas verticais.
+ */
+const MAX_STEP_CONTENT_WIDTH = 1024;
+const MAX_STEP_CONTENT_HEIGHT = 1280;
+const SAFE_MARGIN = 0.92;
+
 export function cameraForStep(step: PresentationStep, viewport: ViewportSize): CameraState {
+  const fitScale = Math.min(
+    step.scale,
+    (viewport.width * SAFE_MARGIN) / MAX_STEP_CONTENT_WIDTH,
+    (viewport.height * SAFE_MARGIN) / MAX_STEP_CONTENT_HEIGHT,
+  );
   return {
-    scale: step.scale,
-    x: viewport.width / 2 - step.position.x * step.scale,
-    y: viewport.height / 2 - step.position.y * step.scale,
+    scale: fitScale,
+    x: viewport.width / 2 - step.position.x * fitScale,
+    y: viewport.height / 2 - step.position.y * fitScale,
   };
 }
 

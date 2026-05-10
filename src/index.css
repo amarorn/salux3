@@ -17,11 +17,18 @@ html, body, #root {
   margin: 0;
 }
 
+html, body {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
 body {
   background: #05070d;
   color: #e2e8f0;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 html {

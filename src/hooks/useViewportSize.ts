@@ -1,28 +1,12 @@
-import { useEffect, useState } from 'react';
 import type { ViewportSize } from '@/domain/types';
+import { STAGE_HEIGHT, STAGE_WIDTH } from '@/components/Stage';
 
-const initial: ViewportSize =
-  typeof window === 'undefined'
-    ? { width: 1440, height: 900 }
-    : { width: window.innerWidth, height: window.innerHeight };
-
+/**
+ * Retorna o tamanho do palco da apresentação. A apresentação roda dentro
+ * de um `<Stage>` de dimensões fixas (1080×1920) escalado para preencher
+ * a janela; toda a matemática de câmera, parallax e nodes deve raciocinar
+ * nesse sistema de coordenadas, não no `window.innerWidth/Height`.
+ */
 export function useViewportSize(): ViewportSize {
-  const [size, setSize] = useState<ViewportSize>(initial);
-
-  useEffect(() => {
-    let frame = 0;
-    const update = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() =>
-        setSize({ width: window.innerWidth, height: window.innerHeight }),
-      );
-    };
-    window.addEventListener('resize', update);
-    return () => {
-      window.removeEventListener('resize', update);
-      cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  return size;
+  return { width: STAGE_WIDTH, height: STAGE_HEIGHT };
 }

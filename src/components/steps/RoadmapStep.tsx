@@ -327,9 +327,9 @@ export function RoadmapStep({ step, active }: Props) {
         active={active}
         stepId={step.id}
         badge={step.content.headline ?? String(step.index + 1).padStart(2, '0')}
-        width={960}
+        width={760}
       >
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {/* Título */}
           <motion.div
             className="sm:col-span-2 lg:col-span-3"

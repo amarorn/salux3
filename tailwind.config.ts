@@ -4,6 +4,13 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      screens: {
+        totem: { raw: '(min-aspect-ratio: 9/16) and (orientation: portrait)' },
+      },
+      spacing: {
+        stage: '1080px',
+        'stage-h': '1920px',
+      },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
