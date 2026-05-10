@@ -95,6 +95,9 @@ export function TransitionMorph({ onComplete }: Props) {
         ))}
       </div>
 
+      {/* ── Faíscas explodindo no clímax do BURST ────────────────────── */}
+      <BurstSparks />
+
       {/* ── Varredura cônica holográfica ─────────────────────────────── */}
       <HolographicSweep />
 
@@ -157,6 +160,75 @@ export function TransitionMorph({ onComplete }: Props) {
         />
       </motion.div>
     </motion.div>
+  );
+}
+
+/* ─── BurstSparks ─────────────────────────────────────────────────── */
+
+const SPARK_PALETTE = ['#ffe5a0', '#ffcc55', '#44ddff', '#22ddff', '#a8f0ff', '#fff7c0'];
+
+interface SparkSeed {
+  angle: number; // rad
+  distance: number; // px (alvo radial)
+  size: number;
+  delay: number;
+  duration: number;
+  color: string;
+}
+
+const SPARKS: SparkSeed[] = Array.from({ length: 22 }, (_, i) => {
+  // Mistura de 8 angulos das pétalas + 14 dispersos para parecer orgânico
+  const r1 = ((i * 1664525 + 1013904223) % 1000) / 1000;
+  const r2 = ((i * 22695477 + 1) % 1000) / 1000;
+  const angle = (i / 22) * Math.PI * 2 + (r1 - 0.5) * 0.6;
+  const distance = 140 + r2 * 220; // 140–360px
+  return {
+    angle,
+    distance,
+    size: 2 + r1 * 3.5,
+    delay: 0.18 + r2 * 0.35, // chegam um pouco depois das pétalas começarem
+    duration: 0.85 + r1 * 0.55,
+    color: SPARK_PALETTE[i % SPARK_PALETTE.length]!,
+  };
+});
+
+function BurstSparks() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 flex items-center justify-center"
+    >
+      {SPARKS.map((s, i) => {
+        const tx = Math.cos(s.angle) * s.distance;
+        const ty = Math.sin(s.angle) * s.distance;
+        return (
+          <motion.div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: s.size,
+              height: s.size,
+              background: s.color,
+              boxShadow: `0 0 ${s.size * 4}px ${s.color}cc, 0 0 ${s.size * 9}px ${s.color}44`,
+              willChange: 'transform, opacity',
+            }}
+            initial={{ x: 0, y: 0, opacity: 0, scale: 0.6 }}
+            animate={{
+              x: [0, tx * 0.4, tx],
+              y: [0, ty * 0.4, ty],
+              opacity: [0, 1, 0],
+              scale: [0.6, 1.15, 0.5],
+            }}
+            transition={{
+              delay: s.delay,
+              duration: s.duration,
+              ease: [0.16, 1, 0.3, 1],
+              times: [0, 0.45, 1],
+            }}
+          />
+        );
+      })}
+    </div>
   );
 }
 

@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Link2, Unlink } from 'lucide-react';
 import { SaluxSymbol } from '../intro/SaluxLogo';
 import { FloatingCard, FloatingCardContext } from '../FloatingCard';
 import type { PresentationStep, RoadmapAgentCard } from '@/domain/types';
@@ -17,6 +17,250 @@ const PHASES = [
   { phase: 'F3', label: 'Orquestração', desc: 'Múltiplos agentes coordenados', tone: '#7c3aed' },
   { phase: 'F4', label: 'Plataforma', desc: 'Capacidade institucional', tone: '#6d28d9' },
 ];
+
+/** Extrai "antes" e "depois" de linhas tipo "De registro → contexto". */
+function parseTransformBullet(line: string): { from: string; to: string } | null {
+  const trimmed = line.trim();
+  const arrowIdx = trimmed.indexOf('→');
+  if (arrowIdx === -1) return null;
+  let left = trimmed.slice(0, arrowIdx).trim();
+  const right = trimmed.slice(arrowIdx + 1).trim();
+  left = left.replace(/^De\s+/i, '').trim();
+  if (!left || !right) return null;
+  return { from: left, to: right };
+}
+
+/** Anel animado reutilizando a estética do ActivationPulse. */
+function NodePulseRing({ color, active }: { color: string; active: boolean }) {
+  if (!active) return null;
+  return (
+    <>
+      {[1.55, 2.1, 2.6].map((s, i) => (
+        <motion.span
+          key={i}
+          className="pointer-events-none absolute inset-0 rounded-full"
+          style={{ borderColor: color, borderStyle: 'solid', borderWidth: 1 }}
+          initial={{ scale: 1, opacity: 0.7 }}
+          animate={{ scale: s, opacity: 0 }}
+          transition={{ duration: 2, delay: i * 0.25, repeat: Infinity, ease: [0.22, 1, 0.36, 1] }}
+        />
+      ))}
+    </>
+  );
+}
+
+/** Partícula SVG que percorre o path (reutiliza a lógica do ParticleStream). */
+function MiniParticleStream({
+  pathD,
+  color,
+  active,
+}: {
+  pathD: string;
+  color: string;
+  active: boolean;
+}) {
+  const phases = [
+    { dash: '0.001 0.32', delay: 0, dur: 3.8 },
+    { dash: '0.001 0.32', delay: 1.2, dur: 3.8 },
+  ];
+  return (
+    <g>
+      {phases.map((p, i) => (
+        <motion.path
+          key={i}
+          d={pathD}
+          fill="none"
+          stroke={color}
+          strokeWidth={active ? 4.5 : 3}
+          strokeLinecap="round"
+          pathLength={1}
+          strokeDasharray={p.dash}
+          initial={{ strokeDashoffset: 0, opacity: 0.7 }}
+          animate={{ strokeDashoffset: -1 }}
+          transition={{ duration: p.dur, delay: p.delay, repeat: Infinity, ease: 'linear' }}
+          style={{ filter: `drop-shadow(0 0 4px ${color})` }}
+        />
+      ))}
+    </g>
+  );
+}
+
+function FragmentedVsCoordinatedPreview({
+  active,
+  reduceMotion,
+}: {
+  active: boolean;
+  reduceMotion: boolean;
+}) {
+  const fragNodes = [
+    { cx: 18, cy: 18 },
+    { cx: 72, cy: 12 },
+    { cx: 32, cy: 55 },
+    { cx: 82, cy: 58 },
+    { cx: 50, cy: 85 },
+  ];
+
+  const coordNodes = [
+    { cx: 10, cy: 50 },
+    { cx: 30, cy: 50 },
+    { cx: 50, cy: 50 },
+    { cx: 70, cy: 50 },
+    { cx: 90, cy: 50 },
+  ];
+
+  return (
+    <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-stretch">
+      {/* -- Fragmentada -- */}
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: active ? 1 : 0.35, y: 0 }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        className="relative overflow-hidden rounded-2xl border border-rose-400/25 bg-gradient-to-br from-rose-950/40 to-transparent p-4 shadow-soft"
+      >
+        <div className="mb-3 flex items-center gap-2">
+          <Unlink className="h-4 w-4 text-rose-300/90" strokeWidth={2} aria-hidden />
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-rose-200/95">Jornada fragmentada</p>
+        </div>
+        <div className="relative mb-2 h-[130px]">
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
+            <defs>
+              <linearGradient id="frag-line" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#fb7185" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#fb7185" stopOpacity="0.08" />
+              </linearGradient>
+            </defs>
+            <path d="M 18 18 Q 45 35 32 55" fill="none" stroke="url(#frag-line)" strokeWidth="0.6" strokeDasharray="2 3" />
+            <path d="M 72 12 Q 77 35 82 58" fill="none" stroke="url(#frag-line)" strokeWidth="0.6" strokeDasharray="2 3" />
+            <path d="M 32 55 Q 42 70 50 85" fill="none" stroke="url(#frag-line)" strokeWidth="0.6" strokeDasharray="2 3" />
+          </svg>
+          {fragNodes.map((n, i) => (
+            <motion.div
+              key={i}
+              initial={reduceMotion ? false : { scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: active ? 1 : 0.45 }}
+              transition={{ delay: reduceMotion ? 0 : 0.08 + i * 0.06 }}
+              className="absolute flex items-center justify-center"
+              style={{ left: `${n.cx}%`, top: `${n.cy}%`, transform: 'translate(-50%, -50%)' }}
+            >
+              <div className="relative flex h-8 w-8 items-center justify-center rounded-full border border-rose-400/50 bg-rose-500/20 text-[11px] font-bold text-rose-100 shadow-soft">
+                {i + 1}
+                {i === 2 && (
+                  <motion.span
+                    className="pointer-events-none absolute inset-0 rounded-full border border-rose-400/40"
+                    animate={{ scale: [1, 1.8], opacity: [0.5, 0] }}
+                    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut' }}
+                  />
+                )}
+              </div>
+            </motion.div>
+          ))}
+          {active && !reduceMotion && (
+            <motion.div
+              className="pointer-events-none absolute text-[8px] font-semibold uppercase tracking-wider text-rose-300/70"
+              style={{ left: '42%', top: '36%' }}
+              animate={{ opacity: [0.35, 0.7, 0.35] }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              ?
+            </motion.div>
+          )}
+        </div>
+        <p className="text-[11px] leading-snug text-rose-200/75">
+          Etapas isoladas, lacunas entre decisões e reconstrução manual do contexto.
+        </p>
+      </motion.div>
+
+      {/* -- Passagem -- */}
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.92 }}
+        animate={{ opacity: active ? 1 : 0.4, scale: 1 }}
+        transition={{ delay: reduceMotion ? 0 : 0.15, duration: 0.5 }}
+        className="flex flex-col items-center justify-center gap-2 py-4 md:py-0"
+        aria-hidden
+      >
+        <div className="hidden h-px w-full bg-gradient-to-r from-transparent via-violet-400/35 to-transparent md:block" />
+        <div className="relative flex flex-col items-center gap-1 rounded-xl border border-violet-400/25 bg-violet-500/10 px-3 py-2.5">
+          <NodePulseRing color="#7c3aed" active={active && !reduceMotion} />
+          <ArrowRight className="h-5 w-5 text-violet-300" strokeWidth={2} />
+          <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-violet-200/80">Passagem</span>
+        </div>
+        <div className="hidden h-px w-full bg-gradient-to-r from-transparent via-violet-400/35 to-transparent md:block" />
+      </motion.div>
+
+      {/* -- Coordenada -- */}
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: active ? 1 : 0.35, y: 0 }}
+        transition={{ delay: reduceMotion ? 0 : 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        className="relative overflow-hidden rounded-2xl border border-emerald-400/25 bg-gradient-to-br from-emerald-950/35 to-transparent p-4 shadow-soft"
+      >
+        <div className="mb-3 flex items-center gap-2">
+          <Link2 className="h-4 w-4 text-emerald-300/95" strokeWidth={2} aria-hidden />
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-200/95">Jornada coordenada</p>
+        </div>
+        <div className="relative mb-2 h-[130px]">
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
+            <defs>
+              <linearGradient id="coord-line" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#34d399" stopOpacity="0.6" />
+                <stop offset="100%" stopColor="#54c1ed" stopOpacity="0.6" />
+              </linearGradient>
+              <filter id="coord-glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="1.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <path
+              d="M 10 50 L 30 50 L 50 50 L 70 50 L 90 50"
+              fill="none"
+              stroke="url(#coord-line)"
+              strokeWidth="0.6"
+              strokeLinecap="round"
+            />
+            {active && !reduceMotion && (
+              <MiniParticleStream
+                pathD="M 10 50 L 30 50 L 50 50 L 70 50 L 90 50"
+                color="#34d399"
+                active={active}
+              />
+            )}
+          </svg>
+          {coordNodes.map((n, i) => (
+            <motion.div
+              key={i}
+              initial={reduceMotion ? false : { opacity: 0, scale: 0.7 }}
+              animate={{ opacity: active ? 1 : 0.45, scale: 1 }}
+              transition={{ delay: reduceMotion ? 0 : 0.2 + i * 0.07 }}
+              className="absolute flex items-center justify-center"
+              style={{ left: `${n.cx}%`, top: `${n.cy}%`, transform: 'translate(-50%, -50%)' }}
+            >
+              <div className="relative flex h-9 w-9 items-center justify-center rounded-full border border-emerald-400/50 bg-emerald-500/20 text-[12px] font-bold text-emerald-50 shadow-soft">
+                {i + 1}
+                <NodePulseRing color="#34d399" active={active && !reduceMotion && i === 2} />
+              </div>
+            </motion.div>
+          ))}
+          {active && !reduceMotion && (
+            <motion.div
+              className="pointer-events-none absolute inset-0 rounded-lg"
+              style={{
+                background: 'radial-gradient(ellipse at 50% 50%, rgba(52,211,153,0.12), transparent 70%)',
+              }}
+              animate={{ opacity: [0.4, 0.8, 0.4] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          )}
+        </div>
+        <p className="text-[11px] leading-snug text-emerald-200/80">
+          Um fio condutor de contexto atravessa etapas, equipas e momentos do cuidado.
+        </p>
+      </motion.div>
+    </div>
+  );
+}
 
 function AgentCard({ card }: { card: RoadmapAgentCard }) {
   const [hovered, setHovered] = useState(false);
@@ -139,7 +383,7 @@ export function RoadmapStep({ step, active }: Props) {
         active={active}
         stepId={step.id}
         badge={step.content.headline ?? String(step.index + 1).padStart(2, '0')}
-        width={720}
+        width={780}
       >
         <motion.div
           className="flex flex-col gap-6"
@@ -151,25 +395,50 @@ export function RoadmapStep({ step, active }: Props) {
             <h2 className="font-display text-[28px] font-bold leading-[1.15] tracking-tight text-white">{step.title}</h2>
           </motion.div>
 
-          <motion.ul variants={item} className="flex flex-col gap-3">
-            {step.content.bullets.map((line, i) => (
-              <motion.li
-                key={`${line}-${i}`}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: reduceMotion ? 0 : 0.14 + i * 0.07, ease: [0.22, 1, 0.36, 1] }}
-                className="flex items-start gap-4 rounded-2xl border border-violet-400/20 bg-gradient-to-r from-violet-500/[0.07] to-transparent px-4 py-3.5 shadow-soft"
-              >
-                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-violet-400/35 bg-violet-500/15 text-violet-200">
-                  <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
-                </span>
-                <span className="text-[13px] font-medium leading-snug text-slate-100">{line}</span>
-              </motion.li>
-            ))}
-          </motion.ul>
+          <motion.div variants={item}>
+            <FragmentedVsCoordinatedPreview active={active} reduceMotion={Boolean(reduceMotion)} />
+          </motion.div>
+
+          <motion.div variants={item} className="space-y-2.5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-violet-300/85">
+              Cinco mudanças de lógica
+            </p>
+            <ul className="flex flex-col gap-2.5">
+              {step.content.bullets.map((line, i) => {
+                const parsed = parseTransformBullet(line);
+                return (
+                  <motion.li
+                    key={`${line}-${i}`}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: reduceMotion ? 0 : 0.22 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                    className="grid gap-2 rounded-2xl border border-white/[0.07] bg-white/[0.03] p-3 shadow-soft sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-3"
+                  >
+                    {parsed ? (
+                      <>
+                        <span className="rounded-lg border border-rose-400/20 bg-rose-500/[0.06] px-3 py-2 text-[12px] leading-snug text-rose-100/95">
+                          {parsed.from}
+                        </span>
+                        <span className="flex justify-center sm:px-1">
+                          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-violet-400/35 bg-violet-500/15 text-violet-200">
+                            <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+                          </span>
+                        </span>
+                        <span className="rounded-lg border border-emerald-400/25 bg-emerald-500/[0.07] px-3 py-2 text-[12px] font-medium leading-snug text-emerald-50/95">
+                          {parsed.to}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="sm:col-span-3 text-[13px] font-medium leading-snug text-slate-100">{line}</span>
+                    )}
+                  </motion.li>
+                );
+              })}
+            </ul>
+          </motion.div>
 
           {step.content.body && (
-            <motion.p variants={item} className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
+            <motion.p variants={item} className="border-t border-white/[0.06] pt-5 text-sm leading-relaxed text-slate-300 whitespace-pre-line">
               {step.content.body}
             </motion.p>
           )}

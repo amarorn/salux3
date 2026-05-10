@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export function DriftingBackground() {
@@ -7,6 +8,7 @@ export function DriftingBackground() {
       <Grid />
       <DriftingSilhouette />
       <DriftingPetals />
+      <MagneticParticles />
       <CRTScanlines />
       <FloatingOrbs />
       <Noise />
@@ -169,6 +171,195 @@ const PETALS: PetalConfig[] = [
   { pathIndex: 2, startX: '26%', startY: '24%', size: 100, duration: 56, delay: 3, rotateBase: 150, driftX: ['0vw', '-3vw', '4vw'], driftY: ['0vh', '4vh', '-3vh'], opacity: 0.05 },
   { pathIndex: 1, startX: '88%', startY: '8%', size: 60, duration: 38, delay: 5, rotateBase: 80, driftX: ['0vw', '-3vw', '2vw'], driftY: ['0vh', '4vh', '-2vh'], opacity: 0.08 },
 ];
+
+/* ─── MagneticParticles ───────────────────────────────────────────── */
+
+interface ParticleSeed {
+  /** posição base em viewport units (0..1) */
+  bx: number;
+  by: number;
+  /** offset orgânico (drift) — params do ciclo */
+  driftAmpX: number; // px
+  driftAmpY: number;
+  driftPeriod: number; // s
+  driftPhase: number;
+  /** raio em px */
+  size: number;
+  /** cor (hex) */
+  color: string;
+  /** opacidade base */
+  opacity: number;
+  /** força do campo magnético (multiplicador) */
+  magnet: number;
+}
+
+const PARTICLE_PALETTE = ['#ffe5a0', '#ffcc55', '#44ddff', '#22ddff', '#a8f0ff', '#fff7c0'];
+
+// Posições orgânicas distribuídas (32 partículas) — seeds curados pra evitar alinhamento.
+// Cada tupla: [bx 0..1, by 0..1, ampX, ampY, period, phase 0..1, size, opacityIdx, paletteIdx, magnet]
+const PARTICLE_SEEDS: ReadonlyArray<readonly [number, number, number, number, number, number, number, number, number, number]> = [
+  [0.08, 0.18, 14,  9, 11.0, 0.12, 2.4, 0.62, 0, 1.05],
+  [0.92, 0.22, 11, 16, 13.0, 0.74, 3.0, 0.55, 3, 0.85],
+  [0.34, 0.08, 18, 10,  8.5, 0.41, 2.0, 0.48, 1, 0.9 ],
+  [0.65, 0.12, 10, 14, 14.0, 0.28, 3.6, 0.7,  4, 1.2 ],
+  [0.12, 0.55,  9, 18, 10.0, 0.83, 2.6, 0.58, 2, 0.95],
+  [0.22, 0.78, 17, 11,  9.5, 0.06, 4.0, 0.66, 5, 1.1 ],
+  [0.85, 0.62, 12, 17, 12.5, 0.55, 3.2, 0.6,  0, 0.8 ],
+  [0.50, 0.92,  8, 12,  8.0, 0.91, 2.2, 0.5,  3, 1.0 ],
+  [0.95, 0.86, 14,  9, 15.0, 0.33, 2.8, 0.7,  4, 0.9 ],
+  [0.18, 0.32, 11, 13, 11.5, 0.22, 3.4, 0.62, 1, 1.05],
+  [0.42, 0.42, 16, 16, 10.5, 0.71, 4.2, 0.55, 2, 0.85],
+  [0.72, 0.34,  9, 11,  7.5, 0.48, 2.0, 0.45, 5, 1.0 ],
+  [0.05, 0.72, 13, 14, 14.5, 0.65, 3.0, 0.65, 1, 0.95],
+  [0.38, 0.62,  7, 19,  9.0, 0.18, 1.8, 0.4,  3, 0.7 ],
+  [0.58, 0.18, 19,  8, 13.5, 0.85, 2.4, 0.5,  4, 0.9 ],
+  [0.78, 0.48, 10, 13, 10.0, 0.04, 3.8, 0.68, 0, 1.1 ],
+  [0.28, 0.88, 12, 15, 11.0, 0.39, 2.6, 0.55, 2, 1.0 ],
+  [0.48, 0.22, 15, 10,  8.5, 0.62, 2.0, 0.6,  5, 0.85],
+  [0.62, 0.78, 11, 17, 12.0, 0.27, 3.6, 0.72, 1, 0.95],
+  [0.88, 0.05, 17,  9, 13.0, 0.81, 2.8, 0.5,  4, 1.05],
+  [0.04, 0.42,  9, 12, 10.5, 0.58, 1.8, 0.42, 3, 0.8 ],
+  [0.16, 0.95, 14, 11,  9.5, 0.46, 3.2, 0.55, 5, 1.0 ],
+  [0.32, 0.28, 10, 14, 14.0, 0.13, 2.2, 0.48, 2, 0.95],
+  [0.55, 0.55, 16, 16, 11.5, 0.72, 4.0, 0.7,  0, 1.15],
+  [0.68, 0.05,  8, 10,  8.0, 0.36, 1.6, 0.4,  3, 0.75],
+  [0.82, 0.92, 13, 15, 12.5, 0.92, 3.0, 0.6,  4, 1.0 ],
+  [0.42, 0.74, 11, 12, 10.0, 0.05, 2.4, 0.52, 1, 0.9 ],
+  [0.96, 0.45, 18, 13, 13.5, 0.43, 3.4, 0.65, 2, 1.05],
+  [0.10, 0.04,  9, 11,  9.0, 0.69, 2.0, 0.45, 5, 0.85],
+  [0.74, 0.65, 14, 14, 11.0, 0.16, 3.8, 0.7,  0, 1.1 ],
+  [0.24, 0.48, 12, 17, 10.5, 0.84, 2.6, 0.58, 4, 0.95],
+  [0.55, 0.36, 10, 12, 12.0, 0.31, 2.0, 0.5,  3, 0.85],
+];
+
+const PARTICLES: ParticleSeed[] = PARTICLE_SEEDS.map((s) => ({
+  bx: s[0],
+  by: s[1],
+  driftAmpX: s[2],
+  driftAmpY: s[3],
+  driftPeriod: s[4],
+  driftPhase: s[5] * Math.PI * 2,
+  size: s[6],
+  color: PARTICLE_PALETTE[s[8]]!,
+  opacity: s[7],
+  magnet: s[9],
+}));
+const MAGNET_RADIUS = 180; // px
+const MAGNET_FORCE = 70; // px de deslocamento máximo
+
+function MagneticParticles() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dotRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const mouseRef = useRef({ x: -9999, y: -9999 });
+  const sizeRef = useRef({ w: 0, h: 0 });
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const measure = () => {
+      const el = containerRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      sizeRef.current = { w: r.width, h: r.height };
+      setReady(true);
+    };
+    measure();
+    window.addEventListener('resize', measure);
+
+    const onMove = (e: PointerEvent) => {
+      const el = containerRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      mouseRef.current = { x: e.clientX - r.left, y: e.clientY - r.top };
+    };
+    const onLeave = () => {
+      mouseRef.current = { x: -9999, y: -9999 };
+    };
+    window.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerleave', onLeave);
+
+    let raf = 0;
+    let last = performance.now();
+    let elapsed = 0;
+    const tick = (now: number) => {
+      const dt = (now - last) / 1000;
+      last = now;
+      elapsed += dt;
+
+      const { w, h } = sizeRef.current;
+      const { x: mx, y: my } = mouseRef.current;
+
+      for (let i = 0; i < PARTICLES.length; i++) {
+        const node = dotRefs.current[i];
+        if (!node) continue;
+        const p = PARTICLES[i]!;
+        const baseX = p.bx * w;
+        const baseY = p.by * h;
+        // Drift senoidal
+        const phase = (elapsed / p.driftPeriod) * Math.PI * 2 + p.driftPhase;
+        const dx = Math.cos(phase) * p.driftAmpX;
+        const dy = Math.sin(phase * 1.2 + 0.5) * p.driftAmpY;
+
+        // Repulsão magnética (cursor empurra)
+        let mxOff = 0;
+        let myOff = 0;
+        const px = baseX + dx;
+        const py = baseY + dy;
+        const ddx = px - mx;
+        const ddy = py - my;
+        const dist2 = ddx * ddx + ddy * ddy;
+        if (dist2 < MAGNET_RADIUS * MAGNET_RADIUS) {
+          const dist = Math.sqrt(dist2) || 1;
+          const falloff = 1 - dist / MAGNET_RADIUS;
+          const force = falloff * falloff * MAGNET_FORCE * p.magnet;
+          mxOff = (ddx / dist) * force;
+          myOff = (ddy / dist) * force;
+        }
+
+        node.style.transform = `translate3d(${baseX + dx + mxOff}px, ${baseY + dy + myOff}px, 0)`;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerleave', onLeave);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      aria-hidden
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      style={{ contain: 'layout paint' }}
+    >
+      {PARTICLES.map((p, i) => (
+        <div
+          key={i}
+          ref={(el) => {
+            dotRefs.current[i] = el;
+          }}
+          className="absolute left-0 top-0"
+          style={{
+            width: p.size,
+            height: p.size,
+            marginLeft: -p.size / 2,
+            marginTop: -p.size / 2,
+            borderRadius: '50%',
+            background: p.color,
+            opacity: ready ? p.opacity : 0,
+            boxShadow: `0 0 ${p.size * 3}px ${p.color}aa, 0 0 ${p.size * 6}px ${p.color}33`,
+            willChange: 'transform',
+            transition: 'opacity 600ms ease-out',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 function DriftingPetals() {
   return (
