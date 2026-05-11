@@ -53,6 +53,8 @@ export interface StepContent {
   roadmapTransform?: boolean;
   /** Narrativa: índice após o qual os bullets passam a segunda secção (ex.: verbos vs fricção). */
   bulletSplitAfter?: number;
+  /** Trilha Operação: headline grande + bullets como chips animados (pain points). */
+  painPointsLayout?: boolean;
 }
 
 export interface PresentationStep {
