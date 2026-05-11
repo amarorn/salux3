@@ -55,6 +55,8 @@ export interface StepContent {
   bulletSplitAfter?: number;
   /** Trilha Operação: headline grande + bullets como chips animados (pain points). */
   painPointsLayout?: boolean;
+  /** Pergunta de fechamento destacada ao final do card (CTA reflexivo). */
+  closingQuestion?: string;
 }
 
 export interface PresentationStep {

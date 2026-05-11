@@ -62,6 +62,7 @@ export const operacaoSteps: PresentationStep[] = cloneSteps(baseSteps)
         body:
           'Isso não é um desvio pontual.\nÉ um padrão.\n\nA instituição amplia capacidade, mas também amplia complexidade.\nQuando crescer exige sempre mais costura, a expansão começa a virar atrito operacional.',
         painPointsLayout: true,
+        closingQuestion: 'Sua instituição está crescendo por arquitetura ou por acúmulo?',
       },
     };
   }
