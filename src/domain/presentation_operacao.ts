@@ -51,16 +51,17 @@ export const operacaoSteps: PresentationStep[] = cloneSteps(baseSteps)
       content: {
         headline: 'O hospital cresce. Mas cresce adicionando esforço.',
         bullets: [
-          'Mais sistemas.',
-          'Mais integrações.',
-          'Mais controles paralelos.',
-          'Mais adaptações locais.',
-          'Mais dependência de pessoas-chave.',
-          'Mais estrutura física para cada nova frente.',
-          'Mais pressão sobre equipes e áreas críticas.',
+          'Mais sistemas',
+          'Mais integrações',
+          'Mais controles paralelos',
+          'Mais adaptações locais',
+          'Mais dependência de pessoas-chave',
+          'Mais estrutura física para cada nova frente',
+          'Mais pressão sobre equipes e áreas críticas',
         ],
         body:
           'Isso não é um desvio pontual.\nÉ um padrão.\n\nA instituição amplia capacidade, mas também amplia complexidade.\nQuando crescer exige sempre mais costura, a expansão começa a virar atrito operacional.',
+        painPointsLayout: true,
       },
     };
   }
