@@ -15,6 +15,12 @@ import { PathwaysStep } from './steps/PathwaysStep';
 import { AgentsFlowStep } from './steps/AgentsFlowStep';
 import { ResultsStep } from './steps/ResultsStep';
 import { FloatingCardContext } from './FloatingCard';
+import { usePresentationStore } from '@/store/presentationStore';
+
+/** Largura unificada para cada trilha (independente do tipo do step). */
+const TRACK_CARD_WIDTH: Partial<Record<string, number>> = {
+  'era-agentica': 780,
+};
 
 function flipFromId(id: string): boolean {
   let h = 0;
@@ -135,6 +141,8 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
   const stepLabel = `Etapa ${step.index + 1}: ${step.title}`;
   const reducedMotion = useReducedMotion();
   const faded = dimNonActive && !active;
+  const currentTrackId = usePresentationStore((s) => s.currentTrackId);
+  const forceWidth = TRACK_CARD_WIDTH[currentTrackId];
 
   return (
     <motion.div
@@ -153,7 +161,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
       }}
     >
       <div style={{ transform: 'translate(-50%, -50%)' }}>
-        <FloatingCardContext.Provider value={{ flipPhoto }}>
+        <FloatingCardContext.Provider value={{ flipPhoto, forceWidth }}>
           <CardFlipShell active={active} flipPhoto={flipPhoto} stepLabel={stepLabel}>
             <StepBody step={step} active={active} />
           </CardFlipShell>

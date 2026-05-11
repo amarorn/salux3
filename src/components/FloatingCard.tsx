@@ -8,7 +8,11 @@ import { INTRO_ASSIST_COVER_URL, presentationSidePhotoForStep } from '@/config/a
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
-export const FloatingCardContext = createContext<{ flipPhoto?: boolean } | null>(null);
+export const FloatingCardContext = createContext<{
+  flipPhoto?: boolean;
+  /** Quando definido, sobrepõe o `width` solicitado por cada step component. */
+  forceWidth?: number;
+} | null>(null);
 
 interface FloatingCardProps {
   accent: Accent;
@@ -39,6 +43,7 @@ export function FloatingCard({
 }: FloatingCardProps) {
   const ctx = useContext(FloatingCardContext);
   const resolvedFlip = flipPhoto ?? ctx?.flipPhoto ?? false;
+  const resolvedWidth = ctx?.forceWidth ?? width;
   const accentColor = theme.accents[accent];
   const reduceMotion = useReducedMotion();
   const photoMotion = getPhotoColumnVariants(resolvedFlip);
@@ -104,7 +109,7 @@ export function FloatingCard({
             : 'shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.05)] group-hover:-translate-y-1 group-hover:border-white/16',
           className,
         )}
-        style={{ width }}
+        style={{ width: resolvedWidth }}
       >
         <div
           aria-hidden
