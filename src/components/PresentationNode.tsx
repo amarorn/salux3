@@ -10,12 +10,9 @@ import { GovernanceStep } from './steps/GovernanceStep';
 import { RoadmapStep } from './steps/RoadmapStep';
 import { ClosingStep } from './steps/ClosingStep';
 import { FloatingCardContext } from './FloatingCard';
-import { usePresentationStore } from '@/store/presentationStore';
 
-/** Largura unificada para cada trilha (independente do tipo do step). */
-const TRACK_CARD_WIDTH: Partial<Record<string, number>> = {
-  'era-agentica': 780,
-};
+/** Largura unificada para todos os cards de todas as trilhas (independente do tipo do step). */
+const UNIFIED_CARD_WIDTH = 780;
 
 function flipFromId(id: string): boolean {
   let h = 0;
@@ -126,8 +123,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
   const stepLabel = `Etapa ${step.index + 1}: ${step.title}`;
   const reducedMotion = useReducedMotion();
   const faded = dimNonActive && !active;
-  const currentTrackId = usePresentationStore((s) => s.currentTrackId);
-  const forceWidth = TRACK_CARD_WIDTH[currentTrackId];
+  const forceWidth = UNIFIED_CARD_WIDTH;
 
   return (
     <motion.div
