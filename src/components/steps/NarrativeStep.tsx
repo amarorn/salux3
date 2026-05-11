@@ -1,5 +1,6 @@
-import { useContext } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useContext, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { FloatingCard, FloatingCardContext } from '../FloatingCard';
 import type { PresentationStep } from '@/domain/types';
 import { theme } from '@/domain/theme';
@@ -18,6 +19,26 @@ export function NarrativeStep({ step, active }: Props) {
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
   const { container, item } = getCardTextVariants(Boolean(reduceMotion), step.index, flipPhoto);
   const painPoints = step.content.painPointsLayout;
+  const useBalloon = painPoints && step.content.painPointsBalloon;
+  const [balloonOpen, setBalloonOpen] = useState(false);
+
+  // Fecha o balão quando o slide deixa de estar ativo
+  useEffect(() => {
+    if (!active) setBalloonOpen(false);
+  }, [active]);
+
+  // ESC fecha o balão
+  useEffect(() => {
+    if (!balloonOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setBalloonOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [balloonOpen]);
 
   return (
     <FloatingCard
@@ -117,13 +138,24 @@ export function NarrativeStep({ step, active }: Props) {
             </motion.div>
           )}
 
-        {painPoints && step.content.bullets && step.content.bullets.length > 0 && (
+        {painPoints && !useBalloon && step.content.bullets && step.content.bullets.length > 0 && (
           <PainPointChips
             bullets={step.content.bullets}
             accentColor={accent.base}
             active={active}
             reducedMotion={Boolean(reduceMotion)}
           />
+        )}
+
+        {useBalloon && step.content.bullets && step.content.bullets.length > 0 && (
+          <motion.div variants={item} className="flex justify-center py-3">
+            <BalloonTrigger
+              label={step.content.painPointsTriggerLabel ?? 'Abrir os 7 pontos'}
+              accentColor={accent.base}
+              onClick={() => setBalloonOpen(true)}
+              reducedMotion={Boolean(reduceMotion)}
+            />
+          </motion.div>
         )}
 
         {!painPoints &&
@@ -196,7 +228,242 @@ export function NarrativeStep({ step, active }: Props) {
           </motion.div>
         )}
       </motion.div>
+
+      <AnimatePresence>
+        {useBalloon && balloonOpen && step.content.bullets && (
+          <PainPointsBalloon
+            title={step.content.painPointsBalloonTitle ?? 'Pontos de atrito'}
+            headline={step.content.headline}
+            bullets={step.content.bullets}
+            accentColor={accent.base}
+            reducedMotion={Boolean(reduceMotion)}
+            onClose={() => setBalloonOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </FloatingCard>
+  );
+}
+
+interface BalloonTriggerProps {
+  label: string;
+  accentColor: string;
+  onClick: () => void;
+  reducedMotion: boolean;
+}
+
+function BalloonTrigger({ label, accentColor, onClick, reducedMotion }: BalloonTriggerProps) {
+  return (
+    <motion.button
+      type="button"
+      data-no-click-advance
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      whileHover={
+        reducedMotion ? undefined : { scale: 1.03, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }
+      }
+      whileTap={reducedMotion ? undefined : { scale: 0.97 }}
+      className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full border px-6 py-3 text-[0.95rem] font-semibold tracking-wide text-white"
+      style={{
+        borderColor: `${accentColor}77`,
+        background: `linear-gradient(135deg, ${accentColor}26 0%, ${accentColor}0d 100%)`,
+        boxShadow: `0 0 0 1px ${accentColor}33, 0 12px 32px -10px ${accentColor}60, inset 0 1px 0 rgba(255,255,255,0.08)`,
+      }}
+    >
+      <motion.span
+        aria-hidden
+        className="relative h-2.5 w-2.5 rounded-full"
+        style={{ background: accentColor, boxShadow: `0 0 14px ${accentColor}` }}
+        animate={
+          reducedMotion
+            ? undefined
+            : { scale: [0.9, 1.2, 0.9], opacity: [0.7, 1, 0.7] }
+        }
+        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <span>{label}</span>
+      <motion.span
+        aria-hidden
+        className="text-lg leading-none"
+        style={{ color: accentColor }}
+        animate={reducedMotion ? undefined : { x: [0, 3, 0] }}
+        transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        →
+      </motion.span>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${accentColor}33, transparent 70%)`,
+        }}
+      />
+    </motion.button>
+  );
+}
+
+interface PainPointsBalloonProps {
+  title: string;
+  headline?: string;
+  bullets: string[];
+  accentColor: string;
+  reducedMotion: boolean;
+  onClose: () => void;
+}
+
+function PainPointsBalloon({
+  title,
+  headline,
+  bullets,
+  accentColor,
+  reducedMotion,
+  onClose,
+}: PainPointsBalloonProps) {
+  const list = {
+    hidden: {},
+    visible: {
+      transition: {
+        delayChildren: reducedMotion ? 0 : 0.18,
+        staggerChildren: reducedMotion ? 0 : 0.06,
+      },
+    },
+  };
+  const tile = {
+    hidden: reducedMotion ? {} : { opacity: 0, y: 14, scale: 0.94, filter: 'blur(6px)' },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      filter: 'blur(0px)',
+      transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
+    },
+  };
+
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <motion.div
+      data-no-click-advance
+      className="fixed inset-0 z-[80] flex items-center justify-center p-10"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <motion.div
+        aria-hidden
+        className="absolute inset-0 cursor-pointer"
+        onClick={onClose}
+        initial={{ backdropFilter: 'blur(0px)' }}
+        animate={{ backdropFilter: 'blur(14px)' }}
+        exit={{ backdropFilter: 'blur(0px)' }}
+        transition={{ duration: 0.4 }}
+        style={{ background: 'rgba(4, 6, 12, 0.72)' }}
+      />
+
+      <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        initial={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.86, y: 16, filter: 'blur(10px)' }}
+        animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+        exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 8, filter: 'blur(8px)' }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        className="relative w-full max-w-[820px] overflow-hidden rounded-[28px] border bg-[#0b0f18]/95 p-10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)]"
+        style={{
+          borderColor: `${accentColor}55`,
+          boxShadow: `0 0 0 1px ${accentColor}22, 0 50px 140px -20px ${accentColor}30, inset 0 1px 0 rgba(255,255,255,0.06)`,
+        }}
+      >
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-10 -top-px h-px"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+          }}
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `radial-gradient(ellipse at top, ${accentColor}1a, transparent 60%)`,
+          }}
+        />
+
+        <div className="relative flex items-start justify-between gap-4">
+          <div>
+            <span
+              className="block text-[10px] font-semibold uppercase tracking-[0.36em]"
+              style={{ color: accentColor, opacity: 0.85 }}
+            >
+              {title}
+            </span>
+            {headline && (
+              <h3 className="mt-3 max-w-[28ch] text-[clamp(1.35rem,2.6vw,1.8rem)] font-bold leading-tight text-white">
+                {headline}
+              </h3>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar"
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white/70 transition-colors duration-200 hover:border-white/30 hover:bg-white/[0.08] hover:text-white"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path
+                d="M1 1L13 13M13 1L1 13"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <motion.ul
+          variants={list}
+          initial="hidden"
+          animate="visible"
+          className="relative mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2"
+        >
+          {bullets.map((text, i) => (
+            <motion.li key={text} variants={tile}>
+              <div
+                className="relative flex items-start gap-3 overflow-hidden rounded-2xl border px-5 py-4"
+                style={{
+                  borderColor: `${accentColor}33`,
+                  background: `linear-gradient(135deg, ${accentColor}14 0%, rgba(255,255,255,0.025) 100%)`,
+                  boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05)`,
+                }}
+              >
+                <span
+                  aria-hidden
+                  className="mt-0.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
+                  style={{
+                    background: `${accentColor}26`,
+                    color: accentColor,
+                    border: `1px solid ${accentColor}55`,
+                  }}
+                >
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className="text-[0.98rem] font-medium leading-snug text-slate-50">
+                  {text}
+                </span>
+              </div>
+            </motion.li>
+          ))}
+        </motion.ul>
+
+        <p className="relative mt-7 text-center text-[11px] uppercase tracking-[0.32em] text-white/35">
+          Toque fora ou pressione ESC para fechar
+        </p>
+      </motion.div>
+    </motion.div>,
+    document.body,
   );
 }
 
