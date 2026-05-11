@@ -1,6 +1,7 @@
 import type { PresentationStep } from './types';
 import { presentationMeta as baseMeta, steps as baseSteps } from './presentation';
 import { assistencialSteps, presentationAssistencialMeta } from './presentation_assistencial';
+import { operacaoSteps, presentationOperacaoMeta } from './presentation_operacao';
 import { presentationReceitaMeta, receitaSteps } from './presentation_receita';
 
 export type TrackId = 'era-agentica' | 'operacoes' | 'assistencial' | 'dados' | 'governanca';
@@ -51,10 +52,10 @@ export const tracks: TrackPresentation[] = [
     'assistencial',
     {
       title: 'Operação',
-      subtitle: 'Agentes como camada de cuidado contínuo e experiência',
-      author: baseMeta.author,
+      subtitle: presentationOperacaoMeta.subtitle,
+      author: presentationOperacaoMeta.author,
     },
-    sharedSteps,
+    operacaoSteps,
   ),
   makeTrack(
     'dados',

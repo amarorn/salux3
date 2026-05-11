@@ -56,6 +56,16 @@ export interface StepContent {
   bulletSplitAfter?: number;
   /** Highlight step: frase de atenção exibida com pulso após o body principal. */
   attentionPhrase?: string;
+  /** Trilha Operação: headline grande + bullets como chips animados (pain points). */
+  painPointsLayout?: boolean;
+  /** Substitui chips inline por botão central que abre balão flutuante com os tópicos. */
+  painPointsBalloon?: boolean;
+  /** Rótulo do botão que abre o balão flutuante (default: "Abrir os 7 pontos"). */
+  painPointsTriggerLabel?: string;
+  /** Título exibido no balão flutuante (default: "Onde o atrito aparece"). */
+  painPointsBalloonTitle?: string;
+  /** Pergunta de fechamento destacada ao final do card (CTA reflexivo). */
+  closingQuestion?: string;
 }
 
 export interface PresentationStep {
