@@ -22,6 +22,7 @@ export function NarrativeStep({ step, active }: Props) {
   const useBalloon = painPoints && step.content.painPointsBalloon;
   const [balloonOpen, setBalloonOpen] = useState(false);
   const [tracerActive, setTracerActive] = useState(false);
+  const [impactActive, setImpactActive] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   // Fecha o balão e reseta o tracer quando o slide deixa de estar ativo
@@ -29,15 +30,28 @@ export function NarrativeStep({ step, active }: Props) {
     if (!active) {
       setBalloonOpen(false);
       setTracerActive(false);
+      setImpactActive(false);
     }
   }, [active]);
 
-  // Dispara o tracer automaticamente ao entrar no slide (uma vez por visita)
-  useEffect(() => {
-    if (!active || !useBalloon || balloonOpen || tracerActive || reduceMotion) return;
-    const t = window.setTimeout(() => setTracerActive(true), 1500);
-    return () => window.clearTimeout(t);
-  }, [active, useBalloon, balloonOpen, tracerActive, reduceMotion]);
+  const handleTriggerClick = () => {
+    if (reduceMotion) {
+      setBalloonOpen(true);
+      return;
+    }
+    if (tracerActive || balloonOpen) return;
+    setTracerActive(true);
+  };
+
+  const handleTracerArrive = () => {
+    setTracerActive(false);
+    setImpactActive(true);
+    // Pequeno atraso para o impacto antes do balão abrir
+    window.setTimeout(() => {
+      setImpactActive(false);
+      setBalloonOpen(true);
+    }, 320);
+  };
 
   // ESC fecha o balão
   useEffect(() => {
@@ -165,9 +179,10 @@ export function NarrativeStep({ step, active }: Props) {
               ref={triggerRef}
               label={step.content.painPointsTriggerLabel ?? 'Abrir os 7 pontos'}
               accentColor={accent.base}
-              onClick={() => setBalloonOpen(true)}
+              onClick={handleTriggerClick}
               reducedMotion={Boolean(reduceMotion)}
               charged={tracerActive && !balloonOpen}
+              impact={impactActive}
             />
           </motion.div>
         )}
@@ -249,11 +264,14 @@ export function NarrativeStep({ step, active }: Props) {
             key="tracer"
             targetRef={triggerRef}
             accentColor={accent.base}
-            onArrive={() => {
-              setTracerActive(false);
-              setBalloonOpen(true);
-            }}
+            onArrive={handleTracerArrive}
           />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {useBalloon && impactActive && (
+          <ImpactBurst key="impact" targetRef={triggerRef} accentColor={accent.base} />
         )}
       </AnimatePresence>
 
@@ -280,12 +298,17 @@ interface BalloonTriggerProps {
   onClick: () => void;
   reducedMotion: boolean;
   charged?: boolean;
+  impact?: boolean;
 }
 
 const BalloonTrigger = forwardRef<HTMLButtonElement, BalloonTriggerProps>(function BalloonTrigger(
-  { label, accentColor, onClick, reducedMotion, charged },
+  { label, accentColor, onClick, reducedMotion, charged, impact },
   ref,
 ) {
+  const idleShadow = `0 0 0 1px ${accentColor}33, 0 12px 32px -10px ${accentColor}60, inset 0 1px 0 rgba(255,255,255,0.08)`;
+  const chargedShadow = `0 0 0 2px ${accentColor}, 0 18px 48px -8px ${accentColor}, inset 0 1px 0 rgba(255,255,255,0.12)`;
+  const impactShadow = `0 0 0 6px ${accentColor}99, 0 0 48px 12px ${accentColor}, inset 0 1px 0 rgba(255,255,255,0.4)`;
+
   return (
     <motion.button
       ref={ref}
@@ -296,22 +319,32 @@ const BalloonTrigger = forwardRef<HTMLButtonElement, BalloonTriggerProps>(functi
         onClick();
       }}
       whileHover={
-        reducedMotion ? undefined : { scale: 1.03, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }
+        reducedMotion || charged || impact
+          ? undefined
+          : { scale: 1.03, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }
       }
       whileTap={reducedMotion ? undefined : { scale: 0.97 }}
       animate={
-        charged && !reducedMotion
+        impact && !reducedMotion
           ? {
-              boxShadow: [
-                `0 0 0 1px ${accentColor}33, 0 12px 32px -10px ${accentColor}60, inset 0 1px 0 rgba(255,255,255,0.08)`,
-                `0 0 0 2px ${accentColor}, 0 18px 48px -8px ${accentColor}, inset 0 1px 0 rgba(255,255,255,0.12)`,
-                `0 0 0 1px ${accentColor}33, 0 12px 32px -10px ${accentColor}60, inset 0 1px 0 rgba(255,255,255,0.08)`,
-              ],
-              scale: [1, 1.04, 1],
+              boxShadow: [chargedShadow, impactShadow, idleShadow],
+              scale: [1, 1.18, 1],
+              x: [0, -3, 3, -2, 2, 0],
             }
-          : undefined
+          : charged && !reducedMotion
+            ? {
+                boxShadow: [idleShadow, chargedShadow, idleShadow],
+                scale: [1, 1.04, 1],
+              }
+            : undefined
       }
-      transition={charged ? { duration: 1.2, ease: 'easeInOut', repeat: Infinity } : undefined}
+      transition={
+        impact
+          ? { duration: 0.32, ease: [0.4, 0, 0.2, 1] }
+          : charged
+            ? { duration: 1.2, ease: 'easeInOut', repeat: Infinity }
+            : undefined
+      }
       className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full border px-6 py-3 text-[0.95rem] font-semibold tracking-wide text-white"
       style={{
         borderColor: `${accentColor}77`,
@@ -350,6 +383,94 @@ const BalloonTrigger = forwardRef<HTMLButtonElement, BalloonTriggerProps>(functi
     </motion.button>
   );
 });
+
+interface ImpactBurstProps {
+  targetRef: RefObject<HTMLElement>;
+  accentColor: string;
+}
+
+function ImpactBurst({ targetRef, accentColor }: ImpactBurstProps) {
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    if (!targetRef.current) return;
+    const rect = targetRef.current.getBoundingClientRect();
+    setPos({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+  }, [targetRef]);
+
+  if (typeof document === 'undefined' || !pos) return null;
+
+  const ripples = [0, 0.07, 0.14];
+
+  return createPortal(
+    <div
+      className="pointer-events-none fixed inset-0 z-[75]"
+      data-no-click-advance
+      style={{ overflow: 'hidden' }}
+    >
+      {/* Flash branco */}
+      <motion.div
+        className="absolute h-3 w-3 rounded-full"
+        style={{
+          top: pos.y,
+          left: pos.x,
+          translate: '-50% -50%',
+          background: `radial-gradient(circle, #ffffff 0%, ${accentColor} 35%, transparent 70%)`,
+        }}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: [0, 1, 0], scale: [0, 8, 14] }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1], times: [0, 0.3, 1] }}
+      />
+
+      {/* Ondas de choque */}
+      {ripples.map((delay, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full border-2"
+          style={{
+            top: pos.y,
+            left: pos.x,
+            translate: '-50% -50%',
+            borderColor: accentColor,
+            boxShadow: `0 0 24px ${accentColor}, inset 0 0 16px ${accentColor}55`,
+          }}
+          initial={{ width: 8, height: 8, opacity: 0.9 }}
+          animate={{ width: 360 + i * 80, height: 360 + i * 80, opacity: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.7, delay, ease: [0.2, 0.8, 0.2, 1] }}
+        />
+      ))}
+
+      {/* Estilhaços/raios curtos */}
+      {Array.from({ length: 8 }).map((_, i) => {
+        const angle = (i / 8) * Math.PI * 2;
+        const dx = Math.cos(angle) * 90;
+        const dy = Math.sin(angle) * 90;
+        return (
+          <motion.span
+            key={`spark-${i}`}
+            className="absolute h-[3px] w-3 rounded-full"
+            style={{
+              top: pos.y,
+              left: pos.x,
+              translate: '-50% -50%',
+              background: accentColor,
+              boxShadow: `0 0 12px ${accentColor}`,
+              transformOrigin: 'left center',
+              rotate: `${(angle * 180) / Math.PI}deg`,
+            }}
+            initial={{ opacity: 1, x: 0, y: 0, scaleX: 0.2 }}
+            animate={{ opacity: [1, 1, 0], x: dx, y: dy, scaleX: [0.2, 2, 0.6] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1], times: [0, 0.5, 1] }}
+          />
+        );
+      })}
+    </div>,
+    document.body,
+  );
+}
 
 interface TracerParticleProps {
   targetRef: RefObject<HTMLElement>;
