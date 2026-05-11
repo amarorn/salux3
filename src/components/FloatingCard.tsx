@@ -67,7 +67,7 @@ export function FloatingCard({
         initial={layerInitial}
         animate={layerAnimate}
         className={clsx(
-          'relative h-[260px] w-full shrink-0 overflow-hidden rounded-3xl border border-white/10 transition-[border-color,box-shadow] duration-500 ease-out',
+          'relative h-[460px] w-full shrink-0 overflow-hidden rounded-3xl border border-white/10 transition-[border-color,box-shadow] duration-500 ease-out',
           active
             ? 'border-white/20 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]'
             : 'shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)] group-hover:-translate-y-1 group-hover:border-white/16',
@@ -104,7 +104,7 @@ export function FloatingCard({
         initial={layerInitial}
         animate={layerAnimate}
         className={clsx(
-          'relative w-full overflow-hidden rounded-3xl border border-white/10 bg-[#0d1018] p-8 transition-[border-color,box-shadow] duration-500 ease-out',
+          'relative w-full min-h-[900px] overflow-hidden rounded-3xl border border-white/10 bg-[#0d1018] p-12 transition-[border-color,box-shadow] duration-500 ease-out',
           active
             ? 'border-white/20 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.08)]'
             : 'shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.05)] group-hover:-translate-y-1 group-hover:border-white/16',

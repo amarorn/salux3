@@ -12,8 +12,9 @@ import { ClosingStep } from './steps/ClosingStep';
 import { FloatingCardContext } from './FloatingCard';
 
 /** Largura unificada para todos os cards de todas as trilhas (independente do tipo do step).
- *  Layout vertical: foto como banner no topo, conteúdo abaixo. */
-const UNIFIED_CARD_WIDTH = 720;
+ *  Layout vertical: foto como banner no topo, conteúdo abaixo.
+ *  Stage 1080×1920 — 920px ≈ 85% da largura, dando respiração lateral. */
+const UNIFIED_CARD_WIDTH = 920;
 
 function flipFromId(id: string): boolean {
   let h = 0;
