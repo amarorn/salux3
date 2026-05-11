@@ -117,5 +117,75 @@ export const operacaoSteps: PresentationStep[] = cloneSteps(baseSteps)
     };
   }
 
+  if (s.id === 'integration') {
+    return {
+      ...s,
+      kind: 'highlight',
+      title: 'O modelo atual ainda cresce por acúmulo.',
+      subtitle: 'Crescer por adição vs. crescer por arquitetura',
+      content: {
+        headline: 'Crescimento por acúmulo',
+        body:
+          'Adiciona. Integra. Adapta. Ajusta. Compensa.\nNo curto prazo, funciona. No médio prazo, cria peso.\n\nCada nova frente exige nova costura. Cada nova unidade exige novos ajustes. Cada novo serviço aumenta dependências. Cada novo volume pressiona equipe, diagnóstico, atendimento e controle.\n\nAté 80% do gasto de TI pode ser consumido por operação e manutenção em ambientes intensivos em legado.',
+        attentionPhrase: 'Quando a base é pesada, crescer custa mais antes mesmo de começar.',
+      },
+    };
+  }
+
+  if (s.id === 'governance') {
+    return {
+      ...s,
+      kind: 'highlight',
+      title: 'Que base permite crescer sem multiplicar complexidade?',
+      subtitle: 'Da pergunta sobre sistema para a pergunta sobre base',
+      content: {
+        headline: 'Virada da pergunta',
+        body:
+          'A pergunta deixa de ser: qual sistema precisamos adicionar?\nE passa a ser: que base permite crescer sem multiplicar complexidade?\n\n12 a 24 meses podem ser necessários em implementações hospitalares amplas. A expansão não espera ciclos pesados de implantação.\n\nA inovação real não está em adicionar mais camadas. Está em remover fricção para que a instituição cresça com mais controle.',
+        attentionPhrase: 'Crescer por arquitetura é diferente de crescer por acúmulo.',
+      },
+    };
+  }
+
+  if (s.id === 'roadmap') {
+    return {
+      ...s,
+      title: 'Isso não se resolve com uma solução isolada.',
+      subtitle: 'Capacidades coordenadas que sustentam a escala',
+      content: {
+        headline: 'Capacidades coordenadas',
+        bullets: [
+          'Base digital da operação',
+          'Capilaridade assistencial',
+          'Continuidade diagnóstica',
+          'Gestão da força de trabalho',
+          'Governança documental',
+          'Controle econômico',
+          'Áreas críticas',
+          'Inteligência em tempo real',
+        ],
+        body:
+          'Esses elementos não podem operar como ilhas.\nEles precisam funcionar como capacidades coordenadas.\n\nCrescer com controle exige que dados, processos, equipes, diagnóstico, cuidado e decisão operem sobre uma mesma lógica.',
+      },
+    };
+  }
+
+  if (s.id === 'closing') {
+    return {
+      ...s,
+      title: 'Sua instituição está crescendo por arquitetura ou por acúmulo?',
+      subtitle: 'Ecossistema Salux — a base para uma nova forma de operar a saúde',
+      content: {
+        headline: 'Encerramento',
+        body:
+          'Esse movimento pode começar pelo ponto onde a expansão hoje gera mais atrito.\n\nUma nova unidade. Uma nova especialidade. Um gargalo diagnóstico. Uma dificuldade de integração. Um desafio de equipe. Uma frente fora da estrutura física. Uma perda de previsibilidade econômica.\n\nMas o impacto real acontece quando esses pontos deixam de ser tratados isoladamente e passam a funcionar como parte de uma mesma arquitetura de crescimento.',
+        meta: {
+          Próximo: 'Workshop de descoberta · 2 horas',
+          Contato: 'salux@beanalytic.com.br',
+        },
+      },
+    };
+  }
+
   return s;
 });
