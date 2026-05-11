@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { forwardRef, useContext, useEffect, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { FloatingCard, FloatingCardContext } from '../FloatingCard';
@@ -21,11 +21,23 @@ export function NarrativeStep({ step, active }: Props) {
   const painPoints = step.content.painPointsLayout;
   const useBalloon = painPoints && step.content.painPointsBalloon;
   const [balloonOpen, setBalloonOpen] = useState(false);
+  const [tracerActive, setTracerActive] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Fecha o balão quando o slide deixa de estar ativo
+  // Fecha o balão e reseta o tracer quando o slide deixa de estar ativo
   useEffect(() => {
-    if (!active) setBalloonOpen(false);
+    if (!active) {
+      setBalloonOpen(false);
+      setTracerActive(false);
+    }
   }, [active]);
+
+  // Dispara o tracer automaticamente ao entrar no slide (uma vez por visita)
+  useEffect(() => {
+    if (!active || !useBalloon || balloonOpen || tracerActive || reduceMotion) return;
+    const t = window.setTimeout(() => setTracerActive(true), 1500);
+    return () => window.clearTimeout(t);
+  }, [active, useBalloon, balloonOpen, tracerActive, reduceMotion]);
 
   // ESC fecha o balão
   useEffect(() => {
@@ -150,10 +162,12 @@ export function NarrativeStep({ step, active }: Props) {
         {useBalloon && step.content.bullets && step.content.bullets.length > 0 && (
           <motion.div variants={item} className="flex justify-center py-3">
             <BalloonTrigger
+              ref={triggerRef}
               label={step.content.painPointsTriggerLabel ?? 'Abrir os 7 pontos'}
               accentColor={accent.base}
               onClick={() => setBalloonOpen(true)}
               reducedMotion={Boolean(reduceMotion)}
+              charged={tracerActive && !balloonOpen}
             />
           </motion.div>
         )}
@@ -230,6 +244,20 @@ export function NarrativeStep({ step, active }: Props) {
       </motion.div>
 
       <AnimatePresence>
+        {useBalloon && tracerActive && !balloonOpen && (
+          <TracerParticle
+            key="tracer"
+            targetRef={triggerRef}
+            accentColor={accent.base}
+            onArrive={() => {
+              setTracerActive(false);
+              setBalloonOpen(true);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
         {useBalloon && balloonOpen && step.content.bullets && (
           <PainPointsBalloon
             title={step.content.painPointsBalloonTitle ?? 'Pontos de atrito'}
@@ -237,6 +265,7 @@ export function NarrativeStep({ step, active }: Props) {
             bullets={step.content.bullets}
             accentColor={accent.base}
             reducedMotion={Boolean(reduceMotion)}
+            originRef={triggerRef}
             onClose={() => setBalloonOpen(false)}
           />
         )}
@@ -250,11 +279,16 @@ interface BalloonTriggerProps {
   accentColor: string;
   onClick: () => void;
   reducedMotion: boolean;
+  charged?: boolean;
 }
 
-function BalloonTrigger({ label, accentColor, onClick, reducedMotion }: BalloonTriggerProps) {
+const BalloonTrigger = forwardRef<HTMLButtonElement, BalloonTriggerProps>(function BalloonTrigger(
+  { label, accentColor, onClick, reducedMotion, charged },
+  ref,
+) {
   return (
     <motion.button
+      ref={ref}
       type="button"
       data-no-click-advance
       onClick={(e) => {
@@ -265,6 +299,19 @@ function BalloonTrigger({ label, accentColor, onClick, reducedMotion }: BalloonT
         reducedMotion ? undefined : { scale: 1.03, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }
       }
       whileTap={reducedMotion ? undefined : { scale: 0.97 }}
+      animate={
+        charged && !reducedMotion
+          ? {
+              boxShadow: [
+                `0 0 0 1px ${accentColor}33, 0 12px 32px -10px ${accentColor}60, inset 0 1px 0 rgba(255,255,255,0.08)`,
+                `0 0 0 2px ${accentColor}, 0 18px 48px -8px ${accentColor}, inset 0 1px 0 rgba(255,255,255,0.12)`,
+                `0 0 0 1px ${accentColor}33, 0 12px 32px -10px ${accentColor}60, inset 0 1px 0 rgba(255,255,255,0.08)`,
+              ],
+              scale: [1, 1.04, 1],
+            }
+          : undefined
+      }
+      transition={charged ? { duration: 1.2, ease: 'easeInOut', repeat: Infinity } : undefined}
       className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full border px-6 py-3 text-[0.95rem] font-semibold tracking-wide text-white"
       style={{
         borderColor: `${accentColor}77`,
@@ -302,6 +349,85 @@ function BalloonTrigger({ label, accentColor, onClick, reducedMotion }: BalloonT
       />
     </motion.button>
   );
+});
+
+interface TracerParticleProps {
+  targetRef: RefObject<HTMLElement>;
+  accentColor: string;
+  onArrive: () => void;
+}
+
+function TracerParticle({ targetRef, accentColor, onArrive }: TracerParticleProps) {
+  const [path, setPath] = useState<{ x: number[]; y: number[] } | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !targetRef.current) {
+      onArrive();
+      return;
+    }
+    const rect = targetRef.current.getBoundingClientRect();
+    const endX = rect.left + rect.width / 2;
+    const endY = rect.top + rect.height / 2;
+
+    // Spawn de um dos cantos superiores aleatoriamente
+    const fromLeft = Math.random() < 0.5;
+    const startX = fromLeft ? window.innerWidth * 0.08 : window.innerWidth * 0.92;
+    const startY = window.innerHeight * (0.08 + Math.random() * 0.14);
+
+    // Ponto de curvatura intermediária (arc poético)
+    const midX = startX * 0.4 + endX * 0.6 + (fromLeft ? -40 : 40);
+    const midY = (startY + endY) / 2 - 80;
+
+    setPath({ x: [startX, midX, endX], y: [startY, midY, endY] });
+
+    const t = window.setTimeout(onArrive, 1500);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (typeof document === 'undefined' || !path) return null;
+
+  return createPortal(
+    <div className="pointer-events-none fixed inset-0 z-[70]" data-no-click-advance>
+      <motion.div
+        className="absolute"
+        style={{ top: 0, left: 0 }}
+        initial={{ x: path.x[0], y: path.y[0], opacity: 0 }}
+        animate={{
+          x: path.x,
+          y: path.y,
+          opacity: [0, 1, 1, 1, 0.2],
+        }}
+        exit={{ opacity: 0, transition: { duration: 0.2 } }}
+        transition={{
+          duration: 1.5,
+          ease: [0.6, 0, 0.25, 1],
+          times: [0, 0.15, 0.5, 0.85, 1],
+        }}
+      >
+        {/* Núcleo brilhante */}
+        <motion.span
+          className="absolute -left-2 -top-2 block h-4 w-4 rounded-full"
+          style={{
+            background: accentColor,
+            boxShadow: `0 0 24px ${accentColor}, 0 0 64px ${accentColor}88, 0 0 120px ${accentColor}44`,
+          }}
+          animate={{ scale: [0.4, 1.1, 1, 1.4, 0.6] }}
+          transition={{ duration: 1.5, ease: [0.6, 0, 0.25, 1], times: [0, 0.18, 0.5, 0.88, 1] }}
+        />
+        {/* Halo externo */}
+        <motion.span
+          className="absolute -left-6 -top-6 block h-12 w-12 rounded-full"
+          style={{
+            background: `radial-gradient(circle, ${accentColor}55 0%, ${accentColor}22 35%, transparent 70%)`,
+          }}
+          animate={{ scale: [0.6, 1, 0.9, 1.8, 0.4], opacity: [0, 0.9, 0.85, 0.6, 0] }}
+          transition={{ duration: 1.5, ease: [0.6, 0, 0.25, 1] }}
+        />
+      </motion.div>
+    </div>,
+    document.body,
+  );
 }
 
 interface PainPointsBalloonProps {
@@ -310,6 +436,7 @@ interface PainPointsBalloonProps {
   bullets: string[];
   accentColor: string;
   reducedMotion: boolean;
+  originRef?: RefObject<HTMLElement>;
   onClose: () => void;
 }
 
@@ -319,8 +446,19 @@ function PainPointsBalloon({
   bullets,
   accentColor,
   reducedMotion,
+  originRef,
   onClose,
 }: PainPointsBalloonProps) {
+  // Calcula a posição inicial do balão a partir do botão de origem (centro relativo)
+  const origin = (() => {
+    if (typeof window === 'undefined' || !originRef?.current) return { dx: 0, dy: 0 };
+    const rect = originRef.current.getBoundingClientRect();
+    const originX = rect.left + rect.width / 2;
+    const originY = rect.top + rect.height / 2;
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    return { dx: originX - centerX, dy: originY - centerY };
+  })();
   const list = {
     hidden: {},
     visible: {
@@ -367,10 +505,18 @@ function PainPointsBalloon({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        initial={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.86, y: 16, filter: 'blur(10px)' }}
-        animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
-        exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 8, filter: 'blur(8px)' }}
-        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        initial={
+          reducedMotion
+            ? { opacity: 0 }
+            : { opacity: 0, scale: 0.02, x: origin.dx, y: origin.dy, filter: 'blur(14px)' }
+        }
+        animate={{ opacity: 1, scale: 1, x: 0, y: 0, filter: 'blur(0px)' }}
+        exit={
+          reducedMotion
+            ? { opacity: 0 }
+            : { opacity: 0, scale: 0.94, y: 8, filter: 'blur(8px)', transition: { duration: 0.35 } }
+        }
+        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
         className="relative w-full max-w-[820px] overflow-hidden rounded-[28px] border bg-[#0b0f18]/95 p-10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)]"
         style={{
           borderColor: `${accentColor}55`,
