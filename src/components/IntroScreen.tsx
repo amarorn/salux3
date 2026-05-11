@@ -13,6 +13,7 @@ import { IntroEnergyLayer } from './intro/IntroEnergyLayer';
 import { SaluxLogo } from './intro/SaluxLogo';
 import { tracks } from '@/domain/tracks';
 import type { TrackPresentation, TrackId } from '@/domain/tracks';
+import { StageAspectPicker } from './StageAspectPicker';
 import { usePresentationStore } from '@/store/presentationStore';
 import { theme } from '@/domain/theme';
 import type { Accent } from '@/domain/types';
@@ -97,6 +98,10 @@ export function IntroScreen() {
       style={{ left: '-1px', top: '1px' }}
     >
       {!reduceMotion && <CustomCursor />}
+
+      <div className="pointer-events-auto absolute left-6 top-24 z-20 sm:left-8 sm:top-28">
+        <StageAspectPicker />
+      </div>
 
       <IntroEnergyLayer
         highlightedTrackIndex={highlightedTrackIndex}

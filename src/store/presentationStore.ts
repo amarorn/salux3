@@ -1,5 +1,19 @@
 import { create } from 'zustand';
 import { tracksById, type TrackId } from '@/domain/tracks';
+import type { StageAspectMode } from '@/domain/stageAspect';
+
+const STAGE_ASPECT_STORAGE_KEY = 'salux-stage-aspect';
+
+function readStoredStageAspect(): StageAspectMode {
+  if (typeof window === 'undefined') return 'totem';
+  try {
+    const raw = localStorage.getItem(STAGE_ASPECT_STORAGE_KEY);
+    if (raw === 'totem' || raw === 'presentation') return raw;
+  } catch {
+    /* ignore */
+  }
+  return 'totem';
+}
 
 type TransitionPhase = 'idle' | 'morphing' | 'done';
 
@@ -12,7 +26,10 @@ interface PresentationState {
   transitionPhase: TransitionPhase;
   /** Slides governance com `revealPillars`: primeiro clique expande em vez de avançar. */
   governanceRevealExpanded: boolean;
+  /** Totem vertical (9:16) ou tela de apresentação (16:9). Afeta escala do palco e câmera. */
+  stageAspectMode: StageAspectMode;
   setGovernanceRevealExpanded: (value: boolean) => void;
+  setStageAspectMode: (mode: StageAspectMode) => void;
   setTrack: (id: TrackId) => void;
   setShowCornerLogo: (value: boolean) => void;
   setStep: (id: string) => void;
@@ -47,7 +64,16 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
   showCornerLogo: false,
   transitionPhase: 'idle',
   governanceRevealExpanded: false,
+  stageAspectMode: readStoredStageAspect(),
   setGovernanceRevealExpanded: (value) => set({ governanceRevealExpanded: value }),
+  setStageAspectMode: (mode) => {
+    try {
+      localStorage.setItem(STAGE_ASPECT_STORAGE_KEY, mode);
+    } catch {
+      /* ignore */
+    }
+    set({ stageAspectMode: mode });
+  },
   setTrack: (id) => {
     const firstId = firstIdForTrack(id);
     set({ currentTrackId: id, currentStepId: firstId, isOverview: false, governanceRevealExpanded: false });

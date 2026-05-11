@@ -1,12 +1,12 @@
 import type { ViewportSize } from '@/domain/types';
-import { STAGE_HEIGHT, STAGE_WIDTH } from '@/components/Stage';
+import { dimensionsForStageAspect } from '@/domain/stageAspect';
+import { usePresentationStore } from '@/store/presentationStore';
 
 /**
- * Retorna o tamanho do palco da apresentação. A apresentação roda dentro
- * de um `<Stage>` de dimensões fixas (1080×1920) escalado para preencher
- * a janela; toda a matemática de câmera, parallax e nodes deve raciocinar
- * nesse sistema de coordenadas, não no `window.innerWidth/Height`.
+ * Tamanho do palco da apresentação no sistema de coordenadas internas.
+ * Segue o modo Totem (1080×1920) ou PS (1920×1080) escolhido no intro.
  */
 export function useViewportSize(): ViewportSize {
-  return { width: STAGE_WIDTH, height: STAGE_HEIGHT };
+  const mode = usePresentationStore((s) => s.stageAspectMode);
+  return dimensionsForStageAspect(mode);
 }
