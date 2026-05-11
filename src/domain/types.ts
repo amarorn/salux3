@@ -7,7 +7,35 @@ export type NodeKind =
   | 'governance'
   | 'roadmap'
   | 'highlight'
+  | 'capacities'
+  | 'pathways'
+  | 'agents-flow'
+  | 'results'
   | 'closing';
+
+export interface CapacityItem {
+  name: string;
+  subtitle: string;
+  description?: string;
+  tagline: string;
+}
+
+export interface CapacityGroup {
+  title: string;
+  tone: 'core' | 'support';
+  items: CapacityItem[];
+}
+
+export interface PathwayItem {
+  pain: string;
+  product: string;
+}
+
+export interface EvidenceCard {
+  label?: string;
+  text: string;
+  metric?: string;
+}
 
 export type Accent = 'violet' | 'cyan' | 'emerald' | 'amber' | 'rose' | 'slate';
 
@@ -56,8 +84,12 @@ export interface StepContent {
   bulletSplitAfter?: number;
   /** Highlight step: frase de atenção exibida com pulso após o body principal. */
   attentionPhrase?: string;
+  /** Highlight step: insere visual "camadas acumuladas → base coordenada" antes da frase de atenção. */
+  layersToBase?: boolean;
   /** Trilha Operação: headline grande + bullets como chips animados (pain points). */
   painPointsLayout?: boolean;
+  /** Camadas decorativas atrás dos chips: 'stacked' (acúmulo) | 'web' (teia tensa). */
+  painPointsBackdrop?: 'stacked' | 'web';
   /** Substitui chips inline por botão central que abre balão flutuante com os tópicos. */
   painPointsBalloon?: boolean;
   /** Rótulo do botão que abre o balão flutuante (default: "Abrir os 7 pontos"). */
@@ -66,6 +98,21 @@ export interface StepContent {
   painPointsBalloonTitle?: string;
   /** Pergunta de fechamento destacada ao final do card (CTA reflexivo). */
   closingQuestion?: string;
+  /** Frases curtas a serem renderizadas como blocos de destaque verde (suporte/release). */
+  highlightPhrases?: string[];
+  /** Card de evidência com glow e métrica. */
+  evidenceCard?: EvidenceCard;
+  /** Frase de fechamento de tela em destaque ciano (call-out final do card). */
+  closingHighlight?: string;
+  /** Card 8 — capacidades centrais e de sustentação. */
+  capacityGroups?: CapacityGroup[];
+  /** Card 9 — caminhos: dor → produto. */
+  pathways?: PathwayItem[];
+  /** Card 10 — comparação antes/com INITIA + funções dos agentes. */
+  beforeAfter?: { before: string[]; after: string[] };
+  agentFunctions?: string[];
+  /** Card 11 — cards de resultados. */
+  resultsCards?: string[];
 }
 
 export interface PresentationStep {

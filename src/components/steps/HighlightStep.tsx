@@ -4,10 +4,86 @@ import { FloatingCard, FloatingCardContext } from '../FloatingCard';
 import type { PresentationStep } from '@/domain/types';
 import { theme } from '@/domain/theme';
 import { getCardTextVariants } from './cardTextMotion';
+import { ClosingHighlight, EvidenceCardBlock } from './HighlightBlocks';
 
 interface Props {
   step: PresentationStep;
   active: boolean;
+}
+
+/** Visual "camadas acumuladas → base coordenada": pilha desalinhada que se alinha sobre uma base luminosa. */
+function LayersToBase({
+  color,
+  reduce,
+  active,
+}: {
+  color: string;
+  reduce: boolean;
+  active: boolean;
+}) {
+  const layers = [0, 1, 2, 3, 4];
+  return (
+    <div
+      aria-hidden
+      className="relative overflow-hidden rounded-xl border px-5 py-4"
+      style={{
+        borderColor: `${color}33`,
+        background: `linear-gradient(135deg, ${color}10 0%, rgba(255,255,255,0.02) 100%)`,
+      }}
+    >
+      <div className="flex items-end justify-between gap-3">
+        <span className="text-[10px] uppercase tracking-[0.28em] text-white/45">
+          Camadas acumuladas
+        </span>
+        <span className="text-[10px] uppercase tracking-[0.28em]" style={{ color }}>
+          Base coordenada
+        </span>
+      </div>
+      <div className="relative mt-3 h-12">
+        {layers.map((i) => (
+          <motion.span
+            key={i}
+            className="absolute left-0 right-0 rounded-md"
+            style={{
+              height: 4,
+              background: `linear-gradient(90deg, rgba(255,255,255,0.18), ${color}55)`,
+              boxShadow: `inset 0 0 0 1px ${color}22`,
+            }}
+            initial={
+              reduce
+                ? false
+                : { top: i * 6, x: i % 2 === 0 ? -8 : 8, opacity: 0.5, scaleX: 0.9 }
+            }
+            animate={
+              active
+                ? { top: 18, x: 0, opacity: 1, scaleX: 1 }
+                : reduce
+                  ? undefined
+                  : { top: i * 6, x: i % 2 === 0 ? -8 : 8, opacity: 0.5, scaleX: 0.9 }
+            }
+            transition={{
+              duration: 0.85,
+              delay: 0.4 + i * 0.08,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          />
+        ))}
+        <motion.span
+          className="absolute inset-x-0 bottom-0 h-[3px] rounded-full"
+          style={{ background: color, boxShadow: `0 0 16px ${color}` }}
+          initial={reduce ? false : { scaleX: 0.3, opacity: 0 }}
+          animate={
+            active
+              ? { scaleX: 1, opacity: 1 }
+              : reduce
+                ? undefined
+                : { scaleX: 0.3, opacity: 0 }
+          }
+          transition={{ duration: 0.6, delay: 1.0, ease: [0.22, 1, 0.36, 1] }}
+        />
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -78,6 +154,22 @@ export function HighlightStep({ step, active }: Props) {
           </motion.p>
         )}
 
+        {step.content.layersToBase && (
+          <motion.div variants={item}>
+            <LayersToBase color={accent.base} reduce={Boolean(reduceMotion)} active={active} />
+          </motion.div>
+        )}
+
+        {step.content.evidenceCard && (
+          <motion.div variants={item}>
+            <EvidenceCardBlock
+              card={step.content.evidenceCard}
+              active={active}
+              accentColor={accent.base}
+            />
+          </motion.div>
+        )}
+
         {attention && (
           <motion.div
             variants={item}
@@ -119,6 +211,12 @@ export function HighlightStep({ step, active }: Props) {
             >
               {attention}
             </p>
+          </motion.div>
+        )}
+
+        {step.content.closingHighlight && (
+          <motion.div variants={item}>
+            <ClosingHighlight text={step.content.closingHighlight} active={active} />
           </motion.div>
         )}
       </motion.div>

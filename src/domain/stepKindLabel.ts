@@ -11,6 +11,10 @@ export function stepKindLabel(kind: NodeKind): string {
     governance: 'Governança',
     roadmap: 'Roadmap',
     highlight: 'Destaque',
+    capacities: 'Capacidades',
+    pathways: 'Caminhos',
+    'agents-flow': 'Agentes',
+    results: 'Resultado',
     closing: 'Encerramento',
   };
   return map[kind];

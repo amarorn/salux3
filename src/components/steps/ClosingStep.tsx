@@ -4,6 +4,7 @@ import { ArrowRight, Orbit } from 'lucide-react';
 import { FloatingCard, FloatingCardContext } from '../FloatingCard';
 import type { PresentationStep } from '@/domain/types';
 import { getCardTextVariants } from './cardTextMotion';
+import { HighlightPhraseList } from './HighlightBlocks';
 import { usePresentationStore } from '@/store/presentationStore';
 import { resolveContactFormUrl } from '@/config/contact';
 
@@ -45,6 +46,12 @@ export function ClosingStep({ step, active }: Props) {
         <motion.p variants={item} className="text-base leading-relaxed text-slate-200 whitespace-pre-line">
           {step.content.body}
         </motion.p>
+
+        {step.content.highlightPhrases && step.content.highlightPhrases.length > 0 && (
+          <motion.div variants={item}>
+            <HighlightPhraseList items={step.content.highlightPhrases} active={active} />
+          </motion.div>
+        )}
 
         <motion.div
           variants={item}
