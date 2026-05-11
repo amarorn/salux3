@@ -495,11 +495,8 @@ function TracerParticle({ targetRef, accentColor, onArrive }: TracerParticleProp
     const startX = fromLeft ? window.innerWidth * 0.08 : window.innerWidth * 0.92;
     const startY = window.innerHeight * (0.08 + Math.random() * 0.14);
 
-    // Ponto de curvatura intermediária (arc poético)
-    const midX = startX * 0.4 + endX * 0.6 + (fromLeft ? -40 : 40);
-    const midY = (startY + endY) / 2 - 80;
-
-    setPath({ x: [startX, midX, endX], y: [startY, midY, endY] });
+    // Trajetória reta para velocidade constante
+    setPath({ x: [startX, endX], y: [startY, endY] });
 
     const t = window.setTimeout(onArrive, 1500);
     return () => window.clearTimeout(t);
@@ -513,37 +510,40 @@ function TracerParticle({ targetRef, accentColor, onArrive }: TracerParticleProp
       <motion.div
         className="absolute"
         style={{ top: 0, left: 0 }}
-        initial={{ x: path.x[0], y: path.y[0], opacity: 0 }}
+        initial={{ x: path.x[0], y: path.y[0] }}
         animate={{
           x: path.x,
           y: path.y,
-          opacity: [0, 1, 1, 1, 0.2],
         }}
-        exit={{ opacity: 0, transition: { duration: 0.2 } }}
+        exit={{ opacity: 0, transition: { duration: 0.18 } }}
         transition={{
           duration: 1.5,
-          ease: [0.6, 0, 0.25, 1],
-          times: [0, 0.15, 0.5, 0.85, 1],
+          ease: 'linear',
         }}
       >
-        {/* Núcleo brilhante */}
-        <motion.span
+        {/* Núcleo brilhante — brilho constante (sem pulse) */}
+        <span
           className="absolute -left-2 -top-2 block h-4 w-4 rounded-full"
           style={{
             background: accentColor,
-            boxShadow: `0 0 24px ${accentColor}, 0 0 64px ${accentColor}88, 0 0 120px ${accentColor}44`,
+            boxShadow: `0 0 24px ${accentColor}, 0 0 64px ${accentColor}aa, 0 0 120px ${accentColor}55`,
           }}
-          animate={{ scale: [0.4, 1.1, 1, 1.4, 0.6] }}
-          transition={{ duration: 1.5, ease: [0.6, 0, 0.25, 1], times: [0, 0.18, 0.5, 0.88, 1] }}
         />
-        {/* Halo externo */}
-        <motion.span
+        {/* Halo externo estável */}
+        <span
           className="absolute -left-6 -top-6 block h-12 w-12 rounded-full"
           style={{
-            background: `radial-gradient(circle, ${accentColor}55 0%, ${accentColor}22 35%, transparent 70%)`,
+            background: `radial-gradient(circle, ${accentColor}66 0%, ${accentColor}22 40%, transparent 72%)`,
           }}
-          animate={{ scale: [0.6, 1, 0.9, 1.8, 0.4], opacity: [0, 0.9, 0.85, 0.6, 0] }}
-          transition={{ duration: 1.5, ease: [0.6, 0, 0.25, 1] }}
+        />
+        {/* Trail/rastro discreto */}
+        <span
+          aria-hidden
+          className="absolute -left-1 -top-1 block h-2 w-2 rounded-full opacity-60"
+          style={{
+            background: `radial-gradient(circle, ${accentColor}, transparent 70%)`,
+            filter: 'blur(2px)',
+          }}
         />
       </motion.div>
     </div>,
