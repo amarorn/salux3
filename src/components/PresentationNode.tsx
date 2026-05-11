@@ -11,8 +11,9 @@ import { RoadmapStep } from './steps/RoadmapStep';
 import { ClosingStep } from './steps/ClosingStep';
 import { FloatingCardContext } from './FloatingCard';
 
-/** Largura unificada para todos os cards de todas as trilhas (independente do tipo do step). */
-const UNIFIED_CARD_WIDTH = 780;
+/** Largura unificada para todos os cards de todas as trilhas (independente do tipo do step).
+ *  Layout vertical: foto como banner no topo, conteúdo abaixo. */
+const UNIFIED_CARD_WIDTH = 720;
 
 function flipFromId(id: string): boolean {
   let h = 0;
