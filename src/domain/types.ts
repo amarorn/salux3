@@ -6,6 +6,7 @@ export type NodeKind =
   | 'integration'
   | 'governance'
   | 'roadmap'
+  | 'highlight'
   | 'closing';
 
 export type Accent = 'violet' | 'cyan' | 'emerald' | 'amber' | 'rose' | 'slate';
@@ -53,6 +54,8 @@ export interface StepContent {
   roadmapTransform?: boolean;
   /** Narrativa: índice após o qual os bullets passam a segunda secção (ex.: verbos vs fricção). */
   bulletSplitAfter?: number;
+  /** Highlight step: frase de atenção exibida com pulso após o body principal. */
+  attentionPhrase?: string;
 }
 
 export interface PresentationStep {
