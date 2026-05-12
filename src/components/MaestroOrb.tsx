@@ -6,9 +6,8 @@ import { theme } from '@/domain/theme';
 import type { NodeKind } from '@/domain/types';
 
 /**
- * Maestro — orbe de luz pulsante que viaja pela tela acompanhando
- * a apresentação. Muda de posição, cor e intensidade conforme o
- * slide ativo, e sussurra uma frase curta a cada transição.
+ * Maestro — orbe mandala com núcleo radiante, anéis orbitais, crosshairs
+ * e ondas senoidais. Viaja pela tela acompanhando o slide ativo.
  */
 
 interface Props {
@@ -28,28 +27,27 @@ const WHISPERS: Record<string, string> = {
   closing: 'Até a próxima.',
 };
 
-/**
- * Posições por kind no sistema de coordenadas do Stage (1080×1920).
- * O Maestro se desloca entre essas paradas conforme navegamos.
- * `whisperSide` controla de que lado o balão de fala aparece.
- */
 const STATIONS: Partial<Record<NodeKind, { x: number; y: number; whisperSide: 'left' | 'right' }>> = {
-  cover:        { x: 540,  y: 1620, whisperSide: 'left' },   // centro-baixo, "presença"
-  narrative:    { x: 940,  y: 1740, whisperSide: 'left' },   // canto inferior direito
-  highlight:    { x: 940,  y: 220,  whisperSide: 'left' },   // alto à direita — "olha aqui!"
-  architecture: { x: 140,  y: 900,  whisperSide: 'right' },  // lado esquerdo, observando
-  journey:      { x: 320,  y: 1780, whisperSide: 'right' },  // base, percorrendo a jornada
-  integration:  { x: 940,  y: 940,  whisperSide: 'left' },   // direita meio — virada
-  governance:   { x: 140,  y: 220,  whisperSide: 'right' },  // canto superior esquerdo
-  roadmap:      { x: 940,  y: 1560, whisperSide: 'left' },   // direita-baixo
-  closing:      { x: 540,  y: 960,  whisperSide: 'right' },  // centro — fechamento
-  results:      { x: 940,  y: 1740, whisperSide: 'left' },
-  capacities:   { x: 140,  y: 900,  whisperSide: 'right' },
-  pathways:     { x: 320,  y: 1780, whisperSide: 'right' },
-  'agents-flow':{ x: 940,  y: 940,  whisperSide: 'left' },
+  cover:        { x: 540,  y: 1660, whisperSide: 'left' },
+  narrative:    { x: 850,  y: 1720, whisperSide: 'left' },
+  highlight:    { x: 850,  y: 240,  whisperSide: 'left' },
+  architecture: { x: 230,  y: 900,  whisperSide: 'right' },
+  journey:      { x: 400,  y: 1760, whisperSide: 'right' },
+  integration:  { x: 850,  y: 960,  whisperSide: 'left' },
+  governance:   { x: 230,  y: 240,  whisperSide: 'right' },
+  roadmap:      { x: 850,  y: 1540, whisperSide: 'left' },
+  closing:      { x: 540,  y: 980,  whisperSide: 'right' },
+  results:      { x: 850,  y: 1720, whisperSide: 'left' },
+  capacities:   { x: 230,  y: 900,  whisperSide: 'right' },
+  pathways:     { x: 400,  y: 1760, whisperSide: 'right' },
+  'agents-flow':{ x: 850,  y: 960,  whisperSide: 'left' },
 };
 
-const DEFAULT_STATION = { x: 940, y: 1740, whisperSide: 'left' as const };
+const DEFAULT_STATION = { x: 850, y: 1720, whisperSide: 'left' as const };
+
+/** Núcleo dourado quente — usado independente do accent do slide. */
+const GOLD = '#fbbf24';
+const GOLD_BRIGHT = '#fde68a';
 
 export function MaestroOrb({ visible }: Props) {
   const reduceMotion = useReducedMotion();
@@ -60,11 +58,9 @@ export function MaestroOrb({ visible }: Props) {
   const whisper = current ? WHISPERS[current.kind] ?? '' : '';
   const station = current ? STATIONS[current.kind] ?? DEFAULT_STATION : DEFAULT_STATION;
 
-  // Mostra o whisper brevemente a cada troca de slide
   const [showWhisper, setShowWhisper] = useState(false);
   useEffect(() => {
     if (!visible || !whisper || reduceMotion) return;
-    // pequena espera para o orbe chegar antes do whisper
     const start = window.setTimeout(() => setShowWhisper(true), 900);
     const end = window.setTimeout(() => setShowWhisper(false), 4400);
     return () => {
@@ -73,7 +69,6 @@ export function MaestroOrb({ visible }: Props) {
     };
   }, [stepId, visible, whisper, reduceMotion]);
 
-  // Intensidade do pulso por kind
   const intensity = useMemo(() => {
     if (!current) return 1;
     const high: NodeKind[] = ['cover', 'closing', 'highlight'];
@@ -97,7 +92,6 @@ export function MaestroOrb({ visible }: Props) {
             y: { duration: 1.6, ease: [0.65, 0, 0.35, 1] },
           }}
         >
-          {/* Drift idle — pequeno movimento aleatório em volta do ponto */}
           <motion.div
             animate={
               reduceMotion
@@ -110,7 +104,7 @@ export function MaestroOrb({ visible }: Props) {
             transition={{ duration: 9.5, repeat: Infinity, ease: 'easeInOut' }}
             className="relative -translate-x-1/2 -translate-y-1/2"
           >
-            <OrbContent
+            <MaestroVisual
               accent={accent}
               intensity={intensity}
               reduceMotion={Boolean(reduceMotion)}
@@ -121,18 +115,18 @@ export function MaestroOrb({ visible }: Props) {
             />
           </motion.div>
 
-          {/* Trilha/rastro do movimento entre paradas */}
+          {/* Rastro/halo expansivo ao chegar em nova parada */}
           {!reduceMotion && (
             <motion.span
               key={`trail-${stepId}`}
               aria-hidden
               className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
-              initial={{ opacity: 0.7, scale: 0.3 }}
-              animate={{ opacity: 0, scale: 3.5 }}
-              transition={{ duration: 1.4, ease: 'easeOut' }}
+              initial={{ opacity: 0.6, scale: 0.3 }}
+              animate={{ opacity: 0, scale: 4 }}
+              transition={{ duration: 1.5, ease: 'easeOut' }}
               style={{
-                width: 72,
-                height: 72,
+                width: 120,
+                height: 120,
                 background: `radial-gradient(circle, ${accent}55, transparent 70%)`,
               }}
             />
@@ -143,7 +137,7 @@ export function MaestroOrb({ visible }: Props) {
   );
 }
 
-interface OrbContentProps {
+interface MaestroVisualProps {
   accent: string;
   intensity: number;
   reduceMotion: boolean;
@@ -153,7 +147,13 @@ interface OrbContentProps {
   stepId: string;
 }
 
-function OrbContent({
+/** Tamanho base do orbe (sem as ondas laterais). */
+const SIZE = 110;
+/** Largura total incluindo ondas. */
+const WAVE_REACH = 90;
+const TOTAL_WIDTH = SIZE + WAVE_REACH * 2;
+
+function MaestroVisual({
   accent,
   intensity,
   reduceMotion,
@@ -161,10 +161,9 @@ function OrbContent({
   showWhisper,
   whisperSide,
   stepId,
-}: OrbContentProps) {
-  const SIZE = 72;
+}: MaestroVisualProps) {
   return (
-    <div className="relative flex items-center" style={{ width: SIZE, height: SIZE }}>
+    <div className="relative" style={{ width: TOTAL_WIDTH, height: SIZE }}>
       {/* Whisper bubble */}
       <AnimatePresence>
         {showWhisper && whisper && (
@@ -176,7 +175,7 @@ function OrbContent({
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="absolute whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[11px] font-medium tracking-wide text-white/90 backdrop-blur-md"
             style={{
-              [whisperSide]: SIZE + 14,
+              [whisperSide]: -28,
               top: '50%',
               transform: 'translateY(-50%)',
               borderColor: `${accent}44`,
@@ -189,123 +188,338 @@ function OrbContent({
         )}
       </AnimatePresence>
 
-      {/* Orbe */}
-      <div className="relative" style={{ width: SIZE, height: SIZE }}>
+      {/* Ondas senoidais laterais — cyan/accent à esquerda, gold à direita */}
+      <SineWaves accent={accent} reduceMotion={reduceMotion} />
+
+      {/* Orbe central (mandala + anéis + crosshair) */}
+      <div
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{ width: SIZE, height: SIZE }}
+      >
         {/* Glow externo difuso */}
         <motion.div
-          className="absolute inset-0 rounded-full"
+          className="absolute inset-[-20px] rounded-full"
           style={{
-            background: `radial-gradient(circle, ${accent}66 0%, ${accent}22 40%, transparent 70%)`,
-            filter: 'blur(8px)',
+            background: `radial-gradient(circle, ${GOLD}33 0%, ${accent}22 35%, transparent 70%)`,
+            filter: 'blur(14px)',
           }}
           animate={
             reduceMotion
               ? undefined
               : {
-                  scale: [1, 1.18 * intensity, 1.08, 1.22 * intensity, 1],
-                  opacity: [0.55, 0.9, 0.7, 0.95, 0.55],
+                  scale: [1, 1.15 * intensity, 1.05, 1.18 * intensity, 1],
+                  opacity: [0.5, 0.85, 0.65, 0.9, 0.5],
                 }
           }
-          transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        {/* Anel orbital 1 */}
-        <motion.div
-          className="absolute inset-1 rounded-full border"
-          style={{
-            borderColor: `${accent}88`,
-            boxShadow: `0 0 16px ${accent}, inset 0 0 12px ${accent}44`,
-          }}
+        {/* SVG principal */}
+        <motion.svg
+          viewBox="0 0 200 200"
+          width={SIZE}
+          height={SIZE}
+          className="absolute inset-0"
+          animate={reduceMotion ? undefined : { rotate: 360 }}
+          transition={{ duration: 80, repeat: Infinity, ease: 'linear' }}
+        >
+          {/* Anel externo dotted */}
+          <circle
+            cx="100"
+            cy="100"
+            r="92"
+            fill="none"
+            stroke={accent}
+            strokeWidth="1"
+            strokeOpacity="0.4"
+            strokeDasharray="2 6"
+          />
+          {/* Anel intermediário */}
+          <circle
+            cx="100"
+            cy="100"
+            r="74"
+            fill="none"
+            stroke={accent}
+            strokeWidth="0.8"
+            strokeOpacity="0.55"
+          />
+          {/* Anel interno tracejado */}
+          <circle
+            cx="100"
+            cy="100"
+            r="56"
+            fill="none"
+            stroke={accent}
+            strokeWidth="1"
+            strokeOpacity="0.5"
+            strokeDasharray="4 4"
+          />
+
+          {/* Pontos nos anéis */}
+          {[0, 60, 120, 180, 240, 300].map((deg) => {
+            const rad = (deg * Math.PI) / 180;
+            return (
+              <circle
+                key={`pt-out-${deg}`}
+                cx={100 + 92 * Math.cos(rad)}
+                cy={100 + 92 * Math.sin(rad)}
+                r="2"
+                fill={deg % 120 === 0 ? GOLD : accent}
+              />
+            );
+          })}
+          {[30, 90, 150, 210, 270, 330].map((deg) => {
+            const rad = (deg * Math.PI) / 180;
+            return (
+              <circle
+                key={`pt-mid-${deg}`}
+                cx={100 + 74 * Math.cos(rad)}
+                cy={100 + 74 * Math.sin(rad)}
+                r="1.5"
+                fill={accent}
+                fillOpacity="0.7"
+              />
+            );
+          })}
+        </motion.svg>
+
+        {/* Crosshair (vertical + horizontal) — não rotaciona */}
+        <svg
+          viewBox="0 0 200 200"
+          width={SIZE}
+          height={SIZE}
+          className="absolute inset-0"
+        >
+          <line
+            x1="100"
+            y1="0"
+            x2="100"
+            y2="200"
+            stroke={accent}
+            strokeWidth="0.6"
+            strokeOpacity="0.4"
+          />
+          <line
+            x1="0"
+            y1="100"
+            x2="200"
+            y2="100"
+            stroke={accent}
+            strokeWidth="0.6"
+            strokeOpacity="0.4"
+          />
+        </svg>
+
+        {/* Mandala interna — flor de 6 pétalas (rotação contra-direção) */}
+        <motion.svg
+          viewBox="0 0 200 200"
+          width={SIZE}
+          height={SIZE}
+          className="absolute inset-0"
+          animate={reduceMotion ? undefined : { rotate: -360 }}
+          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+        >
+          {[0, 60, 120, 180, 240, 300].map((deg) => {
+            const rad = (deg * Math.PI) / 180;
+            const cx = 100 + 18 * Math.cos(rad);
+            const cy = 100 + 18 * Math.sin(rad);
+            return (
+              <circle
+                key={`petal-${deg}`}
+                cx={cx}
+                cy={cy}
+                r="22"
+                fill="none"
+                stroke={GOLD}
+                strokeWidth="0.7"
+                strokeOpacity="0.55"
+              />
+            );
+          })}
+        </motion.svg>
+
+        {/* Sun-burst (12 raios) — gold */}
+        <motion.svg
+          viewBox="0 0 200 200"
+          width={SIZE}
+          height={SIZE}
+          className="absolute inset-0"
           animate={
             reduceMotion
               ? undefined
-              : { scale: [1, 1.08, 1], rotate: 360, opacity: [0.7, 1, 0.7] }
+              : { rotate: 360, opacity: [0.6, 0.95, 0.7, 1, 0.6] }
           }
           transition={{
-            scale: { duration: 3.2, repeat: Infinity, ease: 'easeInOut' },
-            opacity: { duration: 3.2, repeat: Infinity, ease: 'easeInOut' },
-            rotate: { duration: 18, repeat: Infinity, ease: 'linear' },
+            rotate: { duration: 45, repeat: Infinity, ease: 'linear' },
+            opacity: { duration: 3.5, repeat: Infinity, ease: 'easeInOut' },
           }}
-        />
+        >
+          {Array.from({ length: 12 }).map((_, i) => {
+            const deg = i * 30;
+            const rad = (deg * Math.PI) / 180;
+            const x1 = 100 + 18 * Math.cos(rad);
+            const y1 = 100 + 18 * Math.sin(rad);
+            const x2 = 100 + 48 * Math.cos(rad);
+            const y2 = 100 + 48 * Math.sin(rad);
+            return (
+              <line
+                key={`ray-${i}`}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke={GOLD}
+                strokeWidth={i % 3 === 0 ? '1.4' : '0.7'}
+                strokeOpacity={i % 3 === 0 ? '0.9' : '0.55'}
+                strokeLinecap="round"
+              />
+            );
+          })}
+        </motion.svg>
 
-        {/* Anel orbital 2 (contra-rotação) */}
-        <motion.div
-          className="absolute rounded-full border"
-          style={{
-            inset: 8,
-            borderColor: `${accent}55`,
-            borderStyle: 'dashed',
-          }}
-          animate={reduceMotion ? undefined : { rotate: -360 }}
-          transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
-        />
-
-        {/* Núcleo de luz */}
+        {/* Núcleo brilhante */}
         <motion.div
           className="absolute rounded-full"
           style={{
-            inset: 18,
-            background: `radial-gradient(circle at 35% 35%, #ffffff 0%, ${accent} 35%, ${accent}88 70%, transparent 100%)`,
-            boxShadow: `0 0 24px ${accent}, 0 0 60px ${accent}88, inset 0 0 16px rgba(255,255,255,0.6)`,
+            inset: 56,
+            background: `radial-gradient(circle at 35% 35%, ${GOLD_BRIGHT} 0%, ${GOLD} 30%, ${GOLD}88 60%, transparent 100%)`,
+            boxShadow: `0 0 22px ${GOLD}, 0 0 50px ${GOLD}aa, 0 0 80px ${accent}55, inset 0 0 12px rgba(255,255,255,0.7)`,
           }}
           animate={
             reduceMotion
               ? undefined
               : {
-                  scale: [1, 1.14, 1.02, 1.12, 1],
-                  opacity: [0.9, 1, 0.95, 1, 0.9],
+                  scale: [1, 1.12, 1.04, 1.14, 1],
+                  opacity: [0.92, 1, 0.96, 1, 0.92],
                 }
           }
           transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        {/* Feixe horizontal (lens flare) */}
+        {/* Estrela central de 4 pontas — flare */}
         {!reduceMotion && (
           <motion.div
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 h-px -translate-x-1/2 -translate-y-1/2"
-            style={{
-              width: 120,
-              background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
-              boxShadow: `0 0 10px ${accent}`,
-            }}
-            animate={{
-              opacity: [0, 0.6, 0.3, 0.7, 0],
-              scaleX: [0.6, 1, 0.85, 1.1, 0.6],
-            }}
-            transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
-          />
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            animate={{ scale: [0.8, 1.3, 0.9, 1.4, 0.8], opacity: [0.6, 1, 0.7, 1, 0.6] }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <svg width="60" height="60" viewBox="0 0 60 60">
+              <line x1="30" y1="0" x2="30" y2="60" stroke={GOLD_BRIGHT} strokeWidth="1.4" strokeOpacity="0.95" strokeLinecap="round" />
+              <line x1="0" y1="30" x2="60" y2="30" stroke={GOLD_BRIGHT} strokeWidth="1.4" strokeOpacity="0.95" strokeLinecap="round" />
+              <line x1="6" y1="6" x2="54" y2="54" stroke={GOLD} strokeWidth="0.8" strokeOpacity="0.65" strokeLinecap="round" />
+              <line x1="54" y1="6" x2="6" y2="54" stroke={GOLD} strokeWidth="0.8" strokeOpacity="0.65" strokeLinecap="round" />
+            </svg>
+          </motion.div>
         )}
 
         {/* Centelhas orbitais */}
         {!reduceMotion &&
-          [0, 1, 2].map((i) => (
+          [0, 1, 2, 3].map((i) => (
             <motion.span
               key={`spark-${i}`}
               className="absolute h-1 w-1 rounded-full"
               style={{
                 top: '50%',
                 left: '50%',
-                background: accent,
-                boxShadow: `0 0 8px ${accent}`,
+                background: i % 2 === 0 ? GOLD : accent,
+                boxShadow: `0 0 8px ${i % 2 === 0 ? GOLD : accent}`,
                 transformOrigin: '0 0',
               }}
               animate={{
-                rotate: 360,
-                x: [28, 24, 30, 26, 28],
-                y: 0,
+                rotate: i % 2 === 0 ? 360 : -360,
+                x: [50 + i * 4, 46 + i * 4, 52 + i * 4],
               }}
               transition={{
                 rotate: {
-                  duration: 6 + i * 1.5,
+                  duration: 9 + i * 2,
                   repeat: Infinity,
                   ease: 'linear',
-                  delay: i * 1.2,
+                  delay: i * 0.8,
+                },
+                x: {
+                  duration: 4 + i,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
                 },
               }}
             />
           ))}
       </div>
     </div>
+  );
+}
+
+/** Ondas senoidais laterais — gold à direita, accent/cyan à esquerda. */
+function SineWaves({ accent, reduceMotion }: { accent: string; reduceMotion: boolean }) {
+  // Path senoidal: largura 110, altura ~40, 2 ondas
+  const wave = (color: string, dir: 1 | -1, delay: number) => {
+    const start = dir === 1 ? TOTAL_WIDTH / 2 + SIZE / 2 - 8 : TOTAL_WIDTH / 2 - SIZE / 2 + 8;
+    const end = dir === 1 ? TOTAL_WIDTH / 2 + SIZE / 2 + WAVE_REACH : TOTAL_WIDTH / 2 - SIZE / 2 - WAVE_REACH;
+    const cy = SIZE / 2;
+    const amp = 18;
+    const len = Math.abs(end - start);
+    const seg = len / 4;
+    const path =
+      `M ${start} ${cy} ` +
+      `C ${start + dir * seg * 0.5} ${cy - amp}, ${start + dir * seg * 1.5} ${cy + amp}, ${start + dir * seg * 2} ${cy} ` +
+      `C ${start + dir * seg * 2.5} ${cy - amp}, ${start + dir * seg * 3.5} ${cy + amp}, ${end} ${cy}`;
+    return { path, color, delay };
+  };
+
+  const waves = [
+    wave(accent, -1, 0),
+    wave('#fbbf24', 1, 0.6),
+  ];
+
+  return (
+    <svg
+      width={TOTAL_WIDTH}
+      height={SIZE}
+      viewBox={`0 0 ${TOTAL_WIDTH} ${SIZE}`}
+      className="absolute inset-0 overflow-visible"
+    >
+      {waves.map((w, i) => (
+        <g key={`wave-${i}`}>
+          <motion.path
+            d={w.path}
+            fill="none"
+            stroke={w.color}
+            strokeWidth={1.2}
+            strokeOpacity={0.7}
+            style={{ filter: `drop-shadow(0 0 4px ${w.color})` }}
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={
+              reduceMotion
+                ? { pathLength: 1, opacity: 0.7 }
+                : { pathLength: 1, opacity: [0.3, 0.9, 0.5, 0.9, 0.3] }
+            }
+            transition={{
+              pathLength: { duration: 1.4, ease: 'easeOut' },
+              opacity: { duration: 4.5, delay: w.delay, repeat: Infinity, ease: 'easeInOut' },
+            }}
+          />
+          {/* Wave secundária deslocada (espelho) */}
+          <motion.path
+            d={w.path}
+            fill="none"
+            stroke={w.color}
+            strokeWidth={0.7}
+            strokeOpacity={0.4}
+            transform="translate(0, 6)"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={
+              reduceMotion
+                ? { pathLength: 1, opacity: 0.3 }
+                : { pathLength: 1, opacity: [0.15, 0.45, 0.25, 0.5, 0.15] }
+            }
+            transition={{
+              pathLength: { duration: 1.6, ease: 'easeOut' },
+              opacity: { duration: 5.5, delay: w.delay + 0.3, repeat: Infinity, ease: 'easeInOut' },
+            }}
+          />
+        </g>
+      ))}
+    </svg>
   );
 }
