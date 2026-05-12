@@ -15,12 +15,11 @@ import { PathwaysStep } from './steps/PathwaysStep';
 import { AgentsFlowStep } from './steps/AgentsFlowStep';
 import { ResultsStep } from './steps/ResultsStep';
 import { FloatingCardContext } from './FloatingCard';
-import { usePresentationStore } from '@/store/presentationStore';
 
-/** Largura unificada para cada trilha (independente do tipo do step). */
-const TRACK_CARD_WIDTH: Partial<Record<string, number>> = {
-  'era-agentica': 780,
-};
+/** Largura unificada para todos os cards de todas as trilhas (independente do tipo do step).
+ *  Layout vertical: foto como banner no topo, conteúdo abaixo.
+ *  Stage 1080×1920 — 920px ≈ 85% da largura, dando respiração lateral. */
+const UNIFIED_CARD_WIDTH = 920;
 
 function flipFromId(id: string): boolean {
   let h = 0;
@@ -141,8 +140,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
   const stepLabel = `Etapa ${step.index + 1}: ${step.title}`;
   const reducedMotion = useReducedMotion();
   const faded = dimNonActive && !active;
-  const currentTrackId = usePresentationStore((s) => s.currentTrackId);
-  const forceWidth = TRACK_CARD_WIDTH[currentTrackId];
+  const forceWidth = UNIFIED_CARD_WIDTH;
 
   return (
     <motion.div
