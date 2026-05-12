@@ -6,6 +6,7 @@ import { usePresentationClickAdvance } from './hooks/usePresentationClickAdvance
 import { usePresentationStore } from './store/presentationStore';
 import { IntroBackground } from './components/intro/IntroBackground';
 import { PresentationCornerLogo } from './components/PresentationCornerLogo';
+import { MaestroOrb } from './components/MaestroOrb';
 import { TransitionMorph } from './components/intro/TransitionMorph';
 import { Stage } from './components/Stage';
 import './styles/presentationHierarchy.css';
@@ -27,6 +28,7 @@ export function PresentationApp() {
         <IntroBackground />
 
         <PresentationCornerLogo visible={cornerLogoVisible} />
+        <MaestroOrb visible={cornerLogoVisible} />
 
         <AnimatePresence>
           {transitionPhase === 'idle' && !hasEntered && <IntroScreen key="intro" />}
