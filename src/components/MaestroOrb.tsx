@@ -153,11 +153,9 @@ interface MaestroVisualProps {
   stepId: string;
 }
 
-/** Tamanho base do orbe (sem as ondas laterais). */
+/** Tamanho do orbe (mandala). */
 const SIZE = 140;
-/** Largura total incluindo ondas. */
-const WAVE_REACH = 90;
-const TOTAL_WIDTH = SIZE + WAVE_REACH * 2;
+const TOTAL_WIDTH = SIZE;
 
 function MaestroVisual({
   accent,
@@ -193,9 +191,6 @@ function MaestroVisual({
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Ondas senoidais laterais — cyan/accent à esquerda, gold à direita */}
-      <SineWaves accent={accent} reduceMotion={reduceMotion} />
 
       {/* Orbe central (mandala + anéis + crosshair) */}
       <div
@@ -456,76 +451,3 @@ function MaestroVisual({
   );
 }
 
-/** Ondas senoidais laterais — gold à direita, accent/cyan à esquerda. */
-function SineWaves({ accent, reduceMotion }: { accent: string; reduceMotion: boolean }) {
-  // Path senoidal: largura 110, altura ~40, 2 ondas
-  const wave = (color: string, dir: 1 | -1, delay: number) => {
-    const start = dir === 1 ? TOTAL_WIDTH / 2 + SIZE / 2 - 8 : TOTAL_WIDTH / 2 - SIZE / 2 + 8;
-    const end = dir === 1 ? TOTAL_WIDTH / 2 + SIZE / 2 + WAVE_REACH : TOTAL_WIDTH / 2 - SIZE / 2 - WAVE_REACH;
-    const cy = SIZE / 2;
-    const amp = 18;
-    const len = Math.abs(end - start);
-    const seg = len / 4;
-    const path =
-      `M ${start} ${cy} ` +
-      `C ${start + dir * seg * 0.5} ${cy - amp}, ${start + dir * seg * 1.5} ${cy + amp}, ${start + dir * seg * 2} ${cy} ` +
-      `C ${start + dir * seg * 2.5} ${cy - amp}, ${start + dir * seg * 3.5} ${cy + amp}, ${end} ${cy}`;
-    return { path, color, delay };
-  };
-
-  const waves = [
-    wave(accent, -1, 0),
-    wave('#fbbf24', 1, 0.6),
-  ];
-
-  return (
-    <svg
-      width={TOTAL_WIDTH}
-      height={SIZE}
-      viewBox={`0 0 ${TOTAL_WIDTH} ${SIZE}`}
-      className="absolute inset-0 overflow-visible"
-    >
-      {waves.map((w, i) => (
-        <g key={`wave-${i}`}>
-          <motion.path
-            d={w.path}
-            fill="none"
-            stroke={w.color}
-            strokeWidth={1.2}
-            strokeOpacity={0.7}
-            style={{ filter: `drop-shadow(0 0 4px ${w.color})` }}
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={
-              reduceMotion
-                ? { pathLength: 1, opacity: 0.7 }
-                : { pathLength: 1, opacity: [0.3, 0.9, 0.5, 0.9, 0.3] }
-            }
-            transition={{
-              pathLength: { duration: 1.4, ease: 'easeOut' },
-              opacity: { duration: 4.5, delay: w.delay, repeat: Infinity, ease: 'easeInOut' },
-            }}
-          />
-          {/* Wave secundária deslocada (espelho) */}
-          <motion.path
-            d={w.path}
-            fill="none"
-            stroke={w.color}
-            strokeWidth={0.7}
-            strokeOpacity={0.4}
-            transform="translate(0, 6)"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={
-              reduceMotion
-                ? { pathLength: 1, opacity: 0.3 }
-                : { pathLength: 1, opacity: [0.15, 0.45, 0.25, 0.5, 0.15] }
-            }
-            transition={{
-              pathLength: { duration: 1.6, ease: 'easeOut' },
-              opacity: { duration: 5.5, delay: w.delay + 0.3, repeat: Infinity, ease: 'easeInOut' },
-            }}
-          />
-        </g>
-      ))}
-    </svg>
-  );
-}
