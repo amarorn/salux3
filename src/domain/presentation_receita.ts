@@ -133,6 +133,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       subtitle: 'Ela se forma dentro da operação, todos os dias',
       content: {
         headline: 'Diagnóstico',
+        bannerMedia: { videoSrc: '/intro/healthcare-loop.mp4' },
         metrics: [
           {
             value: 14.6,

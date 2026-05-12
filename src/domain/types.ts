@@ -62,6 +62,13 @@ export interface NarrativeMetric {
   unit?: string;
 }
 
+export interface BannerMedia {
+  /** Vídeo do banner (loop muted). */
+  videoSrc?: string;
+  /** Poster do vídeo (também usado como imagem caso o vídeo falhe). */
+  posterSrc?: string;
+}
+
 export type RoadmapSegment =
   | { type: 'text'; text: string }
   | { type: 'product'; name: string };
@@ -125,6 +132,8 @@ export interface StepContent {
   agentFunctions?: string[];
   /** Card 11 — cards de resultados. */
   resultsCards?: string[];
+  /** Vídeo no banner do card (substitui a foto lateral). */
+  bannerMedia?: BannerMedia;
 }
 
 export interface PresentationStep {
