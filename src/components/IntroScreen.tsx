@@ -123,10 +123,11 @@ export function IntroScreen() {
         </motion.div>
       </header>
 
-      {/* Logo — acima do centro para dar respiro aos cards */}
-      <motion.div
-        className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
-        style={{ x: parallaxX, y: parallaxY }}
+      {/* Logo — posicionado para que o "L" de "salux" caia no centro da tela.
+          O L está aprox. a 63% da largura do logo (à direita do ícone X). */}
+      <div
+        className="absolute left-1/2 top-1/2 z-10"
+        style={{ transform: 'translate(-63%, -50%)' }}
       >
         <div className="flex flex-col items-center">
           <motion.div
@@ -173,7 +174,7 @@ export function IntroScreen() {
             />
           </motion.div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Seção inferior — track cards + marquee */}
       <motion.div
