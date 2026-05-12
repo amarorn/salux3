@@ -5,6 +5,7 @@ import { theme } from '@/domain/theme';
 import type { Accent } from '@/domain/types';
 import { getContentPanelVariants, getPhotoColumnVariants } from '@/components/steps/slideLayerMotion';
 import { INTRO_ASSIST_COVER_URL, presentationSidePhotoForStep } from '@/config/assetUrls';
+import { CinematicBanner } from '@/components/visuals/CinematicBanner';
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
@@ -85,45 +86,45 @@ export function FloatingCard({
         )}
       >
         {resolvedVideoSrc ? (
-          <video
-            key={resolvedVideoSrc}
-            src={resolvedVideoSrc}
-            poster={resolvedVideoPoster ?? photoSrc}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="metadata"
-            aria-hidden
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ filter: 'brightness(0.85) saturate(0.95)' }}
-          />
+          <>
+            <video
+              key={resolvedVideoSrc}
+              src={resolvedVideoSrc}
+              poster={resolvedVideoPoster ?? photoSrc}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              aria-hidden
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ filter: 'brightness(0.85) saturate(0.95)' }}
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)',
+              }}
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, transparent 60%, ${accentColor.base}30 100%)`,
+                opacity: active ? 1 : 0.6,
+              }}
+            />
+          </>
         ) : (
-          <img
-            key={photoSrc}
+          <CinematicBanner
             src={photoSrc}
             alt={photoAlt}
-            {...(!photoAlt ? { 'aria-hidden': true as const } : {})}
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ filter: 'brightness(0.85) saturate(0.95)' }}
+            accentColor={accentColor.base}
+            active={active}
           />
         )}
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)',
-          }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, transparent 60%, ${accentColor.base}30 100%)`,
-            opacity: active ? 1 : 0.6,
-          }}
-        />
       </motion.div>
 
       <motion.div
