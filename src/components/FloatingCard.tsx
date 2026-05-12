@@ -5,6 +5,7 @@ import { theme } from '@/domain/theme';
 import type { Accent } from '@/domain/types';
 import { getContentPanelVariants, getPhotoColumnVariants } from '@/components/steps/slideLayerMotion';
 import { INTRO_ASSIST_COVER_URL, presentationSidePhotoForStep } from '@/config/assetUrls';
+import { CinematicBanner } from '@/components/visuals/CinematicBanner';
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
@@ -12,6 +13,9 @@ export const FloatingCardContext = createContext<{
   flipPhoto?: boolean;
   /** Quando definido, sobrepõe o `width` solicitado por cada step component. */
   forceWidth?: number;
+  /** Vídeo do banner (loop muted), passado a partir do step content. */
+  bannerVideoSrc?: string;
+  bannerVideoPoster?: string;
 } | null>(null);
 
 interface FloatingCardProps {
@@ -24,6 +28,10 @@ interface FloatingCardProps {
   /** Sobrepõe a foto da coluna lateral (evita repetir a mesma imagem dentro do painel na capa). */
   sidePhotoSrc?: string;
   sidePhotoAlt?: string;
+  /** Vídeo no banner (loop, muted, autoplay) — sobrepõe sidePhotoSrc quando definido. */
+  bannerVideoSrc?: string;
+  /** Poster opcional (imagem antes do vídeo carregar). */
+  bannerVideoPoster?: string;
   /** Atribui uma foto distinta por slide (`config/assetUrls`). */
   stepId?: string;
   children: ReactNode;
@@ -38,12 +46,16 @@ export function FloatingCard({
   flipPhoto,
   sidePhotoSrc,
   sidePhotoAlt,
+  bannerVideoSrc,
+  bannerVideoPoster,
   stepId,
   children,
 }: FloatingCardProps) {
   const ctx = useContext(FloatingCardContext);
   const resolvedFlip = flipPhoto ?? ctx?.flipPhoto ?? false;
   const resolvedWidth = ctx?.forceWidth ?? width;
+  const resolvedVideoSrc = bannerVideoSrc ?? ctx?.bannerVideoSrc;
+  const resolvedVideoPoster = bannerVideoPoster ?? ctx?.bannerVideoPoster;
   const accentColor = theme.accents[accent];
   const reduceMotion = useReducedMotion();
   const photoMotion = getPhotoColumnVariants(resolvedFlip);
@@ -73,30 +85,46 @@ export function FloatingCard({
             : 'shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)] group-hover:-translate-y-1 group-hover:border-white/16',
         )}
       >
-        <img
-          key={photoSrc}
-          src={photoSrc}
-          alt={photoAlt}
-          {...(!photoAlt ? { 'aria-hidden': true as const } : {})}
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ filter: 'brightness(0.85) saturate(0.95)' }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)',
-          }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, transparent 60%, ${accentColor.base}30 100%)`,
-            opacity: active ? 1 : 0.6,
-          }}
-        />
+        {resolvedVideoSrc ? (
+          <>
+            <video
+              key={resolvedVideoSrc}
+              src={resolvedVideoSrc}
+              poster={resolvedVideoPoster ?? photoSrc}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              aria-hidden
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ filter: 'brightness(0.85) saturate(0.95)' }}
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)',
+              }}
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, transparent 60%, ${accentColor.base}30 100%)`,
+                opacity: active ? 1 : 0.6,
+              }}
+            />
+          </>
+        ) : (
+          <CinematicBanner
+            src={photoSrc}
+            alt={photoAlt}
+            accentColor={accentColor.base}
+            active={active}
+          />
+        )}
       </motion.div>
 
       <motion.div

@@ -159,7 +159,14 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
       }}
     >
       <div style={{ transform: 'translate(-50%, -50%)' }}>
-        <FloatingCardContext.Provider value={{ flipPhoto, forceWidth }}>
+        <FloatingCardContext.Provider
+          value={{
+            flipPhoto,
+            forceWidth,
+            bannerVideoSrc: step.content.bannerMedia?.videoSrc,
+            bannerVideoPoster: step.content.bannerMedia?.posterSrc,
+          }}
+        >
           <CardFlipShell active={active} flipPhoto={flipPhoto} stepLabel={stepLabel}>
             <StepBody step={step} active={active} />
           </CardFlipShell>

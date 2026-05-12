@@ -3,7 +3,7 @@ import { steps as baseSteps } from './presentation';
 
 const receitaRoadmapAgents: RoadmapAgentCard[] = [
   {
-    title: 'BASE OPERACIONAL',
+    title: 'BASE ESTRUTURADA NA ORIGEM',
     segments: [
       {
         type: 'text',
@@ -14,7 +14,7 @@ const receitaRoadmapAgents: RoadmapAgentCard[] = [
     ],
   },
   {
-    title: 'CICLO DE RECEITA',
+    title: 'FLUXO DE RECEITA ACOMPANHADO',
     segments: [
       {
         type: 'text',
@@ -25,7 +25,7 @@ const receitaRoadmapAgents: RoadmapAgentCard[] = [
     ],
   },
   {
-    title: 'GOVERNANÇA DOCUMENTAL',
+    title: 'DOCUMENTAÇÃO QUE SUSTENTA RECEITA',
     segments: [
       {
         type: 'text',
@@ -99,10 +99,10 @@ const tecnologiaQueAgeStep: PresentationStep = {
   kind: 'highlight',
   accent: 'cyan',
   content: {
-    headline: 'Da leitura passiva à ação contínua',
-    body:
-      'Identificar onde o valor está se perdendo.\nPriorizar o que sustenta a receita ao longo da jornada.\nAgir antes que a perda se materialize.',
+    headline: 'A tecnologia que age',
+    body: 'Identificar.\nPriorizar.\nAgir.',
     attentionPhrase: 'A perda deixa de ser invisível. Passa a ser evitável.',
+    bannerMedia: { videoSrc: '/intro/tecnologia-loop.mp4' },
   },
 };
 
@@ -116,8 +116,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       subtitle: 'Receita',
       content: {
         headline: 'Abertura',
-        body:
-          'A maioria dos gestores não sabe responder.\n\nO número está em algum lugar do relatório.\nMas o que ele esconde, na operação, raramente é visível.',
+        body: 'A maioria dos gestores não sabe responder.',
         meta: {
           Edição: '01 / 2026',
           Tempo: '~12 min',
@@ -135,12 +134,13 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       subtitle: 'Ela se forma dentro da operação, todos os dias',
       content: {
         headline: 'Diagnóstico',
+        bannerMedia: { videoSrc: '/intro/healthcare-loop.mp4' },
         metrics: [
           {
             value: 14.6,
             decimals: 1,
             label: 'Glosa média do setor',
-            suffix: 'da receita não se converte ao longo da operação',
+            suffix: 'é a média de glosa no setor',
             ring: 14.6,
             trend: [11.8, 12.4, 12.1, 12.9, 13.5, 13.8, 14.2, 14.6],
             delta: 0.8,
@@ -150,7 +150,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
             value: 50,
             decimals: 0,
             label: 'Tempo administrativo',
-            suffix: 'do tempo do time perdido em tarefas administrativas',
+            suffix: 'do tempo do time ainda se perde em tarefas administrativas',
             ring: 50,
             trend: [38, 41, 43, 44, 46, 47, 48, 50],
             delta: 2,
@@ -159,7 +159,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
           {
             value: 30,
             decimals: 0,
-            label: 'Desperdício',
+            label: 'Desperdício em saúde',
             suffix: 'dos recursos em saúde são considerados desperdício',
             ring: 30,
             trend: [22, 24, 25, 26, 27, 28, 29, 30],
@@ -167,8 +167,6 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
             deltaUnit: 'pp',
           },
         ],
-        body:
-          'Isso não é um desvio pontual. É um padrão.\nÉ valor que deixa de se converter ao longo da operação.',
       },
     };
   }
@@ -182,9 +180,8 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       subtitle: 'A causa está na jornada do paciente',
       content: {
         headline: 'Reframe',
-        body:
-          'Glosa não é causa.\nÉ consequência.\n\nA causa está na jornada do paciente — onde o valor se forma ou se perde.',
-        attentionPhrase: 'A glosa é o sintoma. A jornada é a fonte.',
+        body: 'Glosa não é causa.\nÉ consequência.',
+        attentionPhrase: 'A causa está na jornada do paciente.',
       },
     };
   }
@@ -198,14 +195,9 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       subtitle: 'Pontos críticos da jornada de valor',
       content: {
         headline: 'Jornada do valor',
-        bullets: [
-          'Admissão — captura inicial do contexto',
-          'Suprimentos — consumo e rastreabilidade',
-          'Prontuário — registro clínico que sustenta cobrança',
-          'Faturamento — momento da conversão em receita',
-        ],
+        bullets: ['Admissão', 'Suprimentos', 'Prontuário', 'Faturamento'],
         body:
-          'Quando a informação se quebra entre essas etapas, o valor se perde.\nNão é falha de área. É falha de continuidade.',
+          'Quando a informação se quebra entre essas etapas, o valor se perde.',
         painPointsLayout: true,
       },
     };
@@ -221,13 +213,11 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       content: {
         headline: 'Limite do modelo atual',
         bullets: [
-          'Audita depois — quando a inconsistência já aconteceu',
-          'Corrige no fim — quando o valor já se perdeu',
-          'Registra, mas não conduz — falta loop de ação',
+          'Audita depois',
+          'Corrige no fim',
+          'Registra, mas não conduz',
           'Grande parte do esforço acontece tarde demais',
         ],
-        body:
-          'Cada esforço de correção custa mais e recupera menos.\nA conta final cresce porque a operação não interrompe a perda no ponto onde ela se forma.',
       },
     };
   }
@@ -242,7 +232,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       content: {
         headline: 'Virada de lógica',
         body:
-          'A receita deixa de ser recuperada no final.\nPassa a ser construída ao longo da jornada.\n\nProteger valor enquanto acontece.',
+          'A receita deixa de ser recuperada no final.\nPassa a ser construída ao longo da jornada.',
         attentionPhrase: 'Proteger valor enquanto acontece.',
       },
     };
@@ -264,8 +254,6 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
           'Centro cirúrgico',
           'Inteligência em tempo real',
         ],
-        body:
-          'Esses elementos não operam de forma independente.\nEles precisam funcionar como uma base coordenada.',
       },
     };
   }
@@ -292,8 +280,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       content: {
         headline: 'Encerramento',
         body:
-          'A diferença não está em ter tecnologia.\nEstá em operar com ela.\n\nComece pelo ponto mais crítico da sua operação.',
-        attentionPhrase: 'Ecossistema Salux.',
+          'A diferença não está em ter tecnologia.\nEstá em operar com ela.\n\nComece pelo ponto mais crítico da sua operação.\n\nEcossistema Salux.',
       },
     };
   }
