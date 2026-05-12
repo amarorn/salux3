@@ -197,22 +197,38 @@ function MaestroVisual({
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ width: SIZE, height: SIZE }}
       >
-        {/* Glow externo difuso */}
+        {/* Glow externo difuso — múltiplas camadas suaves */}
         <motion.div
-          className="absolute inset-[-20px] rounded-full"
+          className="absolute inset-[-40px] rounded-full"
           style={{
-            background: `radial-gradient(circle, ${GOLD}33 0%, ${accent}22 35%, transparent 70%)`,
-            filter: 'blur(14px)',
+            background: `radial-gradient(circle, ${GOLD}55 0%, ${GOLD}22 25%, ${accent}11 55%, transparent 75%)`,
+            filter: 'blur(22px)',
           }}
           animate={
             reduceMotion
               ? undefined
               : {
-                  scale: [1, 1.15 * intensity, 1.05, 1.18 * intensity, 1],
-                  opacity: [0.5, 0.85, 0.65, 0.9, 0.5],
+                  scale: [1, 1.18 * intensity, 1.06, 1.22 * intensity, 1],
+                  opacity: [0.6, 1, 0.75, 1, 0.6],
                 }
           }
           transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute inset-[-15px] rounded-full"
+          style={{
+            background: `radial-gradient(circle, ${GOLD_BRIGHT}40 0%, ${GOLD}25 30%, transparent 60%)`,
+            filter: 'blur(10px)',
+          }}
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  scale: [1, 1.08, 0.96, 1.12, 1],
+                  opacity: [0.45, 0.8, 0.55, 0.85, 0.45],
+                }
+          }
+          transition={{ duration: 3.1, repeat: Infinity, ease: 'easeInOut' }}
         />
 
         {/* SVG principal */}
@@ -224,37 +240,37 @@ function MaestroVisual({
           animate={reduceMotion ? undefined : { rotate: 360 }}
           transition={{ duration: 80, repeat: Infinity, ease: 'linear' }}
         >
-          {/* Anel externo dotted */}
+          {/* Anel externo dotted (mais sutil) */}
           <circle
             cx="100"
             cy="100"
             r="92"
             fill="none"
             stroke={accent}
-            strokeWidth="1"
-            strokeOpacity="0.4"
-            strokeDasharray="2 6"
+            strokeWidth="0.7"
+            strokeOpacity="0.22"
+            strokeDasharray="2 8"
           />
-          {/* Anel intermediário */}
+          {/* Anel intermediário (mais transparente) */}
           <circle
             cx="100"
             cy="100"
             r="74"
             fill="none"
             stroke={accent}
-            strokeWidth="0.8"
-            strokeOpacity="0.55"
+            strokeWidth="0.5"
+            strokeOpacity="0.3"
           />
-          {/* Anel interno tracejado */}
+          {/* Anel interno tracejado (suave) */}
           <circle
             cx="100"
             cy="100"
             r="56"
             fill="none"
             stroke={accent}
-            strokeWidth="1"
-            strokeOpacity="0.5"
-            strokeDasharray="4 4"
+            strokeWidth="0.7"
+            strokeOpacity="0.28"
+            strokeDasharray="3 6"
           />
 
           {/* Pontos nos anéis */}
@@ -306,8 +322,9 @@ function MaestroVisual({
                 r="22"
                 fill="none"
                 stroke={GOLD}
-                strokeWidth="0.7"
-                strokeOpacity="0.55"
+                strokeWidth="0.5"
+                strokeOpacity="0.32"
+                style={{ filter: 'blur(0.3px)' }}
               />
             );
           })}
@@ -332,10 +349,10 @@ function MaestroVisual({
           {Array.from({ length: 12 }).map((_, i) => {
             const deg = i * 30;
             const rad = (deg * Math.PI) / 180;
-            const x1 = 100 + 18 * Math.cos(rad);
-            const y1 = 100 + 18 * Math.sin(rad);
-            const x2 = 100 + 48 * Math.cos(rad);
-            const y2 = 100 + 48 * Math.sin(rad);
+            const x1 = 100 + 30 * Math.cos(rad);
+            const y1 = 100 + 30 * Math.sin(rad);
+            const x2 = 100 + 52 * Math.cos(rad);
+            const y2 = 100 + 52 * Math.sin(rad);
             return (
               <line
                 key={`ray-${i}`}
@@ -344,31 +361,50 @@ function MaestroVisual({
                 x2={x2}
                 y2={y2}
                 stroke={GOLD}
-                strokeWidth={i % 3 === 0 ? '1.4' : '0.7'}
-                strokeOpacity={i % 3 === 0 ? '0.9' : '0.55'}
+                strokeWidth={i % 3 === 0 ? '0.9' : '0.4'}
+                strokeOpacity={i % 3 === 0 ? '0.5' : '0.28'}
                 strokeLinecap="round"
+                style={{ filter: `blur(0.5px) drop-shadow(0 0 2px ${GOLD}88)` }}
               />
             );
           })}
         </motion.svg>
 
-        {/* Núcleo brilhante */}
+        {/* Núcleo de luz — esfera etérea, sem bordas duras */}
         <motion.div
           className="absolute rounded-full"
           style={{
-            inset: 56,
-            background: `radial-gradient(circle at 35% 35%, ${GOLD_BRIGHT} 0%, ${GOLD} 30%, ${GOLD}88 60%, transparent 100%)`,
-            boxShadow: `0 0 22px ${GOLD}, 0 0 50px ${GOLD}aa, 0 0 80px ${accent}55, inset 0 0 12px rgba(255,255,255,0.7)`,
+            inset: 40,
+            background: `radial-gradient(circle, ${GOLD_BRIGHT}cc 0%, ${GOLD}88 25%, ${GOLD}44 50%, transparent 80%)`,
+            filter: 'blur(6px)',
           }}
           animate={
             reduceMotion
               ? undefined
               : {
-                  scale: [1, 1.12, 1.04, 1.14, 1],
-                  opacity: [0.92, 1, 0.96, 1, 0.92],
+                  scale: [1, 1.16, 1.04, 1.2, 1],
+                  opacity: [0.7, 1, 0.85, 1, 0.7],
                 }
           }
-          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        {/* Coração interno mais quente, ainda etéreo */}
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            inset: 58,
+            background: `radial-gradient(circle, ${GOLD_BRIGHT}99 0%, ${GOLD}55 50%, transparent 85%)`,
+            filter: 'blur(3px)',
+          }}
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  scale: [1, 1.08, 0.96, 1.1, 1],
+                  opacity: [0.85, 1, 0.9, 1, 0.85],
+                }
+          }
+          transition={{ duration: 2.1, repeat: Infinity, ease: 'easeInOut' }}
         />
 
         {/* Centelhas orbitais */}
