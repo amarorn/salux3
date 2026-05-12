@@ -72,7 +72,7 @@ export function Sparkline({
         transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
       />
 
-      {/* Linha */}
+      {/* Linha base */}
       <motion.path
         d={linePath}
         fill="none"
@@ -86,23 +86,60 @@ export function Sparkline({
         transition={{ duration: 1.1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
       />
 
-      {/* Ponto final pulsante */}
-      <motion.circle
-        cx={lastPoint[0]}
-        cy={lastPoint[1]}
-        r={3}
-        fill={color}
-        style={{ filter: `drop-shadow(0 0 6px ${color})` }}
-        initial={{ opacity: 0, scale: 0.4 }}
-        animate={
-          active
-            ? reducedMotion
-              ? { opacity: 1, scale: 1 }
-              : { opacity: [0, 1, 0.7, 1], scale: [0.4, 1.2, 0.9, 1.1] }
-            : { opacity: 0, scale: 0.4 }
-        }
-        transition={{ duration: 1.6, delay: 1.1, repeat: Infinity, repeatDelay: 1.2 }}
-      />
+      {/* Linha de batimento percorrendo continuamente */}
+      {!reducedMotion && active && (
+        <motion.path
+          d={linePath}
+          fill="none"
+          stroke="white"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{
+            filter: `drop-shadow(0 0 6px ${color})`,
+            strokeDasharray: '12 200',
+          }}
+          initial={{ strokeDashoffset: 0 }}
+          animate={{ strokeDashoffset: -240 }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: 'linear', delay: 1.5 }}
+        />
+      )}
+
+      {/* Pontos de dados emergindo sequencialmente */}
+      {points.map(([x, y], i) => {
+        const isLast = i === points.length - 1;
+        return (
+          <motion.circle
+            key={`pt-${i}`}
+            cx={x}
+            cy={y}
+            r={isLast ? 3.2 : 1.8}
+            fill={isLast ? color : 'white'}
+            fillOpacity={isLast ? 1 : 0.7}
+            style={{ filter: `drop-shadow(0 0 ${isLast ? 8 : 3}px ${color})` }}
+            initial={reducedMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+            animate={active ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+            transition={{
+              duration: 0.4,
+              delay: reducedMotion ? 0 : 0.35 + (i / (points.length - 1)) * 1.1,
+              ease: [0.22, 1.4, 0.36, 1],
+            }}
+          />
+        );
+      })}
+
+      {/* Pulso radial no ponto final (batimento) */}
+      {!reducedMotion && active && (
+        <motion.circle
+          cx={lastPoint[0]}
+          cy={lastPoint[1]}
+          r={3}
+          fill={color}
+          fillOpacity={0.4}
+          animate={{ scale: [1, 2.6, 1], opacity: [0.6, 0, 0.6] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut', delay: 1.6 }}
+        />
+      )}
     </svg>
   );
 }

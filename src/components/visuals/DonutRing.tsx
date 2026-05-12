@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { animate } from 'framer-motion';
+import { animate, motion } from 'framer-motion';
 
 interface DonutRingProps {
   /** Percentual 0–100. */
@@ -81,14 +81,47 @@ export function DonutRing({
             transition: reducedMotion ? 'stroke-dashoffset 0.2s linear' : undefined,
           }}
         />
-        {/* Marcador no fim do arco */}
+        {/* Marcador no fim do arco — núcleo pulsante */}
         {pct > 1 && (
-          <circle
+          <>
+            <motion.circle
+              cx={size / 2 + r * Math.cos((pct / 100) * 2 * Math.PI - Math.PI / 2)}
+              cy={size / 2 + r * Math.sin((pct / 100) * 2 * Math.PI - Math.PI / 2)}
+              r={thickness * 0.5 + 1}
+              fill={color}
+              style={{ filter: `drop-shadow(0 0 8px ${color})` }}
+              animate={
+                reducedMotion
+                  ? undefined
+                  : { opacity: [0.85, 1, 0.85], scale: [1, 1.15, 1] }
+              }
+              transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            {/* Halo respirando atrás do marcador */}
+            {!reducedMotion && (
+              <motion.circle
+                cx={size / 2 + r * Math.cos((pct / 100) * 2 * Math.PI - Math.PI / 2)}
+                cy={size / 2 + r * Math.sin((pct / 100) * 2 * Math.PI - Math.PI / 2)}
+                r={thickness}
+                fill={color}
+                fillOpacity={0.25}
+                animate={{ scale: [0.8, 1.6, 0.8], opacity: [0.5, 0, 0.5] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+              />
+            )}
+          </>
+        )}
+        {/* Cometa de luz percorrendo a trilha durante o preenchimento */}
+        {!reducedMotion && active && (
+          <motion.circle
+            r={thickness * 0.45}
+            fill="white"
+            style={{ filter: `drop-shadow(0 0 10px ${color})` }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 1.55, delay: 0.25, ease: 'linear', times: [0, 0.08, 0.92, 1] }}
             cx={size / 2 + r * Math.cos((pct / 100) * 2 * Math.PI - Math.PI / 2)}
             cy={size / 2 + r * Math.sin((pct / 100) * 2 * Math.PI - Math.PI / 2)}
-            r={thickness * 0.5 + 1}
-            fill={color}
-            style={{ filter: `drop-shadow(0 0 6px ${color})` }}
           />
         )}
       </svg>

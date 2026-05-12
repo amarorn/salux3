@@ -58,6 +58,8 @@ export interface NarrativeMetric {
   delta?: number;
   /** Unidade do delta (default "pp"). */
   deltaUnit?: string;
+  /** Unidade do valor principal (default "%"). Use "" para esconder. */
+  unit?: string;
 }
 
 export type RoadmapSegment =

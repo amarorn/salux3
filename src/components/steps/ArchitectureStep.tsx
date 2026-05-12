@@ -3,6 +3,8 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { Brain, Database, ShieldCheck, Wrench } from 'lucide-react';
 import { FloatingCard, FloatingCardContext } from '../FloatingCard';
 import { AnimatedRiskCurve } from '../visuals/AnimatedRiskCurve';
+import { KpiCards } from '../visuals/KpiCards';
+import { theme } from '@/domain/theme';
 import type { PresentationStep } from '@/domain/types';
 import { getCardTextVariants } from './cardTextMotion';
 
@@ -23,6 +25,11 @@ export function ArchitectureStep({ step, active }: Props) {
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
   const { container, item } = getCardTextVariants(Boolean(reduceMotion), step.index, flipPhoto);
   const minimal = Boolean(step.content.architectureMinimal);
+  const accent = theme.accents[step.accent];
+  const hasRichMetrics =
+    step.content.metrics &&
+    step.content.metrics.length > 0 &&
+    step.content.metrics.some((m) => m.trend || m.label || m.delta !== undefined);
 
   return (
     <FloatingCard
@@ -85,6 +92,17 @@ export function ArchitectureStep({ step, active }: Props) {
           <motion.p variants={item} className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
             {step.content.body}
           </motion.p>
+        )}
+
+        {hasRichMetrics && (
+          <motion.div variants={item}>
+            <KpiCards
+              items={step.content.metrics!}
+              active={active}
+              reducedMotion={Boolean(reduceMotion)}
+              accentColor={accent.base}
+            />
+          </motion.div>
         )}
 
         {minimal && step.content.bullets && step.content.bullets.length > 0 && (

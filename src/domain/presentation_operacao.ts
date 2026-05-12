@@ -27,6 +27,28 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
         subtitle: 'Onde a expansão começa a se transformar em custo',
         content: {
           headline: 'Onde o crescimento da sua instituição começa a pesar?',
+          metrics: [
+            {
+              value: 38,
+              decimals: 0,
+              label: 'Sobrecusto por nova frente',
+              suffix: 'a mais para integrar cada unidade ou serviço novo à operação',
+              ring: 38,
+              trend: [18, 22, 25, 28, 30, 33, 36, 38],
+              delta: 5,
+              deltaUnit: 'pp',
+            },
+            {
+              value: 62,
+              decimals: 0,
+              label: 'Concentração em pessoas-chave',
+              suffix: 'das áreas críticas dependem de ≤ 3 especialistas para operar',
+              ring: 62,
+              trend: [48, 52, 55, 57, 58, 60, 61, 62],
+              delta: 3,
+              deltaUnit: 'pp',
+            },
+          ],
           bullets: [
             'Abertura de nova unidade',
             'Ampliação de serviços',

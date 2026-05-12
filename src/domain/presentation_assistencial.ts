@@ -159,11 +159,32 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       headline: 'Evidência',
       architectureMinimal: true,
       body:
-        'Quando o contexto se perde, o risco cresce em silêncio.\n\nAté 80% dos eventos adversos graves podem estar associados a falhas nas transições de cuidado.\n\nA transição não é apenas passagem de área. É um ponto crítico de segurança.\n\nAté 15% dos pacientes podem apresentar complicações não detectadas imediatamente em áreas críticas, como recuperação pós-anestésica. Em áreas críticas, o risco precisa ser acompanhado enquanto ainda pode ser antecipado.',
+        'Quando o contexto se perde, o risco cresce em silêncio.\n\nA transição não é apenas passagem de área. É um ponto crítico de segurança.\nEm áreas críticas, o risco precisa ser acompanhado enquanto ainda pode ser antecipado.',
+      metrics: [
+        {
+          value: 80,
+          decimals: 0,
+          label: 'Eventos adversos graves',
+          suffix: 'associados a falhas nas transições de cuidado',
+          ring: 80,
+          trend: [52, 58, 61, 64, 68, 72, 76, 80],
+          delta: 4,
+          deltaUnit: 'pp',
+        },
+        {
+          value: 15,
+          decimals: 0,
+          label: 'Complicações tardias',
+          suffix: 'em áreas críticas (ex.: recuperação pós-anestésica)',
+          ring: 15,
+          trend: [9, 10, 11, 11.5, 12.5, 13, 14, 15],
+          delta: 1,
+          deltaUnit: 'pp',
+        },
+      ],
       bullets: [
-        'Até 80% dos eventos adversos graves ↔ falhas nas transições de cuidado',
         'A transição é ponto crítico de segurança — não apenas “passagem de área”',
-        'Até 15% com complicações tardias em áreas críticas (ex.: recuperação pós-anestésica)',
+        'Em áreas críticas, o risco precisa ser acompanhado enquanto ainda pode ser antecipado',
       ],
       visual: { type: 'risk-curve' },
       meta: {
