@@ -371,22 +371,6 @@ function MaestroVisual({
           transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        {/* Estrela central de 4 pontas — flare */}
-        {!reduceMotion && (
-          <motion.div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            animate={{ scale: [0.8, 1.3, 0.9, 1.4, 0.8], opacity: [0.6, 1, 0.7, 1, 0.6] }}
-            transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <svg width="60" height="60" viewBox="0 0 60 60">
-              <line x1="30" y1="0" x2="30" y2="60" stroke={GOLD_BRIGHT} strokeWidth="1.4" strokeOpacity="0.95" strokeLinecap="round" />
-              <line x1="0" y1="30" x2="60" y2="30" stroke={GOLD_BRIGHT} strokeWidth="1.4" strokeOpacity="0.95" strokeLinecap="round" />
-              <line x1="6" y1="6" x2="54" y2="54" stroke={GOLD} strokeWidth="0.8" strokeOpacity="0.65" strokeLinecap="round" />
-              <line x1="54" y1="6" x2="6" y2="54" stroke={GOLD} strokeWidth="0.8" strokeOpacity="0.65" strokeLinecap="round" />
-            </svg>
-          </motion.div>
-        )}
-
         {/* Centelhas orbitais */}
         {!reduceMotion &&
           [0, 1, 2, 3].map((i) => (
