@@ -8,6 +8,7 @@ import { AnimatedRiskCurve } from '../visuals/AnimatedRiskCurve';
 import { AnimatedNarrativeMetrics } from '../visuals/AnimatedNarrativeMetrics';
 import { KpiCards } from '../visuals/KpiCards';
 import { getCardTextVariants } from './cardTextMotion';
+import { ClosingHighlight, EvidenceCardBlock, HighlightPhraseList } from './HighlightBlocks';
 
 interface Props {
   step: PresentationStep;
@@ -175,12 +176,31 @@ export function NarrativeStep({ step, active }: Props) {
           )}
 
         {painPoints && !useBalloon && step.content.bullets && step.content.bullets.length > 0 && (
-          <PainPointChips
-            bullets={step.content.bullets}
-            accentColor={accent.base}
-            active={active}
-            reducedMotion={Boolean(reduceMotion)}
-          />
+          <motion.div variants={item} className="relative">
+            {step.content.painPointsBackdrop === 'stacked' && (
+              <StackedLayersBackdrop
+                color={accent.base}
+                reduce={Boolean(reduceMotion)}
+                active={active}
+              />
+            )}
+            {step.content.painPointsBackdrop === 'web' && (
+              <TenseWebBackdrop
+                color={accent.base}
+                reduce={Boolean(reduceMotion)}
+                active={active}
+                count={step.content.bullets.length}
+              />
+            )}
+            <div className="relative">
+              <PainPointChips
+                bullets={step.content.bullets}
+                accentColor={accent.base}
+                active={active}
+                reducedMotion={Boolean(reduceMotion)}
+              />
+            </div>
+          </motion.div>
         )}
 
         {useBalloon && step.content.bullets && step.content.bullets.length > 0 && (
@@ -231,6 +251,28 @@ export function NarrativeStep({ step, active }: Props) {
           </motion.div>
         )}
 
+        {step.content.highlightPhrases && step.content.highlightPhrases.length > 0 && (
+          <motion.div variants={item}>
+            <HighlightPhraseList items={step.content.highlightPhrases} active={active} />
+          </motion.div>
+        )}
+
+        {step.content.evidenceCard && (
+          <motion.div variants={item}>
+            <EvidenceCardBlock
+              card={step.content.evidenceCard}
+              active={active}
+              accentColor={accent.base}
+            />
+          </motion.div>
+        )}
+
+        {step.content.closingHighlight && (
+          <motion.div variants={item}>
+            <ClosingHighlight text={step.content.closingHighlight} active={active} />
+          </motion.div>
+        )}
+
         {painPoints && step.content.closingQuestion && (
           <motion.div
             variants={item}
@@ -246,14 +288,8 @@ export function NarrativeStep({ step, active }: Props) {
               className="pointer-events-none absolute inset-x-6 -top-px h-px"
               style={{ background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)` }}
             />
-            <span
-              className="mb-1.5 block text-[9px] font-semibold uppercase tracking-[0.34em]"
-              style={{ color: accent.base, opacity: 0.85 }}
-            >
-              Para a sua liderança
-            </span>
             <p
-              className="text-[1.05rem] font-semibold leading-snug text-white"
+              className="text-[1.1rem] font-semibold leading-snug text-white"
               style={{ textShadow: `0 0 24px ${accent.base}25` }}
             >
               {step.content.closingQuestion}
@@ -741,6 +777,117 @@ function PainPointsBalloon({
       </motion.div>
     </motion.div>,
     document.body,
+  );
+}
+
+/** Camadas sobrepostas — "crescimento por acúmulo": cartões empilhados em offset. */
+function StackedLayersBackdrop({
+  color,
+  reduce,
+  active,
+}: {
+  color: string;
+  reduce: boolean;
+  active: boolean;
+}) {
+  const layers = [0, 1, 2, 3];
+  return (
+    <div aria-hidden className="pointer-events-none absolute -inset-3 overflow-hidden">
+      {layers.map((i) => (
+        <motion.div
+          key={i}
+          className="absolute inset-0 rounded-2xl border"
+          style={{
+            borderColor: `${color}22`,
+            background: `linear-gradient(135deg, ${color}06 0%, transparent 80%)`,
+            transform: `translate(${i * 6}px, ${i * 6}px)`,
+            opacity: 0.5 - i * 0.1,
+          }}
+          initial={reduce ? false : { opacity: 0, x: -10 - i * 4, y: -10 - i * 4 }}
+          animate={
+            active
+              ? { opacity: 0.5 - i * 0.1, x: i * 6, y: i * 6 }
+              : reduce
+                ? undefined
+                : { opacity: 0, x: -10 - i * 4, y: -10 - i * 4 }
+          }
+          transition={{ duration: 0.6, delay: 0.2 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Teia tensa — "operação que cresce conectada de forma fragmentada". */
+function TenseWebBackdrop({
+  color,
+  reduce,
+  active,
+  count,
+}: {
+  color: string;
+  reduce: boolean;
+  active: boolean;
+  count: number;
+}) {
+  const W = 600;
+  const H = 320;
+  const nodes = Array.from({ length: Math.min(count, 8) }, (_, i) => {
+    // Distribuição pseudo-aleatória estável
+    const seed = (i * 9301 + 49297) % 233280;
+    const r = seed / 233280;
+    return {
+      x: 60 + ((i * 73) % (W - 120)) + r * 30,
+      y: 40 + ((i * 47) % (H - 80)),
+    };
+  });
+  return (
+    <svg
+      aria-hidden
+      viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute -inset-3 h-[calc(100%+24px)] w-[calc(100%+24px)]"
+      style={{ opacity: active ? 0.45 : 0.15 }}
+    >
+      {nodes.map((n, i) =>
+        nodes.slice(i + 1).map((m, j) => (
+          <motion.line
+            key={`tw-${i}-${j}`}
+            x1={n.x}
+            y1={n.y}
+            x2={m.x}
+            y2={m.y}
+            stroke={color}
+            strokeWidth={0.5}
+            strokeOpacity={0.25}
+            strokeDasharray="3 5"
+            animate={reduce ? undefined : { strokeDashoffset: [0, -8] }}
+            transition={{
+              duration: 4 + ((i + j) % 3),
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
+        )),
+      )}
+      {nodes.map((n, i) => (
+        <motion.circle
+          key={`twn-${i}`}
+          cx={n.x}
+          cy={n.y}
+          r={2}
+          fill={color}
+          opacity={0.55}
+          animate={reduce ? undefined : { opacity: [0.3, 0.7, 0.3] }}
+          transition={{
+            duration: 2.6,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: i * 0.18,
+          }}
+        />
+      ))}
+    </svg>
   );
 }
 

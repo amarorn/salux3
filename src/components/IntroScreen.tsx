@@ -12,6 +12,7 @@ import { CustomCursor } from './intro/CustomCursor';
 import { SaluxLogo } from './intro/SaluxLogo';
 import { tracks } from '@/domain/tracks';
 import type { TrackPresentation, TrackId } from '@/domain/tracks';
+import { StageAspectPicker } from './StageAspectPicker';
 import { usePresentationStore } from '@/store/presentationStore';
 import { theme } from '@/domain/theme';
 import type { Accent } from '@/domain/types';
@@ -41,15 +42,8 @@ export function IntroScreen() {
   const my = useMotionValue(0);
   const sx = useSpring(mx, { stiffness: 60, damping: 18, mass: 0.9 });
   const sy = useSpring(my, { stiffness: 60, damping: 18, mass: 0.9 });
-  const parallaxX = useTransform(sx, (v) => v * 18);
-  const parallaxY = useTransform(sy, (v) => v * 18);
   const counterParallaxX = useTransform(sx, (v) => v * -10);
   const counterParallaxY = useTransform(sy, (v) => v * -10);
-  const energyParallaxX = useTransform(sx, (v) => v * -6);
-  const energyParallaxY = useTransform(sy, (v) => v * -6);
-
-  const wheelEnergy = useMotionValue(0);
-  const wheelEnergySpring = useSpring(wheelEnergy, { stiffness: 90, damping: 16, mass: 0.55 });
 
   useEffect(() => {
     const handler = (e: PointerEvent) => {
@@ -61,22 +55,6 @@ export function IntroScreen() {
     window.addEventListener('pointermove', handler);
     return () => window.removeEventListener('pointermove', handler);
   }, [mx, my]);
-
-  useEffect(() => {
-    let decayTimer: number | null = null;
-    const onWheel = (e: WheelEvent) => {
-      const cur = wheelEnergy.get();
-      const kick = Math.min(Math.abs(e.deltaY) / 240, 0.55);
-      wheelEnergy.set(Math.min(cur + kick, 1.4));
-      if (decayTimer) window.clearTimeout(decayTimer);
-      decayTimer = window.setTimeout(() => wheelEnergy.set(0), 220);
-    };
-    window.addEventListener('wheel', onWheel, { passive: true });
-    return () => {
-      window.removeEventListener('wheel', onWheel);
-      if (decayTimer) window.clearTimeout(decayTimer);
-    };
-  }, [wheelEnergy]);
 
   const handleTrackSelect = (trackId: TrackId) => {
     if (isExiting) return;
@@ -96,6 +74,10 @@ export function IntroScreen() {
       style={{ left: '-1px', top: '1px' }}
     >
       {!reduceMotion && <CustomCursor />}
+
+      <div className="pointer-events-auto absolute left-6 top-24 z-20 sm:left-8 sm:top-28">
+        <StageAspectPicker />
+      </div>
 
       {/* Header */}
       <header className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between p-8">

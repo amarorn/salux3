@@ -24,7 +24,29 @@ function withStep(id: PresentationStep['id'], patch: Partial<PresentationStep>) 
       : s;
 }
 
-export const assistencialSteps: PresentationStep[] = baseSteps
+/**
+ * Card de transição inserido entre `roadmap` e `closing` na trilha assistencial.
+ * Apresenta o título principal, uma frase de leitura escalonada (efeito de
+ * destaque) e uma frase de atenção em destaque com glow pulsante.
+ */
+const highlightContextStep: PresentationStep = {
+  id: 'highlight-context',
+  index: 8,
+  title: 'A instituição registra o cuidado. Mas nem sempre sustenta o contexto.',
+  subtitle: 'Continuidade decisória',
+  position: { x: -560, y: -1480 },
+  scale: 1.25,
+  kind: 'highlight',
+  accent: 'rose',
+  content: {
+    headline: 'Síntese',
+    body:
+      'O risco assistencial nem sempre nasce da gravidade do caso. Muitas vezes, ele se forma quando o contexto clínico se perde ao longo da jornada.',
+    attentionPhrase: 'Não falta dado. Falta continuidade.',
+  },
+};
+
+const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map((s) => ({ ...s, content: { ...s.content } }))
   .map((s) =>
     s.id === 'cover'
@@ -257,6 +279,21 @@ export const assistencialSteps: PresentationStep[] = baseSteps
       },
     }),
   );
+
+/**
+ * Insere o card de transição (`highlight-context`) imediatamente antes do
+ * `closing` e re-indexa o array para manter `step.index` sequencial.
+ */
+export const assistencialSteps: PresentationStep[] = (() => {
+  const closingIdx = assistencialBaseSteps.findIndex((s) => s.id === 'closing');
+  if (closingIdx < 0) return assistencialBaseSteps;
+  const next = [
+    ...assistencialBaseSteps.slice(0, closingIdx),
+    highlightContextStep,
+    ...assistencialBaseSteps.slice(closingIdx),
+  ];
+  return next.map((step, index) => ({ ...step, index }));
+})();
 
 export const assistencialStepsById: Record<string, PresentationStep> = Object.fromEntries(
   assistencialSteps.map((s) => [s.id, s]),

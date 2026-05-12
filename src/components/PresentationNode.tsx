@@ -8,7 +8,12 @@ import { JourneyStep } from './steps/JourneyStep';
 import { IntegrationStep } from './steps/IntegrationStep';
 import { GovernanceStep } from './steps/GovernanceStep';
 import { RoadmapStep } from './steps/RoadmapStep';
+import { HighlightStep } from './steps/HighlightStep';
 import { ClosingStep } from './steps/ClosingStep';
+import { CapacitiesStep } from './steps/CapacitiesStep';
+import { PathwaysStep } from './steps/PathwaysStep';
+import { AgentsFlowStep } from './steps/AgentsFlowStep';
+import { ResultsStep } from './steps/ResultsStep';
 import { FloatingCardContext } from './FloatingCard';
 
 /** Largura unificada para todos os cards de todas as trilhas (independente do tipo do step).
@@ -45,6 +50,16 @@ function StepBody({ step, active }: PresentationNodeProps) {
       return <GovernanceStep step={step} active={active} />;
     case 'roadmap':
       return <RoadmapStep step={step} active={active} />;
+    case 'highlight':
+      return <HighlightStep step={step} active={active} />;
+    case 'capacities':
+      return <CapacitiesStep step={step} active={active} />;
+    case 'pathways':
+      return <PathwaysStep step={step} active={active} />;
+    case 'agents-flow':
+      return <AgentsFlowStep step={step} active={active} />;
+    case 'results':
+      return <ResultsStep step={step} active={active} />;
     case 'closing':
       return <ClosingStep step={step} active={active} />;
   }

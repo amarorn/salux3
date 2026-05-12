@@ -1,21 +1,19 @@
 import type { ReactNode } from 'react';
+import { dimensionsForStageAspect } from '@/domain/stageAspect';
 import { useStageScale } from '@/hooks/useStageScale';
-
-export const STAGE_WIDTH = 1080;
-export const STAGE_HEIGHT = 1920;
+import { usePresentationStore } from '@/store/presentationStore';
 
 interface StageProps {
   children: ReactNode;
-  width?: number;
-  height?: number;
 }
 
 /**
- * Palco de dimensões fixas (default 1080×1920, 9:16) com transform: scale
- * para preencher qualquer viewport (totem vertical, desktop, mobile) sem
- * quebrar o layout interno. Letterbox automático em proporções diferentes.
+ * Palco de dimensões fixas (Totem 9:16 ou PS 16:9) com transform: scale para
+ * preencher a janela preservando proporção (letterbox automático).
  */
-export function Stage({ children, width = STAGE_WIDTH, height = STAGE_HEIGHT }: StageProps) {
+export function Stage({ children }: StageProps) {
+  const mode = usePresentationStore((s) => s.stageAspectMode);
+  const { width, height } = dimensionsForStageAspect(mode);
   const { scale, offsetX, offsetY } = useStageScale(width, height);
 
   return (
