@@ -6,6 +6,7 @@ import type { PresentationStep } from '@/domain/types';
 import { theme } from '@/domain/theme';
 import { AnimatedRiskCurve } from '../visuals/AnimatedRiskCurve';
 import { AnimatedNarrativeMetrics } from '../visuals/AnimatedNarrativeMetrics';
+import { KpiCards } from '../visuals/KpiCards';
 import { getCardTextVariants } from './cardTextMotion';
 import { ClosingHighlight, EvidenceCardBlock, HighlightPhraseList } from './HighlightBlocks';
 
@@ -110,12 +111,21 @@ export function NarrativeStep({ step, active }: Props) {
 
         {step.content.metrics && step.content.metrics.length > 0 && (
           <motion.div variants={item}>
-            <AnimatedNarrativeMetrics
-              items={step.content.metrics}
-              active={active}
-              reducedMotion={Boolean(reduceMotion)}
-              accentColor={accent.base}
-            />
+            {step.content.metrics.some((m) => m.trend || m.label || m.delta !== undefined) ? (
+              <KpiCards
+                items={step.content.metrics}
+                active={active}
+                reducedMotion={Boolean(reduceMotion)}
+                accentColor={accent.base}
+              />
+            ) : (
+              <AnimatedNarrativeMetrics
+                items={step.content.metrics}
+                active={active}
+                reducedMotion={Boolean(reduceMotion)}
+                accentColor={accent.base}
+              />
+            )}
           </motion.div>
         )}
 

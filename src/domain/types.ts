@@ -48,6 +48,16 @@ export interface NarrativeMetric {
   value: number;
   decimals?: number;
   suffix: string;
+  /** Rótulo curto em caps exibido junto à métrica (ex.: "DE GLOSA"). */
+  label?: string;
+  /** Série numérica para o sparkline de tendência (mínimo 4 pontos). */
+  trend?: number[];
+  /** Preenchimento do donut ring (0–100). Default = value se este já estiver em 0–100. */
+  ring?: number;
+  /** Variação relativa exibida abaixo (ex.: 0.8 → "+0,8 pp", -1.2 → "−1,2 pp"). */
+  delta?: number;
+  /** Unidade do delta (default "pp"). */
+  deltaUnit?: string;
 }
 
 export type RoadmapSegment =

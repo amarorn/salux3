@@ -103,8 +103,26 @@ export const receitaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) =>
       title: 'DIAGNÓSTICO',
       content: {
         metrics: [
-          { value: 14.6, decimals: 1, suffix: ' de glosa' },
-          { value: 50, decimals: 0, suffix: ' do tempo consumido por tarefas administrativas' },
+          {
+            value: 14.6,
+            decimals: 1,
+            label: 'De glosa',
+            suffix: 'da receita não se converte ao longo da operação',
+            ring: 14.6,
+            trend: [11.8, 12.4, 12.1, 12.9, 13.5, 13.8, 14.2, 14.6],
+            delta: 0.8,
+            deltaUnit: 'pp',
+          },
+          {
+            value: 50,
+            decimals: 0,
+            label: 'Tempo administrativo',
+            suffix: 'do tempo consumido por tarefas administrativas e retrabalho',
+            ring: 50,
+            trend: [38, 41, 43, 44, 46, 47, 48, 50],
+            delta: 2,
+            deltaUnit: 'pp',
+          },
         ],
         body:
           'Isso não é um desvio pontual.\nÉ um padrão.\nNão se trata apenas de ineficiência.\nÉ valor que deixa de se converter ao longo da operação.',
