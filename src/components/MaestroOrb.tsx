@@ -117,6 +117,7 @@ export function MaestroOrb({ visible }: Props) {
               whisper={whisper}
               showWhisper={showWhisper}
               whisperSide={station.whisperSide}
+              whisperPlacement={station.y < 800 ? 'below' : 'above'}
               stepId={stepId}
             />
           </motion.div>
@@ -150,6 +151,7 @@ interface MaestroVisualProps {
   whisper: string;
   showWhisper: boolean;
   whisperSide: 'left' | 'right';
+  whisperPlacement: 'above' | 'below';
   stepId: string;
 }
 
@@ -163,27 +165,29 @@ function MaestroVisual({
   reduceMotion,
   whisper,
   showWhisper,
-  whisperSide,
+  whisperPlacement,
   stepId,
 }: MaestroVisualProps) {
   return (
     <div className="relative" style={{ width: TOTAL_WIDTH, height: SIZE }}>
-      {/* Whisper bubble */}
+      {/* Whisper bubble — acima ou abaixo do orbe, longe do card */}
       <AnimatePresence>
         {showWhisper && whisper && (
           <motion.div
             key={`whisper-${stepId}`}
-            initial={{ opacity: 0, x: whisperSide === 'right' ? -8 : 8 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: whisperSide === 'right' ? -8 : 8 }}
+            initial={{ opacity: 0, y: whisperPlacement === 'below' ? -6 : 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: whisperPlacement === 'below' ? -4 : 4 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="absolute whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[11px] font-medium tracking-wide text-white/90 backdrop-blur-md"
             style={{
-              [whisperSide]: -28,
-              top: '50%',
-              transform: 'translateY(-50%)',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              ...(whisperPlacement === 'below'
+                ? { top: '100%', marginTop: 12 }
+                : { bottom: '100%', marginBottom: 12 }),
               borderColor: `${accent}44`,
-              background: `linear-gradient(135deg, ${accent}1a 0%, rgba(8,12,20,0.85) 100%)`,
+              background: `linear-gradient(135deg, ${accent}1a 0%, rgba(8,12,20,0.9) 100%)`,
               boxShadow: `0 8px 24px -6px ${accent}55, inset 0 1px 0 rgba(255,255,255,0.08)`,
             }}
           >
