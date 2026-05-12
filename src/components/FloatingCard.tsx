@@ -8,7 +8,11 @@ import { INTRO_ASSIST_COVER_URL, presentationSidePhotoForStep } from '@/config/a
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
-export const FloatingCardContext = createContext<{ flipPhoto?: boolean } | null>(null);
+export const FloatingCardContext = createContext<{
+  flipPhoto?: boolean;
+  /** Quando definido, sobrepõe o `width` solicitado por cada step component. */
+  forceWidth?: number;
+} | null>(null);
 
 interface FloatingCardProps {
   accent: Accent;
@@ -39,6 +43,7 @@ export function FloatingCard({
 }: FloatingCardProps) {
   const ctx = useContext(FloatingCardContext);
   const resolvedFlip = flipPhoto ?? ctx?.flipPhoto ?? false;
+  const resolvedWidth = ctx?.forceWidth ?? width;
   const accentColor = theme.accents[accent];
   const reduceMotion = useReducedMotion();
   const photoMotion = getPhotoColumnVariants(resolvedFlip);
@@ -53,15 +58,16 @@ export function FloatingCard({
     <div
       className={clsx(
         'flex items-stretch gap-3',
-        resolvedFlip ? 'flex-row-reverse' : 'flex-row',
+        resolvedFlip ? 'flex-col-reverse' : 'flex-col',
       )}
+      style={{ width: resolvedWidth }}
     >
       <motion.div
         variants={photoMotion}
         initial={layerInitial}
         animate={layerAnimate}
         className={clsx(
-          'relative w-[240px] shrink-0 overflow-hidden rounded-3xl border border-white/10 transition-[border-color,box-shadow] duration-500 ease-out',
+          'relative h-[460px] w-full shrink-0 overflow-hidden rounded-3xl border border-white/10 transition-[border-color,box-shadow] duration-500 ease-out',
           active
             ? 'border-white/20 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]'
             : 'shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)] group-hover:-translate-y-1 group-hover:border-white/16',
@@ -98,13 +104,12 @@ export function FloatingCard({
         initial={layerInitial}
         animate={layerAnimate}
         className={clsx(
-          'relative overflow-hidden rounded-3xl border border-white/10 bg-[#0d1018] p-8 transition-[border-color,box-shadow] duration-500 ease-out',
+          'relative w-full min-h-[900px] overflow-hidden rounded-3xl border border-white/10 bg-[#0d1018] p-12 transition-[border-color,box-shadow] duration-500 ease-out',
           active
             ? 'border-white/20 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.08)]'
             : 'shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.05)] group-hover:-translate-y-1 group-hover:border-white/16',
           className,
         )}
-        style={{ width }}
       >
         <div
           aria-hidden

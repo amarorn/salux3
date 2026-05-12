@@ -12,6 +12,11 @@ import { HighlightStep } from './steps/HighlightStep';
 import { ClosingStep } from './steps/ClosingStep';
 import { FloatingCardContext } from './FloatingCard';
 
+/** Largura unificada para todos os cards de todas as trilhas (independente do tipo do step).
+ *  Layout vertical: foto como banner no topo, conteúdo abaixo.
+ *  Stage 1080×1920 — 920px ≈ 85% da largura, dando respiração lateral. */
+const UNIFIED_CARD_WIDTH = 920;
+
 function flipFromId(id: string): boolean {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = ((h << 5) - h + id.charCodeAt(i)) | 0;
@@ -123,6 +128,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
   const stepLabel = `Etapa ${step.index + 1}: ${step.title}`;
   const reducedMotion = useReducedMotion();
   const faded = dimNonActive && !active;
+  const forceWidth = UNIFIED_CARD_WIDTH;
 
   return (
     <motion.div
@@ -141,7 +147,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
       }}
     >
       <div style={{ transform: 'translate(-50%, -50%)' }}>
-        <FloatingCardContext.Provider value={{ flipPhoto }}>
+        <FloatingCardContext.Provider value={{ flipPhoto, forceWidth }}>
           <CardFlipShell active={active} flipPhoto={flipPhoto} stepLabel={stepLabel}>
             <StepBody step={step} active={active} />
           </CardFlipShell>

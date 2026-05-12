@@ -1,8 +1,7 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 export function AnimatedRiskCurve({ active }: { active: boolean }) {
-  // Um gráfico estilizado (SVG) que "desenha" a curva e pulsa os pontos.
-  // Mantido simples para ficar leve e consistente com o tema.
+  const reduceMotion = useReducedMotion();
   const d =
     'M 24 180 C 70 176, 92 160, 116 144 C 140 128, 154 112, 178 98 C 206 82, 238 68, 268 54 C 296 42, 322 30, 356 26';
 
@@ -13,6 +12,9 @@ export function AnimatedRiskCurve({ active }: { active: boolean }) {
     { x: 268, y: 54 },
     { x: 356, y: 26 },
   ];
+
+  // Linhas verticais de grid (eixo de tempo)
+  const gridX = [82, 140, 198, 256, 314];
 
   return (
     <div className="mt-2 rounded-2xl border border-white/10 bg-white/[0.03] p-4 shadow-soft">
@@ -25,12 +27,16 @@ export function AnimatedRiskCurve({ active }: { active: boolean }) {
               <stop offset="100%" stopColor="#fb7185" stopOpacity="0.95" />
             </linearGradient>
             <linearGradient id="risk-fill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#54c1ed" stopOpacity="0.18" />
-              <stop offset="70%" stopColor="#fb7185" stopOpacity="0.06" />
-              <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+              <stop offset="0%" stopColor="#fb7185" stopOpacity="0.32" />
+              <stop offset="55%" stopColor="#f59e0b" stopOpacity="0.14" />
+              <stop offset="100%" stopColor="#54c1ed" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="risk-zone-warn" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#fb7185" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#fb7185" stopOpacity="0" />
             </linearGradient>
             <filter id="risk-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3.5" result="blur" />
+              <feGaussianBlur stdDeviation="3" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -38,71 +44,180 @@ export function AnimatedRiskCurve({ active }: { active: boolean }) {
             </filter>
           </defs>
 
+          {/* Eixos */}
           <path d="M 24 180 L 356 180" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
           <path d="M 24 26 L 24 180" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
 
+          {/* Zona de alerta no topo (onde risco materializa) */}
+          <motion.rect
+            x={24}
+            y={26}
+            width={332}
+            height={28}
+            fill="url(#risk-zone-warn)"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: active ? 1 : 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          />
+          {/* Linha tracejada de limiar */}
+          <motion.line
+            x1={24}
+            y1={54}
+            x2={356}
+            y2={54}
+            stroke="#fb7185"
+            strokeWidth={1}
+            strokeDasharray="4 6"
+            strokeOpacity={0.55}
+            initial={reduceMotion ? { pathLength: 1 } : { pathLength: 0 }}
+            animate={{ pathLength: active ? 1 : 0 }}
+            transition={{ duration: 0.9, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          />
+          {/* Etiqueta do limiar */}
+          <motion.text
+            x={350}
+            y={46}
+            textAnchor="end"
+            fontSize="8"
+            fontWeight="700"
+            letterSpacing="2"
+            fill="#fb7185"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: active ? 0.85 : 0 }}
+            transition={{ duration: 0.6, delay: 1.0 }}
+          >
+            LIMIAR
+          </motion.text>
+
+          {/* Linhas verticais de grid */}
+          {gridX.map((x, i) => (
+            <motion.line
+              key={`grid-${i}`}
+              x1={x}
+              y1={180}
+              x2={x}
+              y2={30}
+              stroke="rgba(255,255,255,0.04)"
+              strokeWidth={1}
+              initial={reduceMotion ? { pathLength: 1 } : { pathLength: 0 }}
+              animate={{ pathLength: active ? 1 : 0 }}
+              transition={{ duration: 0.55, delay: 0.1 + i * 0.05, ease: [0.16, 1, 0.3, 1] }}
+            />
+          ))}
+
+          {/* Área sob a curva */}
           <motion.path
             d={`${d} L 356 180 L 24 180 Z`}
             fill="url(#risk-fill)"
             initial={{ opacity: 0 }}
-            animate={{ opacity: active ? 1 : 0.35 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
+            animate={{ opacity: active ? 1 : 0.2 }}
+            transition={{ duration: 0.8, delay: 1.0, ease: 'easeOut' }}
           />
 
+          {/* Linha principal — drawing real via pathLength */}
           <motion.path
             d={d}
             fill="none"
             stroke="url(#risk-line)"
-            strokeWidth="3.2"
+            strokeWidth={3.2}
             strokeLinecap="round"
             filter="url(#risk-glow)"
-            pathLength={1}
-            initial={{ strokeDasharray: 1, strokeDashoffset: 1, opacity: 0.9 }}
-            animate={
-              active
-                ? { strokeDashoffset: 0, opacity: 1 }
-                : { strokeDashoffset: 0, opacity: 0.65 }
-            }
-            transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+            initial={reduceMotion ? { pathLength: 1 } : { pathLength: 0 }}
+            animate={{ pathLength: active ? 1 : 0 }}
+            transition={{ duration: 1.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           />
 
-          {points.map((p, i) => (
-            <g key={i}>
+          {/* Pulso de batimento percorrendo continuamente após o draw */}
+          {!reduceMotion && active && (
+            <motion.path
+              d={d}
+              fill="none"
+              stroke="white"
+              strokeWidth={2.2}
+              strokeLinecap="round"
+              style={{
+                filter: 'drop-shadow(0 0 8px #fb7185)',
+                strokeDasharray: '14 360',
+              }}
+              initial={{ strokeDashoffset: 0 }}
+              animate={{ strokeDashoffset: -380 }}
+              transition={{ duration: 3.2, repeat: Infinity, ease: 'linear', delay: 2.2 }}
+            />
+          )}
+
+          {/* Pontos emergindo sequencialmente — surgem conforme a linha "passa" por eles */}
+          {points.map((p, i) => {
+            const progress = i / (points.length - 1);
+            const pointDelay = 0.3 + progress * 1.5;
+            const fillColor = i === 0 ? '#54c1ed' : i === points.length - 1 ? '#fb7185' : i >= points.length - 2 ? '#f59e0b' : '#a8e6ff';
+            return (
+              <g key={i}>
+                {/* Halo respirando */}
+                {!reduceMotion && active && (
+                  <motion.circle
+                    cx={p.x}
+                    cy={p.y}
+                    r={12}
+                    fill="none"
+                    stroke={fillColor}
+                    strokeWidth={1}
+                    initial={{ opacity: 0, scale: 0.4 }}
+                    animate={{ opacity: [0, 0.5, 0], scale: [0.4, 1.4, 1.8] }}
+                    transition={{
+                      duration: 2.4,
+                      delay: pointDelay + 0.3,
+                      repeat: Infinity,
+                      repeatDelay: 1.2,
+                      ease: 'easeOut',
+                    }}
+                  />
+                )}
+                {/* Núcleo do ponto */}
+                <motion.circle
+                  cx={p.x}
+                  cy={p.y}
+                  r={4.5}
+                  fill={fillColor}
+                  style={{ filter: `drop-shadow(0 0 6px ${fillColor})` }}
+                  initial={reduceMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+                  animate={active ? { opacity: 1, scale: 1 } : { opacity: 0.5, scale: 0.8 }}
+                  transition={{ duration: 0.45, delay: pointDelay, ease: [0.22, 1.4, 0.36, 1] }}
+                />
+              </g>
+            );
+          })}
+
+          {/* Heartbeat radial no ponto final (zona de risco) */}
+          {!reduceMotion && active && (
+            <>
               <motion.circle
-                cx={p.x}
-                cy={p.y}
-                r={10}
-                fill="rgba(255,255,255,0.0)"
-                stroke="rgba(84,193,237,0.18)"
-                strokeWidth="1"
-                initial={false}
-                animate={
-                  active
-                    ? { opacity: [0.2, 0.6, 0.2], scale: [1, 1.08, 1] }
-                    : { opacity: 0.12, scale: 1 }
-                }
-                transition={{ duration: 1.8, delay: 0.2 + i * 0.08, repeat: active ? Infinity : 0 }}
-              />
-              <motion.circle
-                cx={p.x}
-                cy={p.y}
+                cx={356}
+                cy={26}
                 r={4.5}
-                fill="#a8e6ff"
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: active ? 1 : 0.7, scale: 1 }}
-                transition={{ delay: 0.25 + i * 0.08, duration: 0.5, ease: 'easeOut' }}
+                fill="#fb7185"
+                fillOpacity={0.4}
+                animate={{ scale: [1, 3.5, 1], opacity: [0.7, 0, 0.7] }}
+                transition={{ duration: 1.9, repeat: Infinity, ease: 'easeOut', delay: 2.0 }}
               />
-            </g>
-          ))}
+              <motion.circle
+                cx={356}
+                cy={26}
+                r={4.5}
+                fill="#fb7185"
+                fillOpacity={0.25}
+                animate={{ scale: [1, 5, 1], opacity: [0.5, 0, 0.5] }}
+                transition={{ duration: 1.9, repeat: Infinity, ease: 'easeOut', delay: 2.4 }}
+              />
+            </>
+          )}
         </svg>
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/45">
         <span>início</span>
         <span>risco cresce em silêncio</span>
-        <span>materializa</span>
+        <span style={{ color: '#fb7185' }}>materializa</span>
       </div>
     </div>
   );
 }
-

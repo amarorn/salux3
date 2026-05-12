@@ -9,7 +9,6 @@ import {
 } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { CustomCursor } from './intro/CustomCursor';
-import { IntroEnergyLayer } from './intro/IntroEnergyLayer';
 import { SaluxLogo } from './intro/SaluxLogo';
 import { tracks } from '@/domain/tracks';
 import type { TrackPresentation, TrackId } from '@/domain/tracks';
@@ -98,20 +97,6 @@ export function IntroScreen() {
     >
       {!reduceMotion && <CustomCursor />}
 
-      <IntroEnergyLayer
-        highlightedTrackIndex={highlightedTrackIndex}
-        highlightColor={
-          highlightedTrackIndex !== null
-            ? theme.accents[TRACK_ACCENTS[highlightedTrackIndex % TRACK_ACCENTS.length]!].base
-            : null
-        }
-        reduceMotion={!!reduceMotion}
-        logoReady={logoReady}
-        parallaxX={energyParallaxX}
-        parallaxY={energyParallaxY}
-        wheelEnergy={wheelEnergySpring}
-      />
-
       {/* Header */}
       <header className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between p-8">
         <motion.div
@@ -138,10 +123,11 @@ export function IntroScreen() {
         </motion.div>
       </header>
 
-      {/* Logo — acima do centro para dar respiro aos cards */}
-      <motion.div
-        className="absolute left-1/2 top-[40%] z-10 -translate-x-1/2 -translate-y-1/2"
-        style={{ x: parallaxX, y: parallaxY }}
+      {/* Logo — posicionado para que o "L" de "salux" caia no centro da tela.
+          O L está aprox. a 63% da largura do logo (à direita do ícone X). */}
+      <div
+        className="absolute left-1/2 top-1/2 z-10"
+        style={{ transform: 'translate(-63%, -50%)' }}
       >
         <div className="flex flex-col items-center">
           <motion.div
@@ -188,7 +174,7 @@ export function IntroScreen() {
             />
           </motion.div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Seção inferior — track cards + marquee */}
       <motion.div

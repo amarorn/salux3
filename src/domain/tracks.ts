@@ -3,6 +3,7 @@ import { presentationMeta as baseMeta, steps as baseSteps } from './presentation
 import { assistencialSteps, presentationAssistencialMeta } from './presentation_assistencial';
 import { operacaoSteps, presentationOperacaoMeta } from './presentation_operacao';
 import { presentationReceitaMeta, receitaSteps } from './presentation_receita';
+import { gestaoSteps, presentationGestaoMeta } from './presentation_gestao';
 
 export type TrackId = 'era-agentica' | 'operacoes' | 'assistencial' | 'dados' | 'governanca';
 
@@ -61,10 +62,10 @@ export const tracks: TrackPresentation[] = [
     'dados',
     {
       title: 'Gestão',
-      subtitle: 'Ferramentas, eventos e semântica para agentes em saúde',
-      author: baseMeta.author,
+      subtitle: presentationGestaoMeta.subtitle,
+      author: presentationGestaoMeta.author,
     },
-    sharedSteps,
+    gestaoSteps,
   ),
   makeTrack(
     'governanca',
