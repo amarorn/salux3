@@ -125,7 +125,7 @@ export function IntroScreen() {
 
       {/* Logo — acima do centro para dar respiro aos cards */}
       <motion.div
-        className="absolute left-1/2 top-[40%] z-10 -translate-x-1/2 -translate-y-1/2"
+        className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
         style={{ x: parallaxX, y: parallaxY }}
       >
         <div className="flex flex-col items-center">
