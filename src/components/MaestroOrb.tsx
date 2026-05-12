@@ -27,23 +27,29 @@ const WHISPERS: Record<string, string> = {
   closing: 'Até a próxima.',
 };
 
+/**
+ * Estações — todas em "zonas quietas" do Stage (acima ou abaixo do card),
+ * nunca sobrepondo o banner da foto ou o conteúdo central.
+ * Card ativo ocupa ~y=270–1650; topo livre y<240, base livre y>1700.
+ * Bounds horizontais: x ∈ [180, 900] para caber com ondas (320px largura).
+ */
 const STATIONS: Partial<Record<NodeKind, { x: number; y: number; whisperSide: 'left' | 'right' }>> = {
-  cover:        { x: 540,  y: 1660, whisperSide: 'left' },
-  narrative:    { x: 850,  y: 1720, whisperSide: 'left' },
-  highlight:    { x: 850,  y: 240,  whisperSide: 'left' },
-  architecture: { x: 230,  y: 900,  whisperSide: 'right' },
-  journey:      { x: 400,  y: 1760, whisperSide: 'right' },
-  integration:  { x: 850,  y: 960,  whisperSide: 'left' },
-  governance:   { x: 230,  y: 240,  whisperSide: 'right' },
-  roadmap:      { x: 850,  y: 1540, whisperSide: 'left' },
-  closing:      { x: 540,  y: 980,  whisperSide: 'right' },
-  results:      { x: 850,  y: 1720, whisperSide: 'left' },
-  capacities:   { x: 230,  y: 900,  whisperSide: 'right' },
-  pathways:     { x: 400,  y: 1760, whisperSide: 'right' },
-  'agents-flow':{ x: 850,  y: 960,  whisperSide: 'left' },
+  cover:        { x: 540, y: 1770, whisperSide: 'left' },   // base centro — presença
+  narrative:    { x: 820, y: 1770, whisperSide: 'left' },   // base direita
+  highlight:    { x: 540, y: 180,  whisperSide: 'left' },   // topo centro — atenção
+  architecture: { x: 220, y: 180,  whisperSide: 'right' },  // topo esquerda — observando
+  journey:      { x: 400, y: 1770, whisperSide: 'right' },  // base esquerda
+  integration:  { x: 820, y: 180,  whisperSide: 'left' },   // topo direita — a virada
+  governance:   { x: 220, y: 180,  whisperSide: 'right' },  // topo esquerda
+  roadmap:      { x: 820, y: 1770, whisperSide: 'left' },   // base direita
+  closing:      { x: 540, y: 180,  whisperSide: 'right' },  // topo centro — finalizar
+  results:      { x: 820, y: 1770, whisperSide: 'left' },
+  capacities:   { x: 220, y: 180,  whisperSide: 'right' },
+  pathways:     { x: 400, y: 1770, whisperSide: 'right' },
+  'agents-flow':{ x: 820, y: 180,  whisperSide: 'left' },
 };
 
-const DEFAULT_STATION = { x: 850, y: 1720, whisperSide: 'left' as const };
+const DEFAULT_STATION = { x: 820, y: 1770, whisperSide: 'left' as const };
 
 /** Núcleo dourado quente — usado independente do accent do slide. */
 const GOLD = '#fbbf24';
@@ -148,7 +154,7 @@ interface MaestroVisualProps {
 }
 
 /** Tamanho base do orbe (sem as ondas laterais). */
-const SIZE = 110;
+const SIZE = 140;
 /** Largura total incluindo ondas. */
 const WAVE_REACH = 90;
 const TOTAL_WIDTH = SIZE + WAVE_REACH * 2;
