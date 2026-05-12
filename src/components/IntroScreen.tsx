@@ -9,7 +9,6 @@ import {
 } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { CustomCursor } from './intro/CustomCursor';
-import { IntroEnergyLayer } from './intro/IntroEnergyLayer';
 import { SaluxLogo } from './intro/SaluxLogo';
 import { tracks } from '@/domain/tracks';
 import type { TrackPresentation, TrackId } from '@/domain/tracks';
@@ -97,20 +96,6 @@ export function IntroScreen() {
       style={{ left: '-1px', top: '1px' }}
     >
       {!reduceMotion && <CustomCursor />}
-
-      <IntroEnergyLayer
-        highlightedTrackIndex={highlightedTrackIndex}
-        highlightColor={
-          highlightedTrackIndex !== null
-            ? theme.accents[TRACK_ACCENTS[highlightedTrackIndex % TRACK_ACCENTS.length]!].base
-            : null
-        }
-        reduceMotion={!!reduceMotion}
-        logoReady={logoReady}
-        parallaxX={energyParallaxX}
-        parallaxY={energyParallaxY}
-        wheelEnergy={wheelEnergySpring}
-      />
 
       {/* Header */}
       <header className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between p-8">
