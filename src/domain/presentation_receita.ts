@@ -102,6 +102,7 @@ const tecnologiaQueAgeStep: PresentationStep = {
     headline: 'A tecnologia que age',
     body: 'Identificar.\nPriorizar.\nAgir.',
     attentionPhrase: 'A perda deixa de ser invisível. Passa a ser evitável.',
+    bannerMedia: { videoSrc: '/intro/tecnologia-loop.mp4' },
   },
 };
 
