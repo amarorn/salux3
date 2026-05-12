@@ -67,8 +67,8 @@ export function MaestroOrb({ visible }: Props) {
   const [showWhisper, setShowWhisper] = useState(false);
   useEffect(() => {
     if (!visible || !whisper || reduceMotion) return;
-    const start = window.setTimeout(() => setShowWhisper(true), 900);
-    const end = window.setTimeout(() => setShowWhisper(false), 4400);
+    const start = window.setTimeout(() => setShowWhisper(true), 1100);
+    const end = window.setTimeout(() => setShowWhisper(false), 5800);
     return () => {
       window.clearTimeout(start);
       window.clearTimeout(end);
@@ -117,7 +117,9 @@ export function MaestroOrb({ visible }: Props) {
               whisper={whisper}
               showWhisper={showWhisper}
               whisperSide={station.whisperSide}
-              whisperPlacement={station.y < 800 ? 'below' : 'above'}
+              // Estações no topo: whisper ACIMA (longe do card abaixo).
+              // Estações na base: whisper ABAIXO (longe do card acima).
+              whisperPlacement={station.y < 800 ? 'above' : 'below'}
               stepId={stepId}
             />
           </motion.div>
@@ -141,6 +143,121 @@ export function MaestroOrb({ visible }: Props) {
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+interface SpeechBubbleProps {
+  text: string;
+  accent: string;
+  placement: 'above' | 'below';
+  reduceMotion: boolean;
+}
+
+function SpeechBubble({ text, accent, placement, reduceMotion }: SpeechBubbleProps) {
+  // Digitação caractere a caractere — efeito "falando"
+  const [typed, setTyped] = useState(reduceMotion ? text : '');
+  useEffect(() => {
+    if (reduceMotion) {
+      setTyped(text);
+      return;
+    }
+    setTyped('');
+    let i = 0;
+    const speed = Math.max(28, Math.min(55, 1400 / text.length));
+    const tick = window.setInterval(() => {
+      i++;
+      setTyped(text.slice(0, i));
+      if (i >= text.length) window.clearInterval(tick);
+    }, speed);
+    return () => window.clearInterval(tick);
+  }, [text, reduceMotion]);
+
+  const isBelow = placement === 'below';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: isBelow ? -8 : 8, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: isBelow ? -4 : 4, scale: 0.96 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      className="absolute whitespace-nowrap"
+      style={{
+        left: '50%',
+        transform: 'translateX(-50%)',
+        ...(isBelow
+          ? { top: '100%', marginTop: 18 }
+          : { bottom: '100%', marginBottom: 18 }),
+      }}
+    >
+      {/* Tail (triangle) apontando para o orbe */}
+      <span
+        aria-hidden
+        className="absolute left-1/2 -translate-x-1/2"
+        style={{
+          width: 0,
+          height: 0,
+          ...(isBelow
+            ? {
+                top: -7,
+                borderLeft: '7px solid transparent',
+                borderRight: '7px solid transparent',
+                borderBottom: `8px solid ${accent}88`,
+                filter: `drop-shadow(0 -2px 4px ${accent}55)`,
+              }
+            : {
+                bottom: -7,
+                borderLeft: '7px solid transparent',
+                borderRight: '7px solid transparent',
+                borderTop: `8px solid ${accent}88`,
+                filter: `drop-shadow(0 2px 4px ${accent}55)`,
+              }),
+        }}
+      />
+      {/* Tail interior (preenchimento escuro do bubble) */}
+      <span
+        aria-hidden
+        className="absolute left-1/2 -translate-x-1/2"
+        style={{
+          width: 0,
+          height: 0,
+          ...(isBelow
+            ? {
+                top: -5,
+                borderLeft: '6px solid transparent',
+                borderRight: '6px solid transparent',
+                borderBottom: `7px solid rgba(8,12,20,0.95)`,
+              }
+            : {
+                bottom: -5,
+                borderLeft: '6px solid transparent',
+                borderRight: '6px solid transparent',
+                borderTop: `7px solid rgba(8,12,20,0.95)`,
+              }),
+        }}
+      />
+
+      <div
+        className="relative rounded-2xl border px-4 py-2 text-[12px] font-medium leading-snug text-white/95 backdrop-blur-md"
+        style={{
+          borderColor: `${accent}66`,
+          background: `linear-gradient(135deg, ${accent}1f 0%, rgba(8,12,20,0.95) 100%)`,
+          boxShadow: `0 10px 28px -6px ${accent}55, 0 0 0 1px ${accent}22, inset 0 1px 0 rgba(255,255,255,0.08)`,
+          minWidth: 60,
+        }}
+      >
+        <span>{typed}</span>
+        {/* Cursor piscante enquanto digita */}
+        {!reduceMotion && typed.length < text.length && (
+          <motion.span
+            aria-hidden
+            className="ml-0.5 inline-block h-[12px] w-[2px] translate-y-[2px]"
+            style={{ background: accent }}
+            animate={{ opacity: [1, 0, 1] }}
+            transition={{ duration: 0.7, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
+      </div>
+    </motion.div>
   );
 }
 
@@ -170,29 +287,16 @@ function MaestroVisual({
 }: MaestroVisualProps) {
   return (
     <div className="relative" style={{ width: TOTAL_WIDTH, height: SIZE }}>
-      {/* Whisper bubble — acima ou abaixo do orbe, longe do card */}
+      {/* Speech bubble — Maestro "falando" com tail apontando para o orbe */}
       <AnimatePresence>
         {showWhisper && whisper && (
-          <motion.div
+          <SpeechBubble
             key={`whisper-${stepId}`}
-            initial={{ opacity: 0, y: whisperPlacement === 'below' ? -6 : 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: whisperPlacement === 'below' ? -4 : 4 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[11px] font-medium tracking-wide text-white/90 backdrop-blur-md"
-            style={{
-              left: '50%',
-              transform: 'translateX(-50%)',
-              ...(whisperPlacement === 'below'
-                ? { top: '100%', marginTop: 12 }
-                : { bottom: '100%', marginBottom: 12 }),
-              borderColor: `${accent}44`,
-              background: `linear-gradient(135deg, ${accent}1a 0%, rgba(8,12,20,0.9) 100%)`,
-              boxShadow: `0 8px 24px -6px ${accent}55, inset 0 1px 0 rgba(255,255,255,0.08)`,
-            }}
-          >
-            {whisper}
-          </motion.div>
+            text={whisper}
+            accent={accent}
+            placement={whisperPlacement}
+            reduceMotion={reduceMotion}
+          />
         )}
       </AnimatePresence>
 
