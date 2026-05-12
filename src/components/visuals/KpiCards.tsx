@@ -85,6 +85,7 @@ function KpiCard({ item, accentColor, active, reducedMotion }: KpiCardProps) {
 
   const ringValue = item.ring ?? (target >= 0 && target <= 100 ? target : 50);
   const deltaUnit = item.deltaUnit ?? 'pp';
+  const unit = item.unit ?? '%';
 
   return (
     <div
@@ -119,7 +120,8 @@ function KpiCard({ item, accentColor, active, reducedMotion }: KpiCardProps) {
             )}
             style={{ color: accentColor, textShadow: `0 0 10px ${accentColor}88` }}
           >
-            {formatBR(display, decimals)}%
+            {formatBR(display, decimals)}
+            {unit && <span className="ml-0.5 text-[0.85em] font-semibold opacity-75">{unit}</span>}
           </span>
         </DonutRing>
 
