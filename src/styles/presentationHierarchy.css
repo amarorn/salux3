@@ -3,11 +3,11 @@
  * Variáveis usadas pelos steps da apresentação (`body.presentation-body`).
  */
 body.presentation-body {
-  --ppt-kicker-size: 10px;
+  --ppt-kicker-size: 11px;
   --ppt-kicker-tracking: 0.32em;
   --ppt-title-weight: 700;
   --ppt-title-tracking: -0.03em;
-  --ppt-body-size: 15px;
+  --ppt-body-size: 17px;
   --ppt-body-leading: 1.65;
 }
 

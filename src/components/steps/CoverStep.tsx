@@ -93,10 +93,19 @@ export function CoverStep({ step, active }: Props) {
       >
         <motion.h1
           variants={item}
-          className="presentation-ppt-title max-w-[22ch] text-[clamp(1.7rem,4.4vw,2.45rem)] whitespace-pre-line"
+          className="presentation-ppt-title max-w-[22ch] text-[clamp(1.95rem,4.9vw,2.75rem)] whitespace-pre-line"
         >
           {step.title}
         </motion.h1>
+
+        {step.content.lead && (
+          <motion.p
+            variants={item}
+            className="presentation-ppt-body max-w-prose whitespace-pre-line text-slate-200/90"
+          >
+            {step.content.lead}
+          </motion.p>
+        )}
 
         {contrast && (
           <motion.div variants={item} className="flex w-full gap-3">
