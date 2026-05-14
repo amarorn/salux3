@@ -39,7 +39,7 @@ export function CapacitiesStep({ step, active }: Props) {
       >
         <motion.div variants={item}>
           <h2
-            className="presentation-ppt-title max-w-[26ch] text-[clamp(1.45rem,3.2vw,2.05rem)] leading-[1.1]"
+            className="presentation-ppt-title max-w-[26ch] text-[clamp(1.65rem,3.6vw,2.3rem)] leading-[1.1]"
             style={{ textShadow: `0 0 28px ${accent.base}22` }}
           >
             {step.content.headline ?? 'Capacidades coordenadas'}

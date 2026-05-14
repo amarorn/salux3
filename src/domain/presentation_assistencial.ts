@@ -32,17 +32,42 @@ function withStep(id: PresentationStep['id'], patch: Partial<PresentationStep>) 
 const highlightContextStep: PresentationStep = {
   id: 'highlight-context',
   index: 8,
-  title: 'A instituição registra o cuidado. Mas nem sempre sustenta o contexto.',
-  subtitle: 'Continuidade decisória',
+  title: 'Com o INITIA, a informação deixa de ser consultada e passa a sustentar a decisão.',
+  subtitle: 'Agentes que sustentam a continuidade decisória',
   position: { x: -560, y: -1480 },
   scale: 1.25,
-  kind: 'highlight',
-  accent: 'rose',
+  kind: 'narrative',
+  accent: 'emerald',
   content: {
-    headline: 'Síntese',
-    body:
-      'O risco assistencial nem sempre nasce da gravidade do caso. Muitas vezes, ele se forma quando o contexto clínico se perde ao longo da jornada.',
-    attentionPhrase: 'Não falta dado. Falta continuidade.',
+    headline: 'INITIA · Agentes',
+    cardVisual: 'radar',
+    contrastPair: {
+      left: {
+        label: 'Sem INITIA',
+        tone: 'warm',
+        text:
+          'O usuário procura.\nInterpreta. Reconstrói contexto.\nDecide com visão parcial. Aciona tarde.',
+      },
+      right: {
+        label: 'Com INITIA',
+        tone: 'cool',
+        text:
+          'A informação se apresenta. O contexto acompanha.\nO risco é priorizado. O agente orienta.\nA ação parte do dado.',
+      },
+    },
+    body: 'O que os agentes fazem na jornada assistencial:',
+    bullets: [
+      'Estruturam dados críticos desde a admissão',
+      'Sintetizam o prontuário e destacam riscos, alergias e restrições',
+      'Mantêm contexto entre áreas e equipes ao longo das transições',
+      'Acompanham áreas críticas e priorizam eventos',
+      'Validam consistência entre registro, conduta e documentação',
+      'Apoiam a organização da alta e a continuidade do pós-alta',
+    ],
+    attentionPhrase:
+      'Os agentes não substituem a equipe. Ampliam a capacidade de leitura, priorização e decisão ao longo da jornada.',
+    closingHighlight:
+      'A tecnologia deixa de apenas registrar o cuidado — e passa a sustentar continuidade, visibilidade e capacidade real de decisão.',
   },
 };
 
@@ -52,231 +77,387 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
     s.id === 'cover'
       ? {
           ...s,
-          title: 'Onde o cuidado perde continuidade na sua operação?',
+          accent: 'emerald' as const,
+          title: 'Onde o risco assistencial começa a se formar?',
           subtitle: '2 — Assistência',
         }
       : s,
   )
   .map(
     withStep('limit', {
-      title: 'O risco assistencial nem sempre nasce da gravidade do caso.',
-      subtitle: 'Contexto clínico ao longo da jornada',
+      accent: 'rose',
+      title: 'O risco não começa com um erro grave. Ele se acumula.',
+      subtitle: 'Rupturas pequenas que ninguém percebe isoladamente',
     }),
   )
   .map(
     withStep('why-agents', {
-      title: 'A instituição registra o cuidado',
-      subtitle: 'Registrar não é o mesmo que sustentar contexto',
+      accent: 'emerald',
+      title: 'A instituição registra. Mas algo se perde ao longo da jornada.',
+      subtitle: 'Registrar não é o mesmo que sustentar continuidade decisória',
     }),
   )
   .map(
     withStep('architecture', {
-      title: 'Quando o contexto se perde, o risco cresce em silêncio',
-      subtitle: 'Evidência e pontos críticos',
+      kind: 'narrative',
+      accent: 'amber',
+      title: 'Quando o contexto se perde, o risco cresce em silêncio.',
+      subtitle: 'Evidência: o padrão aparece nos números',
     }),
   )
   .map(
     withStep('journey', {
-      title: 'A ruptura não acontece em um único ponto',
-      subtitle: 'Ela se forma ao longo da jornada',
+      kind: 'narrative',
+      accent: 'cyan',
+      title: 'A ruptura não acontece em um único ponto. Ela se forma ao longo da jornada.',
+      subtitle: 'Cada etapa parece resolvida isoladamente — mas o cuidado depende de continuidade',
     }),
   )
   .map(
     withStep('integration', {
-      title: 'O problema não é falta de competência clínica',
-      subtitle: 'É ausência de continuidade decisória',
+      kind: 'narrative',
+      accent: 'emerald',
+      title: 'Não é um problema de competência clínica. É um problema de continuidade operacional.',
+      subtitle: 'As equipes sabem cuidar — falta sustentar continuidade',
     }),
   )
   .map(
     withStep('governance', {
-      title: 'A pergunta deixa de ser onde está registrado',
-      subtitle: 'Virada de lógica',
+      kind: 'narrative',
+      accent: 'emerald',
+      title: 'A pergunta mudou.',
+      subtitle: 'Da posse do dado para a continuidade do contexto na decisão',
     }),
   )
   .map(
     withStep('roadmap', {
-      title: 'Do registro à decisão contínua',
-      subtitle: 'Movimento necessário',
+      kind: 'capacities',
+      accent: 'cyan',
+      title: 'Essa arquitetura já existe na prática.',
+      subtitle: 'Ecossistema Salux: capacidades centrais e de sustentação da continuidade',
     }),
   )
   .map(
     withStep('closing', {
-      title: 'Uma base coordenada para o cuidado',
-      subtitle: 'Segurança assistencial em escala',
+      accent: 'emerald',
+      title: 'O cuidado deixa de depender de reconstrução. E passa a ter continuidade real.',
+      subtitle: 'Resultado: base coordenada, continuidade clínica e capacidade real de decisão',
     }),
   )
   .map(
     withContent('cover', {
       headline: 'Abertura',
-      body:
-        'Na admissão com dados incompletos?\nNa transição entre áreas?\nNo diagnóstico que não acompanha o caso?\nNo centro cirúrgico ou na recuperação?\nNa documentação fragmentada?\nNa alta sem acompanhamento?\nNo pós-alta sem vínculo?',
-      heroImage: { src: INTRO_ASSIST_COVER_URL, alt: 'Equipe em corredor hospitalar' },
-      meta: {
-        Edição: '01 / 2026',
-        Tempo: '~12 min',
-        Público: 'Liderança assistencial e tecnologia',
+      cardVisual: 'reveal',
+      lead:
+        'Na gravidade do caso?\nNa complexidade do paciente?\nOu no momento em que o cuidado perde continuidade?',
+      contrastPair: {
+        left: {
+          label: 'Evento visível',
+          icon: '🔴',
+          tone: 'warm',
+          text:
+            'Complicação.\nErro identificado.\nEvento adverso registrado.',
+        },
+        right: {
+          label: 'Risco silencioso',
+          icon: '🦊',
+          tone: 'cool',
+          text:
+            'Contexto que se perde.\nDecisão com visão parcial.\nRisco crescendo antes de aparecer.',
+        },
       },
+      body:
+        'Em saúde, o risco nem sempre nasce de um evento isolado. Muitas vezes, ele se forma aos poucos — e em silêncio.',
+      attentionPhrase: 'O problema não é falta de dado. É falta de continuidade.',
+      closingQuestionLabel: 'CTA · Pergunta-gatilho',
+      closingQuestion: 'Onde o cuidado perde continuidade na sua operação?',
+      heroImage: { src: INTRO_ASSIST_COVER_URL, alt: 'Equipe em corredor hospitalar' },
     }),
   )
   .map(
     withContent('limit', {
-      headline: 'Diagnóstico',
+      headline: 'Acúmulo',
+      cardVisual: 'accumulation',
+      valueStagesLead:
+        'Na maioria das vezes, o risco se forma em rupturas pequenas — que ninguém percebe isoladamente:',
+      valueStagesFlat: true,
+      valueStagesGridCols: 3,
+      valueStages: [
+        { number: '📋', label: 'Informação', description: 'Que não chega completa.' },
+        { number: '🔁', label: 'Histórico', description: 'Que precisa ser reconstruído a cada etapa.' },
+        { number: '🔀', label: 'Transição', description: 'Entre áreas sem contexto preservado.' },
+        { number: '🧩', label: 'Decisão', description: 'Tomada com visão parcial do caso.' },
+        { number: '🚪', label: 'Alta', description: 'Que encerra o vínculo antes de encerrar o cuidado.' },
+      ],
       body:
-        'Muitas vezes, ele se forma quando o contexto clínico se perde ao longo da jornada.\n\nNão falta dado. Falta continuidade.',
-      meta: {
-        Próximo: 'O que a instituição sustenta',
-      },
+        'Cada ruptura parece administrável. Mas elas se somam ao longo da jornada — e o risco cresce antes de se tornar visível.',
+      attentionPhrase:
+        'Não falta dado. Falta continuidade entre o dado e a decisão certa, no momento certo.',
+      bullets: [],
+      metrics: undefined,
     }),
   )
   .map(
     withContent('why-agents', {
-      headline: 'Fragmentação',
+      headline: 'Continuidade decisória',
+      cardVisual: 'transform',
       metrics: [],
-      body:
-        'A instituição registra o cuidado. Mas nem sempre sustenta o contexto.\n\nMas… ao longo da jornada:\n\nA operação sustenta o cuidado todos os dias, mas ainda não sustenta continuidade de decisão.',
-      bullets: [
-        'Registra',
-        'Documenta',
-        'Atende',
-        'Prescreve',
-        'Executa',
-        'Encaminha',
-        'Dá alta',
-        'informações não chegam completas',
-        'históricos são reconstruídos',
-        'decisões são tomadas com visão parcial',
-        'áreas operam com leituras diferentes',
-        'o cuidado perde fluidez',
-      ],
-      bulletSplitAfter: 7,
-      meta: {
-        Próximo: 'Evidência quantitativa',
+      bullets: [],
+      bulletSplitAfter: undefined,
+      dualStages: {
+        positive: {
+          lead: 'O que a operação faz todos os dias:',
+          gridCols: 7,
+          items: [
+            { label: 'Registra' },
+            { label: 'Documenta' },
+            { label: 'Atende' },
+            { label: 'Prescreve' },
+            { label: 'Executa' },
+            { label: 'Encaminha' },
+            { label: 'Dá alta' },
+          ],
+        },
+        negative: {
+          lead: 'O que acontece entre essas etapas:',
+          gridCols: 3,
+          items: [
+            { label: 'Informações não chegam completas' },
+            { label: 'Contexto clínico é reconstruído a cada transição' },
+            { label: 'Áreas operam com leituras diferentes do mesmo caso' },
+          ],
+        },
       },
+      attentionPhrase:
+        'A operação sustenta o cuidado todos os dias. Mas ainda não sustenta continuidade de decisão ao longo da jornada.',
     }),
   )
   .map(
     withContent('architecture', {
       headline: 'Evidência',
+      cardVisual: 'late-reaction',
+      lead: 'Esse padrão não é percepção. Aparece nos números:',
+      metrics: [],
+      bullets: [],
       architectureMinimal: true,
-      body:
-        'Quando o contexto se perde, o risco cresce em silêncio.\n\nA transição não é apenas passagem de área. É um ponto crítico de segurança.\nEm áreas críticas, o risco precisa ser acompanhado enquanto ainda pode ser antecipado.',
-      metrics: [
+      evidenceMetrics: [
         {
+          badge: 'Dado · Evidência',
+          prefix: 'até',
           value: 80,
-          decimals: 0,
-          label: 'Eventos adversos graves',
-          suffix: 'associados a falhas nas transições de cuidado',
-          ring: 80,
-          trend: [52, 58, 61, 64, 68, 72, 76, 80],
-          delta: 4,
-          deltaUnit: 'pp',
+          unit: '%',
+          headline:
+            'dos eventos adversos graves podem estar associados a falhas nas transições de cuidado.',
+          context:
+            'A transição entre áreas não é apenas passagem de paciente. É um ponto crítico de segurança — onde o contexto se perde e o risco se forma.',
         },
         {
+          badge: 'Dado · Evidência',
+          prefix: 'até',
           value: 15,
-          decimals: 0,
-          label: 'Complicações tardias',
-          suffix: 'em áreas críticas (ex.: recuperação pós-anestésica)',
-          ring: 15,
-          trend: [9, 10, 11, 11.5, 12.5, 13, 14, 15],
-          delta: 1,
-          deltaUnit: 'pp',
+          unit: '%',
+          headline:
+            'dos pacientes em áreas críticas podem apresentar complicações não detectadas imediatamente.',
+          context:
+            'Em recuperação pós-anestésica, UTI e leitos monitorados, o risco muda rápido. Quando a visibilidade chega tarde, parte do dano já aconteceu.',
         },
       ],
-      bullets: [
-        'A transição é ponto crítico de segurança — não apenas “passagem de área”',
-        'Em áreas críticas, o risco precisa ser acompanhado enquanto ainda pode ser antecipado',
-      ],
-      visual: { type: 'risk-curve' },
-      meta: {
-        Próximo: 'Jornada como cadeia de decisões',
-      },
+      body: 'Esses dados não falam apenas de eventos. Eles mostram uma fragilidade estrutural.',
+      attentionPhrase:
+        'Quando o contexto se perde, o risco cresce em silêncio. E quando se torna visível, parte dele já se materializou.',
     }),
   )
   .map(
     withContent('journey', {
       headline: 'Jornada',
-      journeyStages: [
-        'Admissão',
-        'Atendimento',
-        'Diagnóstico',
-        'Transição',
-        'Centro cirúrgico',
-        'Recuperação',
-        'Documentação',
-        'Alta',
-        'Pós-alta',
+      cardVisual: 'transform',
+      journeyStages: [],
+      lead: 'Cada etapa parece resolvida isoladamente. Mas o cuidado não acontece em etapas isoladas.',
+      valueStagesFlat: true,
+      valueStagesGridCols: 5,
+      valueStages: [
+        { number: '01', label: 'Admissão' },
+        { number: '02', label: 'Atendimento' },
+        { number: '03', label: 'Transição entre áreas' },
+        { number: '04', label: 'Centro cirúrgico' },
+        { number: '05', label: 'Recuperação' },
+        { number: '06', label: 'Documentação' },
+        { number: '07', label: 'Operação assistencial' },
+        { number: '08', label: 'Alta' },
+        { number: '09', label: 'Pós-alta' },
       ],
       body:
-        'Cada etapa parece resolvida isoladamente.\nMas o cuidado depende de continuidade entre elas.\n\nQuando a jornada depende de reconstrução manual, o risco passa a se formar entre as etapas.\n\nOrientação visual: cada etapa como ponto na jornada; entre os pontos, rupturas de contexto e alertas.',
+        'Quando a continuidade não é sustentada entre essas etapas, a jornada passa a depender de repasses manuais, memória individual e reconstrução constante de contexto.',
+      attentionPhrase:
+        'O cuidado depende de continuidade entre as etapas. Não apenas de qualidade dentro delas.',
+      closingQuestionLabel: 'CTA · Pergunta-gatilho',
+      closingQuestion:
+        'Em qual ponto da jornada o cuidado perde mais continuidade na sua instituição?',
       bullets: [],
-      meta: {
-        Próximo: 'Limite do modelo atual',
-      },
     }),
   )
   .map(
     withContent('integration', {
-      headline: 'Modelo atual',
-      integrationMinimal: true,
-      body:
-        'O limite não está na ausência de tecnologia. Está na ausência de continuidade decisória.',
-      bullets: [
-        'Reconstrói histórico',
-        'Reconstrói contexto',
-        'Reconstrói pendências',
-        'Reconstrói orientações',
-        'Reconstrói riscos',
-        'Reconstrói decisões',
-        'No curto prazo, a equipe compensa.\nNo médio prazo, isso cria variabilidade.',
-      ],
-      meta: {
-        Próximo: 'Nova pergunta operacional',
+      headline: 'Continuidade operacional',
+      cardVisual: 'mesh',
+      lead: 'As equipes sabem cuidar. O problema está na forma como a operação está organizada.',
+      contrastPair: {
+        left: {
+          label: 'O que a saúde avançou',
+          tone: 'cool',
+          text:
+            'Registrar e armazenar informação.\nDigitalizar processos.\nIntegrar sistemas.',
+        },
+        right: {
+          label: 'O que ainda falta',
+          tone: 'warm',
+          text:
+            'Fazer com que a informação certa acompanhe a jornada no momento em que a decisão precisa ser tomada.',
+        },
       },
+      body:
+        'Registrar informação não significa preservar contexto.\nPreservar contexto não significa apenas integrar sistemas.',
+      attentionPhrase:
+        'O limite não está na ausência de tecnologia. Está na ausência de uma base capaz de transformar informação dispersa em clareza clínica e ação coordenada.',
+      bullets: [],
     }),
   )
   .map(
     withContent('governance', {
-      headline: 'Virada',
-      governanceCompare: {
-        before: 'Onde a informação está registrada?',
-        after: 'O contexto certo acompanha a decisão no momento em que ela acontece?',
+      headline: 'A pergunta mudou.',
+      cardVisual: 'transform',
+      contrastPair: {
+        left: {
+          label: 'Antes',
+          tone: 'warm',
+          text: 'Onde a informação está registrada?',
+        },
+        right: {
+          label: 'Agora',
+          tone: 'cool',
+          text: 'O contexto certo acompanha a decisão no momento em que ela acontece?',
+        },
       },
-      body: 'Movimento visual: da posse do dado para a coincidência entre contexto e decisão.',
+      body: 'Isso exige uma mudança de lógica na base da operação:',
+      beforeAfter: {
+        before: [
+          'Registro',
+          'Etapa isolada',
+          'Leitura tardia',
+          'Reação ao risco',
+          'Esforço individual de compensação',
+        ],
+        after: [
+          'Contexto preservado',
+          'Jornada coordenada',
+          'Visibilidade durante a execução',
+          'Antecipação coordenada',
+          'Suporte estruturado à decisão',
+        ],
+      },
+      attentionPhrase:
+        'A mudança não está em digitalizar mais uma etapa. Está em sustentar continuidade ao longo de toda a jornada.',
       bullets: [],
-      meta: {
-        Conformidade: 'LGPD · governança clínica',
-        Próximo: 'Transformações práticas',
-      },
+      revealPillars: [],
     }),
   )
   .map(
     withContent('roadmap', {
-      headline: 'Eixos',
-      roadmapTransform: true,
-      bullets: [
-        'De registro → contexto',
-        'De etapa → jornada',
-        'De leitura tardia → visibilidade durante a execução',
-        'De reação → antecipação',
-        'De esforço individual → suporte estruturado à decisão',
-      ],
+      headline: 'Essa arquitetura já existe na prática.',
+      cardVisual: 'orbit',
       body:
-        'Cuidar com continuidade exige uma base capaz de preservar contexto ao longo da jornada.',
-      meta: {
-        Próximo: 'Encerramento',
-      },
+        'O Ecossistema Salux estrutura a continuidade em cada ponto da jornada — de forma integrada, não como soluções isoladas.',
+      capacityGroups: [
+        {
+          title: 'Capacidades centrais da continuidade',
+          tone: 'core',
+          items: [
+            {
+              name: 'Base clínica',
+              subtitle: 'Plataforma Salux + INITIA',
+              description:
+                'Núcleo que organiza dados, fluxos, registros e contexto clínico.',
+              tagline: 'O caso deixa de ser reconstruído a cada etapa.',
+            },
+            {
+              name: 'Diagnóstico integrado',
+              subtitle: 'Med.Place',
+              description:
+                'Exame, laudo e contexto conectados à linha do cuidado.',
+              tagline: 'Diagnóstico como infraestrutura crítica da jornada — não serviço apartado.',
+            },
+            {
+              name: 'Cuidado conectado',
+              subtitle: 'CloudHealth',
+              description:
+                'Crônicos, pós-cirúrgicos e pacientes em recuperação acompanhados com vínculo e resposta.',
+              tagline: 'A continuidade não termina na alta.',
+            },
+            {
+              name: 'Áreas críticas',
+              subtitle: 'SkyMed · VisionPilot · AGCOM',
+              description:
+                'Registro anestésico estruturado e rastreabilidade contínua.',
+              tagline: 'O risco acompanhado enquanto o cuidado acontece.',
+            },
+          ],
+        },
+        {
+          title: 'Capacidades de sustentação da continuidade',
+          tone: 'support',
+          items: [
+            {
+              name: 'Governança documental',
+              subtitle: 'ZeroDox',
+              description:
+                'Documentação que sustenta rastreabilidade, conformidade e continuidade.',
+              tagline: 'Deixa de ser ponto de fragilidade.',
+            },
+            {
+              name: 'Força de trabalho',
+              subtitle: 'StarGrid',
+              description:
+                'Escala, cobertura e disponibilidade alinhadas ao risco e ao fluxo assistencial.',
+              tagline: 'Equipe como capacidade coordenada.',
+            },
+            {
+              name: 'Inteligência operacional',
+              subtitle: 'VisionPilot',
+              description:
+                'Fluxos físicos, ocupação e sinais do ambiente acompanhados em tempo real.',
+              tagline: 'O risco que não aparece no prontuário.',
+            },
+          ],
+        },
+      ],
+      bullets: [],
+      roadmapTransform: false,
     }),
   )
   .map(
     withContent('closing', {
-      headline: 'Síntese',
+      headline: 'O cuidado deixa de depender de reconstrução. E passa a ter continuidade real.',
+      cardVisual: 'flow',
       body:
-        'Isso não se resolve com uma solução isolada.\n\nBase clínica e operacional. Diagnóstico integrado. Centro cirúrgico e áreas críticas. Documentação estruturada. Gestão da força de trabalho. Cuidado conectado. Inteligência em tempo real.\n\nEsses elementos não podem operar como pontos separados. Precisam funcionar como uma base coordenada.\n\nSegurança assistencial depende da capacidade de manter continuidade entre áreas, equipes e momentos do cuidado.',
+        'Com uma base coordenada, a jornada deixa de depender de esforço individual de compensação.',
+      valueStagesFlat: true,
+      valueStagesGridCols: 3,
+      valueStages: [
+        { number: '✓', label: 'Mais previsibilidade sobre a jornada e os riscos' },
+        { number: '✓', label: 'Mais clareza clínica no momento da decisão' },
+        { number: '✓', label: 'Mais continuidade entre áreas, equipes e momentos' },
+        { number: '✓', label: 'Menos retrabalho e reconstrução de contexto' },
+        { number: '✓', label: 'Menos variabilidade e exposição assistencial' },
+        { number: '✓', label: 'Mais capacidade de antecipar risco antes que se materialize' },
+      ],
+      attentionPhrase:
+        'O valor não está em registrar melhor. Está em sustentar o cuidado com contexto vivo ao longo da jornada.',
+      closingQuestionLabel: 'CTA · Pergunta-gatilho',
+      closingQuestion:
+        'Podemos mapear juntos onde o cuidado perde continuidade na sua operação? Marque uma conversa com nosso time.',
+      closingHighlight:
+        'Ecossistema Salux · A base para uma nova forma de operar a saúde.',
       bullets: [],
-      meta: {
-        Próximo: 'Workshop de descoberta · 2 horas',
-        Contato: 'salux@beanalytic.com.br',
-      },
     }),
   );
 

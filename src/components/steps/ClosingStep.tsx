@@ -53,7 +53,7 @@ export function ClosingStep({ step, active }: Props) {
 
         <motion.h2
           variants={item}
-          className="presentation-ppt-title max-w-[22ch] text-[clamp(1.5rem,3.8vw,2.35rem)] whitespace-pre-line"
+          className="presentation-ppt-title max-w-[22ch] text-[clamp(1.7rem,4.2vw,2.6rem)] whitespace-pre-line"
         >
           {step.content.headline}
         </motion.h2>

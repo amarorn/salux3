@@ -27,6 +27,7 @@ import { theme } from '@/domain/theme';
 import { AnimatedRiskCurve } from '../visuals/AnimatedRiskCurve';
 import { AnimatedNarrativeMetrics } from '../visuals/AnimatedNarrativeMetrics';
 import { KpiCards } from '../visuals/KpiCards';
+import { EvidenceMetricCard } from '../visuals/EvidenceMetricCard';
 import { getCardTextVariants } from './cardTextMotion';
 import { ClosingHighlight, EvidenceCardBlock, HighlightPhraseList } from './HighlightBlocks';
 
@@ -101,11 +102,13 @@ export function NarrativeStep({ step, active }: Props) {
             : step.content.painPointsGridCols === 3
               ? 820
               : 640
-          : step.content.valueStages && step.content.valueStages.length >= 4
-            ? step.content.valueStages.length >= 6 || step.content.valueStagesGridCols === 4
-              ? 880
-              : 760
-            : undefined
+          : step.content.dualStages
+            ? 900
+            : step.content.valueStages && step.content.valueStages.length >= 4
+              ? step.content.valueStages.length >= 6 || step.content.valueStagesGridCols === 4
+                ? 880
+                : 760
+              : undefined
       }
       badge={
         painPoints
@@ -136,7 +139,7 @@ export function NarrativeStep({ step, active }: Props) {
           </motion.div>
         ) : (
           <motion.div variants={item}>
-            <h2 className="presentation-ppt-title max-w-[24ch] text-[clamp(1.35rem,3.2vw,1.85rem)]">
+            <h2 className="presentation-ppt-title max-w-[24ch] text-[clamp(1.55rem,3.6vw,2.1rem)]">
               {step.title}
             </h2>
           </motion.div>
@@ -160,6 +163,15 @@ export function NarrativeStep({ step, active }: Props) {
               />
             )}
           </motion.div>
+        )}
+
+        {step.content.lead && (
+          <motion.p
+            variants={item}
+            className="presentation-ppt-body max-w-prose whitespace-pre-line text-slate-200/90"
+          >
+            {step.content.lead}
+          </motion.p>
         )}
 
         {step.content.contrastPair && (
@@ -290,6 +302,100 @@ export function NarrativeStep({ step, active }: Props) {
                 );
               })}
             </div>
+          </motion.div>
+        )}
+
+        {step.content.evidenceMetrics && step.content.evidenceMetrics.length > 0 && (
+          <motion.div variants={item} className="space-y-3">
+            {step.content.evidenceMetrics.map((m, i) => (
+              <EvidenceMetricCard
+                key={`${m.value}-${i}`}
+                badge={m.badge}
+                prefix={m.prefix}
+                value={m.value}
+                decimals={m.decimals}
+                unit={m.unit}
+                headline={m.headline}
+                context={m.context}
+                accentColor={accent.base}
+                active={active}
+                delay={i * 0.45}
+              />
+            ))}
+          </motion.div>
+        )}
+
+        {step.content.dualStages && (
+          <motion.div variants={item} className="space-y-5">
+            {(['positive', 'negative'] as const).map((group, gi) => {
+              const cfg = step.content.dualStages![group];
+              const c = group === 'positive' ? theme.accents.emerald : theme.accents.rose;
+              const icon = group === 'positive' ? '✓' : '⚠';
+              return (
+                <div key={group} className="space-y-2.5">
+                  <p
+                    className="text-[0.95rem] font-semibold leading-snug"
+                    style={{ color: c.base, textShadow: `0 0 16px ${c.base}1f` }}
+                  >
+                    {cfg.lead}
+                  </p>
+                  <div
+                    className="grid gap-2"
+                    style={{
+                      gridTemplateColumns: `repeat(${cfg.gridCols ?? cfg.items.length}, minmax(0, 1fr))`,
+                    }}
+                  >
+                    {cfg.items.map((it, i) => (
+                      <motion.div
+                        key={`${it.label}-${i}`}
+                        className="relative overflow-hidden rounded-lg border px-3 py-2.5"
+                        style={{
+                          borderColor: `${c.base}55`,
+                          background: `linear-gradient(135deg, ${c.base}18 0%, rgba(255,255,255,0.02) 70%)`,
+                          boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05)`,
+                        }}
+                        initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                        animate={
+                          active ? { opacity: 1, y: 0 } : reduceMotion ? undefined : { opacity: 0, y: 8 }
+                        }
+                        transition={{
+                          duration: 0.45,
+                          ease: [0.22, 1, 0.36, 1],
+                          delay: 0.4 + gi * 0.15 + i * 0.06,
+                        }}
+                      >
+                        <span
+                          aria-hidden
+                          className="pointer-events-none absolute inset-x-3 -top-px h-px"
+                          style={{ background: `linear-gradient(90deg, transparent, ${c.base}, transparent)` }}
+                        />
+                        <div className="flex items-start gap-2">
+                          <span
+                            aria-hidden
+                            className="mt-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded text-[11px] font-bold"
+                            style={{
+                              background: c.base,
+                              color: '#0b0f1a',
+                              boxShadow: `0 0 10px ${c.base}66`,
+                            }}
+                          >
+                            {icon}
+                          </span>
+                          <p className="text-[0.85rem] font-medium leading-snug text-white/95">
+                            {it.label}
+                            {it.description && (
+                              <span className="block text-[0.78rem] font-normal text-slate-300/80">
+                                {it.description}
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </motion.div>
         )}
 

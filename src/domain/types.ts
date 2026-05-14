@@ -169,14 +169,46 @@ export interface StepContent {
   bannerMedia?: BannerMedia;
   /** Par de contraste (ex.: visível × despercebido) usado na capa. */
   contrastPair?: ContrastPair;
+  /** Texto curto exibido logo abaixo do título (lead) — usado em capa e steps narrativos. */
+  lead?: string;
   /** Etapas numeradas em grid (4 colunas) — usadas em "ruptura acumulada". */
   valueStages?: ValueStage[];
   /** Texto curto exibido logo acima da grid de etapas (lead). */
   valueStagesLead?: string;
+  /** Cartões de "evidência numérica" — número grande com prefixo, manchete e contexto em itálico. */
+  evidenceMetrics?: {
+    /** Badge curta acima do número (ex.: "Dado · Evidência"). */
+    badge?: string;
+    /** Prefixo curto antes do número (ex.: "até"). */
+    prefix?: string;
+    /** Valor numérico (será animado em count-up). */
+    value: number;
+    /** Casas decimais (default 0). */
+    decimals?: number;
+    /** Unidade após o valor (default "%"). */
+    unit?: string;
+    /** Frase principal logo abaixo do número. */
+    headline: string;
+    /** Parágrafo em itálico (contexto/explicação). */
+    context?: string;
+  }[];
+  /** Duas linhas de etapas — uma "positiva" (o que se faz), outra "negativa" (o que falha). */
+  dualStages?: {
+    positive: {
+      lead: string;
+      items: { label: string; description?: string }[];
+      gridCols?: number;
+    };
+    negative: {
+      lead: string;
+      items: { label: string; description?: string }[];
+      gridCols?: number;
+    };
+  };
   /** Desabilita o gradiente de intensidade entre etapas — usa estilo uniforme (ex.: 3 falhas equivalentes). */
   valueStagesFlat?: boolean;
   /** Número de colunas da grid de etapas (default = quantidade de etapas, em uma linha). */
-  valueStagesGridCols?: 2 | 3 | 4;
+  valueStagesGridCols?: 2 | 3 | 4 | 5;
   /** Variante do visual decorativo no rodapé do card (default: 'flow'). */
   cardVisual?:
     | 'flow'
