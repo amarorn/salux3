@@ -3,77 +3,252 @@ import { useEffect, useMemo, useState } from 'react';
 import { usePresentationStore } from '@/store/presentationStore';
 import { useCurrentPresentation } from '@/hooks/useCurrentPresentation';
 import { theme } from '@/domain/theme';
-import type { NodeKind } from '@/domain/types';
+import { dimensionsForStageAspect } from '@/domain/stageAspect';
+import type { NodeKind, PresentationStep } from '@/domain/types';
 
 /**
- * Maestro — orbe mandala com núcleo radiante, anéis orbitais, crosshairs
- * e ondas senoidais. Viaja pela tela acompanhando o slide ativo.
+ * Maestro — orbe mandala com núcleo radiante, anéis orbitais e balão de fala.
+ *
+ * Comportamento:
+ * - Posição diferente em cada slide (permutação determinística sobre uma
+ *   tabela de estações seguras, sempre acima ou abaixo do card).
+ * - Fala curta extraída do conteúdo do slide (attentionPhrase / closingQuestion
+ *   / headline / body / fallback por kind) — nunca repete entre cards.
+ * - Balão fica visível enquanto o slide está ativo (sem auto-hide).
+ * - Balão é deslocado horizontalmente para nunca sair da tela.
  */
 
 interface Props {
   visible: boolean;
 }
 
-/** Sussurros curtos por kind de slide. */
-const WHISPERS: Record<string, string> = {
-  cover: 'Vamos começar.',
+const SIZE = 140;
+const TOTAL_WIDTH = SIZE;
+const ORB_HALF = SIZE / 2;
+const BUBBLE_MAX_WIDTH = 320;
+const SCREEN_MARGIN = 24;
+const GOLD = '#fbbf24';
+const GOLD_BRIGHT = '#fde68a';
+
+interface Slot {
+  x: number;
+  y: number;
+}
+
+type SlotName =
+  | 'top-center-outer'
+  | 'top-left'
+  | 'top-right'
+  | 'top-left-mid'
+  | 'top-right-mid'
+  | 'bottom-center-outer'
+  | 'bottom-left'
+  | 'bottom-right'
+  | 'bottom-left-mid'
+  | 'bottom-right-mid';
+
+const SLOT_ORDER: SlotName[] = [
+  'top-center-outer',
+  'top-left',
+  'top-right',
+  'top-left-mid',
+  'top-right-mid',
+  'bottom-center-outer',
+  'bottom-left',
+  'bottom-right',
+  'bottom-left-mid',
+  'bottom-right-mid',
+];
+
+/**
+ * Constrói as estações seguras a partir das dimensões do palco. Todas estão
+ * acima do topo do card (~y=290) ou abaixo do rodapé (~y=1620) no modo totem
+ * — nunca sobrepondo o conteúdo do painel.
+ */
+function buildSlots(stageWidth: number, stageHeight: number): Record<SlotName, Slot> {
+  const cx = stageWidth / 2;
+  const left = Math.max(ORB_HALF + SCREEN_MARGIN, stageWidth * 0.2);
+  const right = Math.min(stageWidth - ORB_HALF - SCREEN_MARGIN, stageWidth * 0.8);
+  const leftMid = cx - (cx - left) * 0.55;
+  const rightMid = cx + (right - cx) * 0.55;
+  const topInner = Math.max(ORB_HALF + 40, stageHeight * 0.075);
+  const topOuter = Math.max(ORB_HALF + 16, stageHeight * 0.055);
+  const bottomInner = Math.min(stageHeight - ORB_HALF - 40, stageHeight * 0.92);
+  const bottomOuter = Math.min(stageHeight - ORB_HALF - 16, stageHeight * 0.945);
+  return {
+    'top-center-outer': { x: cx, y: topOuter },
+    'top-left': { x: left, y: topInner },
+    'top-right': { x: right, y: topInner },
+    'top-left-mid': { x: leftMid, y: topInner },
+    'top-right-mid': { x: rightMid, y: topInner },
+    'bottom-center-outer': { x: cx, y: bottomOuter },
+    'bottom-left': { x: left, y: bottomInner },
+    'bottom-right': { x: right, y: bottomInner },
+    'bottom-left-mid': { x: leftMid, y: bottomInner },
+    'bottom-right-mid': { x: rightMid, y: bottomInner },
+  };
+}
+
+function hashString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+/**
+ * Zonas seguras por `stepId`. Cada slide declara quais slots pode usar.
+ * O orbe rotaciona entre eles conforme o offset da trilha — assim a mesma
+ * "capa" pousa em pontos diferentes quando o usuário troca de trilha.
+ */
+const STEP_SLOTS: Record<string, SlotName[]> = {
+  cover: ['top-center-outer', 'bottom-center-outer'],
+  limit: ['bottom-left', 'top-right-mid'],
+  'why-agents': ['top-left', 'bottom-right-mid'],
+  architecture: ['top-left-mid', 'bottom-right'],
+  journey: ['top-right', 'bottom-left'],
+  integration: ['top-right-mid', 'bottom-left-mid'],
+  governance: ['top-left', 'bottom-right'],
+  roadmap: ['bottom-left-mid', 'top-right'],
+  'tecnologia-que-age': ['top-left', 'bottom-right'],
+  closing: ['top-center-outer', 'bottom-center-outer'],
+  capacities: ['top-left', 'bottom-right-mid'],
+  pathways: ['top-right', 'bottom-left-mid'],
+  'agents-flow': ['top-left-mid', 'bottom-right'],
+  results: ['bottom-right', 'top-left'],
+  'highlight-context': ['top-center-outer', 'bottom-center-outer'],
+  'gestao-results': ['bottom-right', 'top-left'],
+};
+
+/** Fallback por tipo de slide quando o `stepId` não tem zona declarada. */
+const KIND_SLOTS: Record<NodeKind, SlotName[]> = {
+  cover: ['top-center-outer', 'bottom-center-outer'],
+  narrative: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+  highlight: ['top-center-outer', 'bottom-center-outer'],
+  architecture: ['top-left-mid', 'bottom-right'],
+  journey: ['top-right', 'bottom-left'],
+  integration: ['top-right-mid', 'bottom-left-mid'],
+  governance: ['top-left', 'bottom-right'],
+  roadmap: ['bottom-left-mid', 'top-right'],
+  closing: ['top-center-outer', 'bottom-center-outer'],
+  capacities: ['top-left', 'bottom-right-mid'],
+  pathways: ['top-right', 'bottom-left-mid'],
+  'agents-flow': ['top-left-mid', 'bottom-right'],
+  results: ['bottom-right', 'top-left'],
+};
+
+/** Lista de zonas permitidas para o slide atual. */
+function allowedSlotsFor(step: PresentationStep): SlotName[] {
+  return STEP_SLOTS[step.id] ?? KIND_SLOTS[step.kind] ?? SLOT_ORDER;
+}
+
+/** Escolha determinística dentro das zonas permitidas pelo slide. */
+function pickSlot(
+  slotMap: Record<SlotName, Slot>,
+  trackId: string,
+  step: PresentationStep,
+): Slot {
+  const allowed = allowedSlotsFor(step);
+  const trackOffset = hashString(trackId);
+  const idx = (step.index + trackOffset) % allowed.length;
+  const name = allowed[idx] ?? allowed[0]!;
+  return slotMap[name];
+}
+
+/** Fallback curto por tipo de slide. */
+const KIND_WHISPERS: Record<NodeKind, string> = {
+  cover: 'Vamos começar por aqui.',
   narrative: 'Olha por aqui.',
   highlight: 'Esse ponto é importante.',
   architecture: 'A estrutura sustenta tudo.',
   journey: 'Cada etapa conta.',
-  integration: 'A virada de lógica.',
+  integration: 'Aqui acontece a virada.',
   governance: 'Tudo se conecta.',
-  roadmap: 'Capacidades que sustentam.',
-  closing: 'Até a próxima.',
+  roadmap: 'O caminho ganha forma.',
+  closing: 'Vamos fechar essa ideia.',
+  capacities: 'Capacidades que sustentam.',
+  pathways: 'Há um caminho para cada dor.',
+  'agents-flow': 'Os agentes entram em cena.',
+  results: 'O resultado aparece aqui.',
 };
+
+function firstSentence(text?: string): string | undefined {
+  if (!text) return undefined;
+  const cleaned = text.replace(/\s+/g, ' ').trim();
+  if (!cleaned) return undefined;
+  const match = cleaned.match(/^[^.!?\n]+[.!?]?/);
+  const candidate = (match?.[0] ?? cleaned).trim();
+  if (candidate.length <= 140) return candidate;
+  return candidate.slice(0, 138).trimEnd() + '…';
+}
+
+/** Extrai uma frase curta a partir do conteúdo do slide. */
+function pickWhisper(step: PresentationStep): string {
+  const candidates = [
+    step.content.attentionPhrase,
+    step.content.closingQuestion,
+    step.content.valueStagesLead,
+    step.content.headline,
+    step.content.body,
+  ];
+  for (const c of candidates) {
+    const phrase = firstSentence(c);
+    if (phrase) return phrase;
+  }
+  return KIND_WHISPERS[step.kind] ?? 'Olha por aqui.';
+}
 
 /**
- * Estações — todas em "zonas quietas" do Stage (acima ou abaixo do card),
- * nunca sobrepondo o banner da foto ou o conteúdo central.
- * Card ativo ocupa ~y=270–1650; topo livre y<240, base livre y>1700.
- * Bounds horizontais: x ∈ [180, 900] para caber com ondas (320px largura).
+ * Quanto o balão precisa ser deslocado em X para caber na tela.
+ * Positivo = empurra para a direita; negativo = para a esquerda.
  */
-const STATIONS: Partial<Record<NodeKind, { x: number; y: number; whisperSide: 'left' | 'right' }>> = {
-  cover:        { x: 540, y: 1770, whisperSide: 'left' },   // base centro — presença
-  narrative:    { x: 820, y: 1770, whisperSide: 'left' },   // base direita
-  highlight:    { x: 540, y: 180,  whisperSide: 'left' },   // topo centro — atenção
-  architecture: { x: 220, y: 180,  whisperSide: 'right' },  // topo esquerda — observando
-  journey:      { x: 400, y: 1770, whisperSide: 'right' },  // base esquerda
-  integration:  { x: 820, y: 180,  whisperSide: 'left' },   // topo direita — a virada
-  governance:   { x: 220, y: 180,  whisperSide: 'right' },  // topo esquerda
-  roadmap:      { x: 820, y: 1770, whisperSide: 'left' },   // base direita
-  closing:      { x: 540, y: 180,  whisperSide: 'right' },  // topo centro — finalizar
-  results:      { x: 820, y: 1770, whisperSide: 'left' },
-  capacities:   { x: 220, y: 180,  whisperSide: 'right' },
-  pathways:     { x: 400, y: 1770, whisperSide: 'right' },
-  'agents-flow':{ x: 820, y: 180,  whisperSide: 'left' },
-};
-
-const DEFAULT_STATION = { x: 820, y: 1770, whisperSide: 'left' as const };
-
-/** Núcleo dourado quente — usado independente do accent do slide. */
-const GOLD = '#fbbf24';
-const GOLD_BRIGHT = '#fde68a';
+function computeBubbleShift(orbX: number, stageWidth: number): number {
+  const half = BUBBLE_MAX_WIDTH / 2;
+  const leftOver = orbX - half - SCREEN_MARGIN;
+  const rightOver = orbX + half - (stageWidth - SCREEN_MARGIN);
+  if (leftOver < 0) return -leftOver;
+  if (rightOver > 0) return -rightOver;
+  return 0;
+}
 
 export function MaestroOrb({ visible }: Props) {
   const reduceMotion = useReducedMotion();
   const stepId = usePresentationStore((s) => s.currentStepId);
+  const trackId = usePresentationStore((s) => s.currentTrackId);
+  const stageAspectMode = usePresentationStore((s) => s.stageAspectMode);
   const { stepsById } = useCurrentPresentation();
   const current = stepsById[stepId];
-  const accent = current ? theme.accents[current.accent].base : '#54c1ed';
-  const whisper = current ? WHISPERS[current.kind] ?? '' : '';
-  const station = current ? STATIONS[current.kind] ?? DEFAULT_STATION : DEFAULT_STATION;
 
+  const stage = useMemo(() => dimensionsForStageAspect(stageAspectMode), [stageAspectMode]);
+  const slotMap = useMemo(
+    () => buildSlots(stage.width, stage.height),
+    [stage.width, stage.height],
+  );
+
+  const accent = current ? theme.accents[current.accent].base : '#54c1ed';
+  const whisper = useMemo(() => (current ? pickWhisper(current) : ''), [current]);
+  const slot = useMemo(
+    () => (current ? pickSlot(slotMap, trackId, current) : slotMap['top-center-outer']),
+    [current, slotMap, trackId],
+  );
+
+  const placement: 'above' | 'below' = slot.y < stage.height / 2 ? 'below' : 'above';
+  const bubbleShift = useMemo(
+    () => computeBubbleShift(slot.x, stage.width),
+    [slot.x, stage.width],
+  );
+
+  // Balão persiste enquanto o slide está ativo — só some na troca de slide
+  // (curto delay para reaparecer alinhado à chegada do orbe na nova estação).
   const [showWhisper, setShowWhisper] = useState(false);
   useEffect(() => {
-    if (!visible || !whisper || reduceMotion) return;
-    const start = window.setTimeout(() => setShowWhisper(true), 1100);
-    const end = window.setTimeout(() => setShowWhisper(false), 5800);
-    return () => {
-      window.clearTimeout(start);
-      window.clearTimeout(end);
-    };
-  }, [stepId, visible, whisper, reduceMotion]);
+    if (!visible || !whisper) {
+      setShowWhisper(false);
+      return;
+    }
+    setShowWhisper(false);
+    const start = window.setTimeout(() => setShowWhisper(true), 900);
+    return () => window.clearTimeout(start);
+  }, [stepId, visible, whisper]);
 
   const intensity = useMemo(() => {
     if (!current) return 1;
@@ -88,14 +263,14 @@ export function MaestroOrb({ visible }: Props) {
           key="maestro"
           className="pointer-events-none absolute z-30 select-none"
           style={{ top: 0, left: 0 }}
-          initial={{ opacity: 0, x: station.x, y: station.y, scale: 0.6 }}
-          animate={{ opacity: 1, x: station.x, y: station.y, scale: 1 }}
+          initial={{ opacity: 0, x: slot.x, y: slot.y, scale: 0.6 }}
+          animate={{ opacity: 1, x: slot.x, y: slot.y, scale: 1 }}
           exit={{ opacity: 0, scale: 0.7 }}
           transition={{
             opacity: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
             scale: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
-            x: { duration: 1.6, ease: [0.65, 0, 0.35, 1] },
-            y: { duration: 1.6, ease: [0.65, 0, 0.35, 1] },
+            x: { duration: 1.4, ease: [0.65, 0, 0.35, 1] },
+            y: { duration: 1.4, ease: [0.65, 0, 0.35, 1] },
           }}
         >
           <motion.div
@@ -116,15 +291,12 @@ export function MaestroOrb({ visible }: Props) {
               reduceMotion={Boolean(reduceMotion)}
               whisper={whisper}
               showWhisper={showWhisper}
-              whisperSide={station.whisperSide}
-              // Estações no topo: whisper ACIMA (longe do card abaixo).
-              // Estações na base: whisper ABAIXO (longe do card acima).
-              whisperPlacement={station.y < 800 ? 'above' : 'below'}
+              whisperPlacement={placement}
+              bubbleShift={bubbleShift}
               stepId={stepId}
             />
           </motion.div>
 
-          {/* Rastro/halo expansivo ao chegar em nova parada */}
           {!reduceMotion && (
             <motion.span
               key={`trail-${stepId}`}
@@ -151,10 +323,11 @@ interface SpeechBubbleProps {
   accent: string;
   placement: 'above' | 'below';
   reduceMotion: boolean;
+  /** Deslocamento horizontal do balão para manter dentro da tela. */
+  shiftX: number;
 }
 
-function SpeechBubble({ text, accent, placement, reduceMotion }: SpeechBubbleProps) {
-  // Digitação caractere a caractere — efeito "falando"
+function SpeechBubble({ text, accent, placement, reduceMotion, shiftX }: SpeechBubbleProps) {
   const [typed, setTyped] = useState(reduceMotion ? text : '');
   useEffect(() => {
     if (reduceMotion) {
@@ -163,7 +336,7 @@ function SpeechBubble({ text, accent, placement, reduceMotion }: SpeechBubblePro
     }
     setTyped('');
     let i = 0;
-    const speed = Math.max(28, Math.min(55, 1400 / text.length));
+    const speed = Math.max(22, Math.min(50, 1500 / Math.max(text.length, 1)));
     const tick = window.setInterval(() => {
       i++;
       setTyped(text.slice(0, i));
@@ -176,24 +349,29 @@ function SpeechBubble({ text, accent, placement, reduceMotion }: SpeechBubblePro
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: isBelow ? -8 : 8, scale: 0.9 }}
+      initial={{ opacity: 0, y: isBelow ? -8 : 8, scale: 0.92 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: isBelow ? -4 : 4, scale: 0.96 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="absolute whitespace-nowrap"
+      className="absolute"
       style={{
         left: '50%',
-        transform: 'translateX(-50%)',
+        transform: `translateX(calc(-50% + ${shiftX}px))`,
+        maxWidth: BUBBLE_MAX_WIDTH,
+        width: 'max-content',
         ...(isBelow
           ? { top: '100%', marginTop: 18 }
           : { bottom: '100%', marginBottom: 18 }),
       }}
     >
-      {/* Tail (triangle) apontando para o orbe */}
+      {/* Cauda apontando para o orbe — fica ancorada na posição original do
+          orbe (compensa o deslocamento horizontal do balão). */}
       <span
         aria-hidden
-        className="absolute left-1/2 -translate-x-1/2"
+        className="absolute"
         style={{
+          left: '50%',
+          transform: `translateX(calc(-50% - ${shiftX}px))`,
           width: 0,
           height: 0,
           ...(isBelow
@@ -213,11 +391,12 @@ function SpeechBubble({ text, accent, placement, reduceMotion }: SpeechBubblePro
               }),
         }}
       />
-      {/* Tail interior (preenchimento escuro do bubble) */}
       <span
         aria-hidden
-        className="absolute left-1/2 -translate-x-1/2"
+        className="absolute"
         style={{
+          left: '50%',
+          transform: `translateX(calc(-50% - ${shiftX}px))`,
           width: 0,
           height: 0,
           ...(isBelow
@@ -237,16 +416,16 @@ function SpeechBubble({ text, accent, placement, reduceMotion }: SpeechBubblePro
       />
 
       <div
-        className="relative rounded-2xl border px-4 py-2 text-[12px] font-medium leading-snug text-white/95 backdrop-blur-md"
+        className="relative rounded-2xl border px-4 py-2.5 text-[12px] font-medium leading-snug text-white/95 backdrop-blur-md"
         style={{
           borderColor: `${accent}66`,
           background: `linear-gradient(135deg, ${accent}1f 0%, rgba(8,12,20,0.95) 100%)`,
           boxShadow: `0 10px 28px -6px ${accent}55, 0 0 0 1px ${accent}22, inset 0 1px 0 rgba(255,255,255,0.08)`,
           minWidth: 60,
+          whiteSpace: 'pre-wrap',
         }}
       >
         <span>{typed}</span>
-        {/* Cursor piscante enquanto digita */}
         {!reduceMotion && typed.length < text.length && (
           <motion.span
             aria-hidden
@@ -267,14 +446,10 @@ interface MaestroVisualProps {
   reduceMotion: boolean;
   whisper: string;
   showWhisper: boolean;
-  whisperSide: 'left' | 'right';
   whisperPlacement: 'above' | 'below';
+  bubbleShift: number;
   stepId: string;
 }
-
-/** Tamanho do orbe (mandala). */
-const SIZE = 140;
-const TOTAL_WIDTH = SIZE;
 
 function MaestroVisual({
   accent,
@@ -283,11 +458,11 @@ function MaestroVisual({
   whisper,
   showWhisper,
   whisperPlacement,
+  bubbleShift,
   stepId,
 }: MaestroVisualProps) {
   return (
     <div className="relative" style={{ width: TOTAL_WIDTH, height: SIZE }}>
-      {/* Speech bubble — Maestro "falando" com tail apontando para o orbe */}
       <AnimatePresence>
         {showWhisper && whisper && (
           <SpeechBubble
@@ -296,16 +471,15 @@ function MaestroVisual({
             accent={accent}
             placement={whisperPlacement}
             reduceMotion={reduceMotion}
+            shiftX={bubbleShift}
           />
         )}
       </AnimatePresence>
 
-      {/* Orbe central (mandala + anéis + crosshair) */}
       <div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ width: SIZE, height: SIZE }}
       >
-        {/* Glow externo difuso — múltiplas camadas suaves */}
         <motion.div
           className="absolute inset-[-40px] rounded-full"
           style={{
@@ -339,7 +513,6 @@ function MaestroVisual({
           transition={{ duration: 3.1, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        {/* SVG principal */}
         <motion.svg
           viewBox="0 0 200 200"
           width={SIZE}
@@ -348,7 +521,6 @@ function MaestroVisual({
           animate={reduceMotion ? undefined : { rotate: 360 }}
           transition={{ duration: 80, repeat: Infinity, ease: 'linear' }}
         >
-          {/* Anel externo dotted (mais sutil) */}
           <circle
             cx="100"
             cy="100"
@@ -359,7 +531,6 @@ function MaestroVisual({
             strokeOpacity="0.22"
             strokeDasharray="2 8"
           />
-          {/* Anel intermediário (mais transparente) */}
           <circle
             cx="100"
             cy="100"
@@ -369,7 +540,6 @@ function MaestroVisual({
             strokeWidth="0.5"
             strokeOpacity="0.3"
           />
-          {/* Anel interno tracejado (suave) */}
           <circle
             cx="100"
             cy="100"
@@ -381,7 +551,6 @@ function MaestroVisual({
             strokeDasharray="3 6"
           />
 
-          {/* Pontos nos anéis */}
           {[0, 60, 120, 180, 240, 300].map((deg) => {
             const rad = (deg * Math.PI) / 180;
             return (
@@ -409,7 +578,6 @@ function MaestroVisual({
           })}
         </motion.svg>
 
-        {/* Mandala interna — flor de 6 pétalas (rotação contra-direção) */}
         <motion.svg
           viewBox="0 0 200 200"
           width={SIZE}
@@ -438,7 +606,6 @@ function MaestroVisual({
           })}
         </motion.svg>
 
-        {/* Sun-burst (12 raios) — gold */}
         <motion.svg
           viewBox="0 0 200 200"
           width={SIZE}
@@ -478,7 +645,6 @@ function MaestroVisual({
           })}
         </motion.svg>
 
-        {/* Núcleo de luz — esfera etérea, sem bordas duras */}
         <motion.div
           className="absolute rounded-full"
           style={{
@@ -496,7 +662,6 @@ function MaestroVisual({
           }
           transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
         />
-        {/* Coração interno mais quente, ainda etéreo */}
         <motion.div
           className="absolute rounded-full"
           style={{
@@ -515,7 +680,6 @@ function MaestroVisual({
           transition={{ duration: 2.1, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        {/* Centelhas orbitais */}
         {!reduceMotion &&
           [0, 1, 2, 3].map((i) => (
             <motion.span
@@ -551,4 +715,3 @@ function MaestroVisual({
     </div>
   );
 }
-
