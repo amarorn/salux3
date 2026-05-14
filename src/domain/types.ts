@@ -37,6 +37,31 @@ export interface EvidenceCard {
   metric?: string;
 }
 
+export interface ContrastItem {
+  /** Rótulo curto em caps (ex.: "VISÍVEL"). */
+  label: string;
+  /** Emoji ou caractere usado como ícone à esquerda do label. */
+  icon?: string;
+  /** Texto descritivo (pode usar \n para quebrar). */
+  text: string;
+  /** Tom visual — 'warm' (rose/amber, alerta) | 'cool' (cyan, silencioso). */
+  tone?: 'warm' | 'cool';
+}
+
+export interface ContrastPair {
+  left: ContrastItem;
+  right: ContrastItem;
+}
+
+export interface ValueStage {
+  /** Número exibido em destaque (ex.: "01"). */
+  number: string;
+  /** Rótulo curto em caps (ex.: "REGISTRO"). */
+  label: string;
+  /** Descrição curta. */
+  description: string;
+}
+
 export type Accent = 'violet' | 'cyan' | 'emerald' | 'amber' | 'rose' | 'slate';
 
 export interface NodePosition {
@@ -107,6 +132,12 @@ export interface StepContent {
   layersToBase?: boolean;
   /** Trilha Operação: headline grande + bullets como chips animados (pain points). */
   painPointsLayout?: boolean;
+  /** Frase curta exibida entre o headline e a grid de pain points. */
+  painPointsLead?: string;
+  /** Ícones (lucide) em paralelo aos bullets — mesmo índice. */
+  painPointsIcons?: string[];
+  /** Número de colunas da grid (default 2). */
+  painPointsGridCols?: 2 | 3 | 4;
   /** Camadas decorativas atrás dos chips: 'stacked' (acúmulo) | 'web' (teia tensa). */
   painPointsBackdrop?: 'stacked' | 'web';
   /** Substitui chips inline por botão central que abre balão flutuante com os tópicos. */
@@ -117,6 +148,8 @@ export interface StepContent {
   painPointsBalloonTitle?: string;
   /** Pergunta de fechamento destacada ao final do card (CTA reflexivo). */
   closingQuestion?: string;
+  /** Rótulo curto exibido acima da pergunta de fechamento (ex.: "CTA / PERGUNTA-GATILHO"). */
+  closingQuestionLabel?: string;
   /** Frases curtas a serem renderizadas como blocos de destaque verde (suporte/release). */
   highlightPhrases?: string[];
   /** Card de evidência com glow e métrica. */
@@ -134,6 +167,28 @@ export interface StepContent {
   resultsCards?: string[];
   /** Vídeo no banner do card (substitui a foto lateral). */
   bannerMedia?: BannerMedia;
+  /** Par de contraste (ex.: visível × despercebido) usado na capa. */
+  contrastPair?: ContrastPair;
+  /** Etapas numeradas em grid (4 colunas) — usadas em "ruptura acumulada". */
+  valueStages?: ValueStage[];
+  /** Texto curto exibido logo acima da grid de etapas (lead). */
+  valueStagesLead?: string;
+  /** Desabilita o gradiente de intensidade entre etapas — usa estilo uniforme (ex.: 3 falhas equivalentes). */
+  valueStagesFlat?: boolean;
+  /** Número de colunas da grid de etapas (default = quantidade de etapas, em uma linha). */
+  valueStagesGridCols?: 2 | 3 | 4;
+  /** Variante do visual decorativo no rodapé do card (default: 'flow'). */
+  cardVisual?:
+    | 'flow'
+    | 'reveal'
+    | 'pattern'
+    | 'accumulation'
+    | 'late-reaction'
+    | 'transform'
+    | 'mesh'
+    | 'orbit'
+    | 'radar'
+    | 'entry-points';
 }
 
 export interface PresentationStep {

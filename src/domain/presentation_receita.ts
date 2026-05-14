@@ -92,17 +92,33 @@ function cloneSteps(steps: PresentationStep[]): PresentationStep[] {
 const tecnologiaQueAgeStep: PresentationStep = {
   id: 'tecnologia-que-age',
   index: 8,
-  title: 'A tecnologia que age',
-  subtitle: 'Identificar · Priorizar · Agir',
+  title: 'O ponto de entrada pode variar. A resposta precisa ser coordenada.',
+  subtitle: 'Use este slide para aprofundar a dor específica do visitante',
   position: { x: 560, y: -1480 },
   scale: 1.25,
-  kind: 'highlight',
+  kind: 'narrative',
   accent: 'cyan',
   content: {
-    headline: 'A tecnologia que age',
-    body: 'Identificar.\nPriorizar.\nAgir.',
-    attentionPhrase: 'A perda deixa de ser invisível. Passa a ser evitável.',
-    bannerMedia: { videoSrc: '/intro/tecnologia-loop.mp4' },
+    headline: 'Pontos de entrada',
+    cardVisual: 'entry-points',
+    valueStagesLead: 'Use este slide para aprofundar a dor específica do visitante:',
+    valueStagesFlat: true,
+    valueStagesGridCols: 3,
+    valueStages: [
+      {
+        number: '📋',
+        label: 'Glosa / Faturamento',
+        description: '→ Plataforma Salux (Ciclo de Receita)',
+      },
+      { number: '📄', label: 'Documentação', description: '→ ZeroDox' },
+      { number: '🏥', label: 'Centro cirúrgico', description: '→ SkyMed + VisionPilot' },
+      { number: '👥', label: 'Equipe / Custo', description: '→ StarGrid' },
+      { number: '🎥', label: 'Operação em tempo real', description: '→ AGCOM / VisionPilot' },
+      { number: '🎯', label: 'Antecipação de risco', description: '→ Maria (Agentes)' },
+    ],
+    closingQuestionLabel: 'CTA · Pergunta-gatilho',
+    closingQuestion:
+      'Qual desses pontos está gerando mais perda invisível na sua operação hoje?',
   },
 };
 
@@ -112,35 +128,51 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
   if (s.id === 'cover') {
     return {
       ...s,
-      title: 'Qual o percentual de glosa do seu hospital hoje?',
+      title: 'Onde a operação de saúde perde valor hoje?',
       subtitle: 'Receita',
       content: {
         headline: 'Abertura',
-        body: 'A maioria dos gestores não sabe responder.',
-        meta: {
-          Edição: '01 / 2026',
-          Tempo: '~12 min',
-          Público: 'Liderança executiva e financeira',
+        cardVisual: 'reveal',
+        contrastPair: {
+          left: {
+            label: 'Visível',
+            icon: '👁',
+            tone: 'warm',
+            text: 'Glosa identificada.\nConta devolvida.\nRetrabalho registrado.',
+          },
+          right: {
+            label: 'Despercebido',
+            icon: '🌫',
+            tone: 'cool',
+            text: 'Valor que não se converte.\nPerda que não aparece como erro.\nPadrão que se repete.',
+          },
         },
+        body: 'Existe uma perda que acontece todos os dias na operação — e que nem sempre aparece como problema.',
+        attentionPhrase:
+          'A maior parte do valor perdido não está no erro óbvio. Está na ruptura silenciosa entre cuidado e receita.',
+        closingQuestionLabel: 'CTA · Pergunta-gatilho',
+        closingQuestion:
+          'Onde a sua operação está perdendo valor hoje — no que é visível ou no que passa despercebido?',
       },
     };
   }
 
-  // SLIDE 2 — Diagnóstico com 3 KPIs
+  // SLIDE 2 — Diagnóstico: padrão, não desvio
   if (s.id === 'limit') {
     return {
       ...s,
-      title: 'A perda não começa no faturamento',
-      subtitle: 'Ela se forma dentro da operação, todos os dias',
+      title: 'Não é um desvio pontual. É um padrão.',
+      subtitle: 'A perda se forma dentro da operação, todos os dias',
       content: {
         headline: 'Diagnóstico',
-        bannerMedia: { videoSrc: '/intro/healthcare-loop.mp4' },
+        cardVisual: 'pattern',
         metrics: [
           {
             value: 14.6,
             decimals: 1,
             label: 'Glosa média do setor',
-            suffix: 'é a média de glosa no setor',
+            suffix:
+              'Taxa média de glosa no setor hospitalar brasileiro — valor que sai da conta antes mesmo de ser contestado.',
             ring: 14.6,
             trend: [11.8, 12.4, 12.1, 12.9, 13.5, 13.8, 14.2, 14.6],
             delta: 0.8,
@@ -150,137 +182,309 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
             value: 50,
             decimals: 0,
             label: 'Tempo administrativo',
-            suffix: 'do tempo do time ainda se perde em tarefas administrativas',
+            suffix:
+              'Do tempo das equipes consumido por tarefas administrativas — tempo que deveria gerar receita, não gerir inconsistência.',
             ring: 50,
             trend: [38, 41, 43, 44, 46, 47, 48, 50],
             delta: 2,
             deltaUnit: 'pp',
           },
+        ],
+        body:
+          'Esses números não indicam má gestão. Indicam um modelo operacional que foi construído para reagir — e não para prevenir.',
+        attentionPhrase:
+          'Não se trata apenas de ineficiência. É valor que deixa de se converter ao longo da operação.',
+      },
+    };
+  }
+
+  // SLIDE 3 — A perda se acumula em 4 etapas
+  if (s.id === 'why-agents') {
+    return {
+      ...s,
+      kind: 'narrative',
+      accent: 'rose',
+      title: 'A perda não acontece em um único ponto. Ela se acumula.',
+      subtitle: 'Quatro etapas críticas da conversão do cuidado em receita',
+      content: {
+        headline: 'Acúmulo',
+        cardVisual: 'accumulation',
+        valueStagesLead:
+          'Ao longo da jornada assistencial, a conversão do cuidado em receita passa por quatro etapas críticas:',
+        valueStages: [
           {
-            value: 30,
-            decimals: 0,
-            label: 'Desperdício em saúde',
-            suffix: 'dos recursos em saúde são considerados desperdício',
-            ring: 30,
-            trend: [22, 24, 25, 26, 27, 28, 29, 30],
-            delta: 1,
-            deltaUnit: 'pp',
+            number: '01',
+            label: 'Registro',
+            description: 'Dado incompleto ou inconsistente na origem.',
+          },
+          {
+            number: '02',
+            label: 'Validação',
+            description: 'Inconsistência que passa sem checagem.',
+          },
+          {
+            number: '03',
+            label: 'Execução',
+            description: 'Procedimento realizado sem registro adequado.',
+          },
+          {
+            number: '04',
+            label: 'Consolidação',
+            description: 'Conta que chega ao faturamento com lacunas acumuladas.',
+          },
+        ],
+        body:
+          'Cada etapa parece administrável isoladamente. Mas as rupturas se acumulam — e o resultado aparece apenas no fim, quando o valor já se perdeu.',
+        attentionPhrase:
+          'São pequenas rupturas que se acumulam e interrompem a conversão do cuidado em receita.',
+      },
+    };
+  }
+
+  // SLIDE 4 — O modelo atual reage ao erro
+  if (s.id === 'architecture') {
+    return {
+      ...s,
+      kind: 'narrative',
+      accent: 'rose',
+      title: 'O modelo atual reage ao erro. O valor já se foi.',
+      subtitle: 'O custo de corrigir é sempre maior que o custo de prevenir',
+      content: {
+        headline: 'Modelo reativo',
+        cardVisual: 'late-reaction',
+        valueStagesFlat: true,
+        valueStages: [
+          {
+            number: '✕',
+            label: 'Corrige no final',
+            description: 'Quando o valor já se perdeu na jornada.',
+          },
+          {
+            number: '✕',
+            label: 'Audita depois',
+            description: 'Quando a inconsistência já gerou glosa.',
+          },
+          {
+            number: '✕',
+            label: 'Registra',
+            description: 'Mas não conduz. O dado existe — a ação não vem.',
+          },
+        ],
+        body:
+          'No curto prazo, a equipe compensa. Corrige, reconcilia, recorre. Mas esse esforço custa tempo, custa gente, custa margem.',
+        attentionPhrase:
+          'Grande parte do esforço acontece tarde demais. O custo de corrigir é sempre maior que o custo de prevenir.',
+        closingQuestionLabel: 'CTA · Pergunta-gatilho',
+        closingQuestion:
+          'Quanto da receita da sua operação é resultado de correção — e quanto vem de fluxo estruturado?',
+      },
+    };
+  }
+
+  // SLIDE 5 — A virada de lógica (de reação para estrutura)
+  if (s.id === 'journey') {
+    return {
+      ...s,
+      kind: 'narrative',
+      accent: 'emerald',
+      title: 'A questão não é corrigir melhor. É estruturar para não perder.',
+      subtitle: 'Da recuperação no final à proteção ao longo da jornada',
+      content: {
+        headline: 'Virada de lógica',
+        cardVisual: 'transform',
+        contrastPair: {
+          left: {
+            label: 'Antes',
+            tone: 'warm',
+            text: 'A receita é recuperada no final — após glosa, recurso e retrabalho.',
+          },
+          right: {
+            label: 'Depois',
+            tone: 'cool',
+            text: 'A receita é construída ao longo da jornada — protegida enquanto acontece.',
+          },
+        },
+        body: 'Essa virada exige uma mudança na forma como a operação é estruturada:',
+        beforeAfter: {
+          before: ['Reação ao erro', 'Auditoria posterior', 'Registro sem condução'],
+          after: ['Prevenção na origem', 'Controle contínuo', 'Dado que orienta ação'],
+        },
+        attentionPhrase:
+          'O valor precisa ser protegido enquanto acontece — não recuperado depois que se perdeu.',
+      },
+    };
+  }
+
+  // SLIDE 6 — 6 pontos coordenados
+  if (s.id === 'integration') {
+    return {
+      ...s,
+      kind: 'narrative',
+      accent: 'cyan',
+      title: 'Isso não se resolve com uma solução isolada.',
+      subtitle: 'Os 6 pontos que precisam funcionar como base coordenada',
+      content: {
+        headline: 'Base coordenada',
+        cardVisual: 'mesh',
+        valueStagesLead:
+          'A proteção da receita depende de como a operação funciona como um todo — da origem ao faturamento.\n\nOs 6 pontos que precisam funcionar como base coordenada:',
+        valueStagesFlat: true,
+        valueStagesGridCols: 3,
+        valueStages: [
+          { number: '01', label: 'Base operacional', description: 'Origem estruturada da informação.' },
+          { number: '02', label: 'Ciclo de receita', description: 'Acompanhamento contínuo da jornada.' },
+          { number: '03', label: 'Governança documental', description: 'Documentação que sustenta valor.' },
+          { number: '04', label: 'Força de trabalho', description: 'Escala, alocação e produtividade.' },
+          { number: '05', label: 'Centro cirúrgico', description: 'Alta complexidade sob controle.' },
+          { number: '06', label: 'Inteligência em tempo real', description: 'Operação lida enquanto acontece.' },
+        ],
+        attentionPhrase:
+          'Esses elementos não operam de forma independente. Quando um falha, a perda se forma nos outros.',
+      },
+    };
+  }
+
+  // SLIDE 7 — Ecossistema Salux em capacidades centrais e de sustentação
+  if (s.id === 'governance') {
+    return {
+      ...s,
+      kind: 'capacities',
+      accent: 'cyan',
+      title: 'Ecossistema Salux',
+      subtitle: 'Capacidades centrais e de sustentação da receita',
+      content: {
+        headline: 'Essa arquitetura já existe na prática.',
+        cardVisual: 'orbit',
+        body:
+          'O Ecossistema Salux estrutura cada ponto da operação de receita — de forma integrada, não como soluções isoladas.',
+        capacityGroups: [
+          {
+            title: 'Capacidades centrais da receita',
+            tone: 'core',
+            items: [
+              {
+                name: 'Base operacional',
+                subtitle: 'Plataforma Salux',
+                description:
+                  'Base estruturada que reduz retrabalho na origem.',
+                tagline: 'A consistência da operação começa aqui.',
+              },
+              {
+                name: 'Ciclo de receita',
+                subtitle: 'Plataforma Salux',
+                description:
+                  'Acompanhamento do fluxo que reduz perda ao longo da jornada.',
+                tagline: 'A glosa deixa de ser descoberta no final.',
+              },
+              {
+                name: 'Governança documental',
+                subtitle: 'ZeroDox',
+                description:
+                  'Documentação estruturada que sustenta receita e reduz glosa.',
+                tagline: 'O valor deixa de ser questionado e passa a ser comprovado.',
+              },
+            ],
+          },
+          {
+            title: 'Capacidades de sustentação da receita',
+            tone: 'support',
+            items: [
+              {
+                name: 'Força de trabalho',
+                subtitle: 'StarGrid',
+                description:
+                  'Reduz custo invisível e aumenta produtividade.',
+                tagline: 'Escala e alocação deixam de ser ruído.',
+              },
+              {
+                name: 'Centro cirúrgico',
+                subtitle: 'SkyMed · VisionPilot',
+                description:
+                  'Registro anestésico estruturado e leitura da operação em tempo real.',
+                tagline: 'Alta complexidade exige controle constante.',
+              },
+              {
+                name: 'Inteligência em tempo real',
+                subtitle: 'VisionPilot',
+                description:
+                  'A operação deixa de ser analisada depois.',
+                tagline: 'Passa a ser acompanhada enquanto acontece.',
+              },
+            ],
           },
         ],
       },
     };
   }
 
-  // SLIDE 3 — Reframe: glosa é consequência
-  if (s.id === 'why-agents') {
-    return {
-      ...s,
-      kind: 'highlight',
-      title: 'Glosa não é causa. É consequência.',
-      subtitle: 'A causa está na jornada do paciente',
-      content: {
-        headline: 'Reframe',
-        body: 'Glosa não é causa.\nÉ consequência.',
-        attentionPhrase: 'A causa está na jornada do paciente.',
-      },
-    };
-  }
-
-  // SLIDE 4 — Onde a perda se forma (4 etapas)
-  if (s.id === 'architecture') {
-    return {
-      ...s,
-      kind: 'narrative',
-      title: 'Onde a perda se forma',
-      subtitle: 'Pontos críticos da jornada de valor',
-      content: {
-        headline: 'Jornada do valor',
-        bullets: ['Admissão', 'Suprimentos', 'Prontuário', 'Faturamento'],
-        body:
-          'Quando a informação se quebra entre essas etapas, o valor se perde.',
-        painPointsLayout: true,
-      },
-    };
-  }
-
-  // SLIDE 5 — Limite do modelo atual
-  if (s.id === 'journey') {
-    return {
-      ...s,
-      kind: 'narrative',
-      title: 'O modelo atual reage ao erro',
-      subtitle: 'Auditar depois é tarde demais',
-      content: {
-        headline: 'Limite do modelo atual',
-        bullets: [
-          'Audita depois',
-          'Corrige no fim',
-          'Registra, mas não conduz',
-          'Grande parte do esforço acontece tarde demais',
-        ],
-      },
-    };
-  }
-
-  // SLIDE 6 — Virada de lógica
-  if (s.id === 'integration') {
-    return {
-      ...s,
-      kind: 'highlight',
-      title: 'A receita deixa de ser recuperada no final',
-      subtitle: 'Passa a ser construída ao longo da jornada',
-      content: {
-        headline: 'Virada de lógica',
-        body:
-          'A receita deixa de ser recuperada no final.\nPassa a ser construída ao longo da jornada.',
-        attentionPhrase: 'Proteger valor enquanto acontece.',
-      },
-    };
-  }
-
-  // SLIDE 7 — Arquitetura coordenada (6 pilares com reveal)
-  if (s.id === 'governance') {
-    return {
-      ...s,
-      title: 'Arquitetura coordenada',
-      subtitle: 'Seis pilares operando como base unificada',
-      content: {
-        headline: 'Arquitetura',
-        revealPillars: [
-          'Base operacional',
-          'Ciclo de receita',
-          'Governança documental',
-          'Força de trabalho',
-          'Centro cirúrgico',
-          'Inteligência em tempo real',
-        ],
-      },
-    };
-  }
-
-  // SLIDE 8 — Capacidades que sustentam a receita
+  // SLIDE 8 — A tecnologia deixa de registrar e passa a atuar
   if (s.id === 'roadmap') {
     return {
       ...s,
-      title: 'Capacidades que sustentam a receita',
-      subtitle: 'Da base operacional à inteligência em tempo real',
+      kind: 'narrative',
+      accent: 'emerald',
+      title: 'A tecnologia deixa de registrar e passa a atuar.',
+      subtitle: 'Sem agentes × Com agentes (Maria) — antecipação em vez de retrabalho',
       content: {
-        headline: 'Capacidades',
-        roadmapAgents: receitaRoadmapAgents,
+        headline: 'Agentes',
+        cardVisual: 'radar',
+        contrastPair: {
+          left: {
+            label: 'Sem agentes',
+            tone: 'warm',
+            text:
+              'A operação registra. A equipe interpreta. A inconsistência é descoberta no final. O retrabalho começa.',
+          },
+          right: {
+            label: 'Com agentes (Maria)',
+            tone: 'cool',
+            text:
+              'O agente identifica, prioriza e aciona. O risco é antecipado antes da perda. A operação ganha capacidade de resposta em tempo real.',
+          },
+        },
+        body: 'O que os agentes fazem na proteção da receita:',
+        bullets: [
+          'Identificam inconsistências no registro antes do faturamento',
+          'Priorizam pendências com maior risco de glosa',
+          'Sinalizam rupturas no fluxo assistencial com impacto financeiro',
+          'Acompanham o ciclo de receita em tempo contínuo',
+          'Antecipam pontos de perda antes que se materializem',
+        ],
+        attentionPhrase:
+          'A antecipação de risco reduz perda antes que aconteça. A operação para de correr atrás.',
       },
     };
   }
 
-  // SLIDE 10 — Encerramento
+  // SLIDE 10 — Encerramento: a perda deixa de ser invisível
   if (s.id === 'closing') {
     return {
       ...s,
-      title: 'A diferença não está em ter tecnologia',
-      subtitle: 'Está em operar com ela',
+      accent: 'emerald',
+      title: 'A perda deixa de ser invisível.',
+      subtitle: 'Com base coordenada, a receita passa a ser protegida ao longo da jornada',
       content: {
-        headline: 'Encerramento',
+        headline: 'A perda deixa de ser invisível.',
+        cardVisual: 'flow',
         body:
-          'A diferença não está em ter tecnologia.\nEstá em operar com ela.\n\nComece pelo ponto mais crítico da sua operação.\n\nEcossistema Salux.',
+          'Com uma base operacional coordenada, a receita deixa de ser recuperada no final e passa a ser protegida ao longo da jornada.',
+        valueStagesFlat: true,
+        valueStagesGridCols: 3,
+        valueStages: [
+          { number: '✓', label: 'Mais previsibilidade sobre receita e margem' },
+          { number: '✓', label: 'Menos retrabalho de faturamento e reconciliação' },
+          { number: '✓', label: 'Mais controle sobre glosa antes do faturamento' },
+          { number: '✓', label: 'Menos valor perdido em rupturas silenciosas' },
+          { number: '✓', label: 'Mais capacidade de antecipar risco operacional' },
+          { number: '✓', label: 'Operação que protege valor enquanto acontece' },
+        ],
+        attentionPhrase:
+          'A diferença não está em ter tecnologia. Está na capacidade de operar com ela.',
+        closingQuestionLabel: 'CTA · Pergunta-gatilho',
+        closingQuestion:
+          'Podemos mapear juntos onde a sua operação está perdendo valor hoje? Marque uma conversa com nosso time.',
+        closingHighlight:
+          'Ecossistema Salux · A base para uma nova forma de operar a saúde.',
       },
     };
   }

@@ -29,6 +29,7 @@ export function CapacitiesStep({ step, active }: Props) {
       stepId={step.id}
       width={760}
       badge={step.title}
+      cardVisual={step.content.cardVisual}
     >
       <motion.div
         className="flex flex-col gap-6"
@@ -44,6 +45,12 @@ export function CapacitiesStep({ step, active }: Props) {
             {step.content.headline ?? 'Capacidades coordenadas'}
           </h2>
         </motion.div>
+
+        {step.content.body && (
+          <motion.p variants={item} className="presentation-ppt-body text-[0.95rem] leading-snug text-slate-200/90 whitespace-pre-line">
+            {step.content.body}
+          </motion.p>
+        )}
 
         {groups.map((group, gi) => (
           <motion.section variants={item} key={group.title} className="flex flex-col gap-3">

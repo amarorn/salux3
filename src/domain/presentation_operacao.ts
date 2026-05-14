@@ -27,43 +27,27 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
         subtitle: 'Onde a expansão começa a se transformar em custo',
         content: {
           headline: 'Onde o crescimento da sua instituição começa a pesar?',
-          metrics: [
-            {
-              value: 38,
-              decimals: 0,
-              label: 'Sobrecusto por nova frente',
-              suffix: 'a mais para integrar cada unidade ou serviço novo à operação',
-              ring: 38,
-              trend: [18, 22, 25, 28, 30, 33, 36, 38],
-              delta: 5,
-              deltaUnit: 'pp',
-            },
-            {
-              value: 62,
-              decimals: 0,
-              label: 'Concentração em pessoas-chave',
-              suffix: 'das áreas críticas dependem de ≤ 3 especialistas para operar',
-              ring: 62,
-              trend: [48, 52, 55, 57, 58, 60, 61, 62],
-              delta: 3,
-              deltaUnit: 'pp',
-            },
-          ],
           bullets: [
             'Abertura de nova unidade',
-            'Ampliação de serviços',
-            'Diagnóstico que vira gargalo',
+            'Integrações que precisam ser costuradas a cada nova frente',
             'Equipe que não acompanha a demanda',
-            'Integrações costuradas a cada nova frente',
-            'Expansão física: mais estrutura, equipamento e custo',
-            'Perda de previsibilidade econômica',
+            'Diagnóstico que vira gargalo',
+            'Perda de previsibilidade econômica com o crescimento',
+            'Expansão física que exige mais estrutura e mais custo',
           ],
-          highlightPhrases: [
-            'O crescimento em saúde nem sempre trava por falta de demanda.',
-            'Muitas vezes, trava porque a base não acompanha a ambição da instituição.',
-          ],
-          closingHighlight: 'Sua instituição está crescendo por arquitetura ou por acúmulo?',
           painPointsLayout: true,
+          painPointsLead: 'Reconhece algum destes pontos de atrito?',
+          painPointsGridCols: 3,
+          painPointsIcons: [
+            'building-2',
+            'link',
+            'users',
+            'microscope',
+            'trending-down',
+            'landmark',
+          ],
+          closingQuestion: 'Sua instituição está crescendo por arquitetura — ou por acúmulo?',
+          closingQuestionLabel: 'CTA / Pergunta-gatilho',
         },
       };
     }
@@ -71,6 +55,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
     if (s.id === 'why-agents') {
       return {
         ...s,
+        accent: 'amber' as const,
         title: 'CRESCER ADICIONANDO ESFORÇO',
         subtitle: 'A expansão amplia capacidade — e também complexidade',
         content: {
@@ -84,17 +69,23 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
             'Mais estrutura física para cada nova frente',
             'Mais pressão sobre equipes e áreas críticas',
           ],
+          painPointsLayout: true,
+          painPointsBackdrop: 'stacked' as const,
+          painPointsGridCols: 4,
+          painPointsIcons: [
+            'plus',
+            'plus',
+            'plus',
+            'plus',
+            'plus',
+            'plus',
+            'plus',
+          ],
           highlightPhrases: [
             'Isso não é um desvio pontual. É um padrão.',
             'A instituição amplia capacidade, mas também amplia complexidade.',
             'Quando crescer exige sempre mais costura, a expansão começa a virar atrito operacional.',
           ],
-          painPointsLayout: true,
-          painPointsBackdrop: 'stacked' as const,
-          painPointsBalloon: true,
-          painPointsTriggerLabel: 'Onde isso aparece? Ver os 7 pontos',
-          painPointsBalloonTitle: 'Onde o crescimento adiciona esforço',
-          closingQuestion: 'Sua instituição está crescendo por arquitetura ou por acúmulo?',
         },
       };
     }
