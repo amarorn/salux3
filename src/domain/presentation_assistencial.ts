@@ -40,7 +40,7 @@ const highlightContextStep: PresentationStep = {
   accent: 'emerald',
   content: {
     headline: 'INITIA · Agentes',
-    cardVisual: 'radar',
+    cardVisual: 'fan',
     contrastPair: {
       left: {
         label: 'Sem INITIA',
@@ -147,7 +147,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map(
     withContent('cover', {
       headline: 'Abertura',
-      cardVisual: 'reveal',
+      cardVisual: 'ripple',
       lead:
         'Na gravidade do caso?\nNa complexidade do paciente?\nOu no momento em que o cuidado perde continuidade?',
       contrastPair: {
@@ -177,7 +177,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map(
     withContent('limit', {
       headline: 'Acúmulo',
-      cardVisual: 'accumulation',
+      cardVisual: 'fragment',
       valueStagesLead:
         'Na maioria das vezes, o risco se forma em rupturas pequenas — que ninguém percebe isoladamente:',
       valueStagesFlat: true,
@@ -200,7 +200,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map(
     withContent('why-agents', {
       headline: 'Continuidade decisória',
-      cardVisual: 'transform',
+      cardVisual: 'weave',
       metrics: [],
       bullets: [],
       bulletSplitAfter: undefined,
@@ -235,7 +235,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map(
     withContent('architecture', {
       headline: 'Evidência',
-      cardVisual: 'late-reaction',
+      cardVisual: 'magnet',
       lead: 'Esse padrão não é percepção. Aparece nos números:',
       metrics: [],
       bullets: [],
@@ -270,7 +270,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map(
     withContent('journey', {
       headline: 'Jornada',
-      cardVisual: 'transform',
+      cardVisual: 'thread',
       journeyStages: [],
       lead: 'Cada etapa parece resolvida isoladamente. Mas o cuidado não acontece em etapas isoladas.',
       valueStagesFlat: true,
@@ -299,7 +299,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map(
     withContent('integration', {
       headline: 'Continuidade operacional',
-      cardVisual: 'mesh',
+      cardVisual: 'crystal',
       lead: 'As equipes sabem cuidar. O problema está na forma como a operação está organizada.',
       contrastPair: {
         left: {
@@ -325,7 +325,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map(
     withContent('governance', {
       headline: 'A pergunta mudou.',
-      cardVisual: 'transform',
+      cardVisual: 'prism',
       contrastPair: {
         left: {
           label: 'Antes',
@@ -364,7 +364,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map(
     withContent('roadmap', {
       headline: 'Essa arquitetura já existe na prática.',
-      cardVisual: 'orbit',
+      cardVisual: 'branch',
       body:
         'O Ecossistema Salux estrutura a continuidade em cada ponto da jornada — de forma integrada, não como soluções isoladas.',
       capacityGroups: [
@@ -437,7 +437,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map(
     withContent('closing', {
       headline: 'O cuidado deixa de depender de reconstrução. E passa a ter continuidade real.',
-      cardVisual: 'flow',
+      cardVisual: 'bloom',
       body:
         'Com uma base coordenada, a jornada deixa de depender de esforço individual de compensação.',
       valueStagesFlat: true,

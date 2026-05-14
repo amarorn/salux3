@@ -3,7 +3,7 @@ import { steps as baseSteps } from './presentation';
 
 export const presentationGestaoMeta = {
   title: 'Gestão da operação em saúde',
-  subtitle: 'Decisão com contexto, custo invisível sob controle',
+  subtitle: 'Coordenação de rede, capacidade instalada e decisão sob risco',
   author: '',
 };
 
@@ -14,79 +14,411 @@ function cloneSteps(steps: PresentationStep[]): PresentationStep[] {
   }));
 }
 
-/** Trilha Gestão: substitui os KPIs herdados (receita) por indicadores
- *  de gestão — custo invisível, decisão tardia, lead-time de informação. */
-export const gestaoSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
+/** Trilha Gestão / Pública: coordenação de rede, previsibilidade e
+ *  enxergar melhor com o recurso certo. */
+const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
+  // SLIDE 1 — Sinais de pressão na rede
   if (s.id === 'cover') {
     return {
       ...s,
-      title: 'GESTÃO DA OPERAÇÃO EM SAÚDE',
-      subtitle: 'Decisão com contexto, custo invisível sob controle',
+      kind: 'narrative' as const,
+      accent: 'rose' as const,
+      title: 'Quando a pressão assistencial supera a capacidade de coordenação da rede?',
+      subtitle: 'Sinais de uma rede que opera sob carga',
       content: {
-        body:
-          'Onde a gestão da sua operação perde controle hoje?\nNo custo que ninguém viu chegar?\nNa decisão tomada com visão parcial?\nNo tempo que a informação leva para virar ação?',
-        meta: {
-          Edição: '01 / 2026',
-          Tempo: '~12 min',
-          Público: 'Diretoria executiva e financeira',
-        },
+        headline: 'Abertura',
+        cardVisual: 'heartbeat',
+        lead: 'Sua rede reconhece algum destes sinais?',
+        valueStagesFlat: true,
+        valueStagesGridCols: 3,
+        valueStages: [
+          { number: '📋', label: 'Filas regulatórias crescentes' },
+          { number: '🔗', label: 'Gargalos entre níveis assistenciais' },
+          { number: '⏳', label: 'Demora no acesso ao cuidado' },
+          { number: '📊', label: 'Baixa visibilidade sobre a rede' },
+          { number: '⚖️', label: 'Judicialização crescendo' },
+          { number: '🔁', label: 'Decisões dependentes de controles paralelos' },
+        ],
+        attentionPhrase:
+          'O desafio não é atender mais. É coordenar melhor o que a rede já precisa sustentar.',
       },
     };
   }
 
+  // SLIDE 2 — A rede segue operando, mas perde previsibilidade
   if (s.id === 'limit') {
     return {
       ...s,
-      title: 'DIAGNÓSTICO',
-      subtitle: 'Onde a gestão perde tração',
+      kind: 'narrative',
+      accent: 'cyan',
+      title: 'A rede segue operando. Mas perde previsibilidade.',
+      subtitle: 'Sinais isolados que expressam um mesmo desequilíbrio',
       content: {
-        metrics: [
-          {
-            value: 71,
-            decimals: 0,
-            label: 'Decisão com visão parcial',
-            suffix: 'das decisões executivas são tomadas sem o contexto completo',
-            ring: 71,
-            trend: [58, 60, 63, 65, 67, 68, 70, 71],
-            delta: 4,
-            deltaUnit: 'pp',
-          },
-          {
-            value: 4.2,
-            decimals: 1,
-            label: 'Lead-time da informação',
-            suffix: 'em média até a informação consolidada chegar à decisão',
-            ring: 70, // proporcional para representação visual
-            trend: [2.8, 3.0, 3.2, 3.5, 3.7, 3.9, 4.0, 4.2],
-            delta: 0.6,
-            deltaUnit: 'd',
-            unit: ' d',
-          },
+        headline: 'Diagnóstico',
+        cardVisual: 'converge',
+        lead:
+          'Os sinais estão espalhados por toda a rede — e costumam ser tratados como problemas isolados. Na prática, são a expressão visível de um único desequilíbrio:',
+        attentionPhrase:
+          'A rede cresce em demanda e complexidade. A coordenação não cresce na mesma proporção.',
+        body: 'O que acontece quando isso não é corrigido:',
+        bullets: [
+          'Filas deixam de ser fluxo e se tornam passivo assistencial',
+          'Diagnósticos tardios elevam a complexidade clínica e o custo',
+          'A judicialização cresce como resposta à falha de acesso',
+          'A capacidade instalada é usada de forma desigual',
+          'O gasto público financia resposta tardia e retrabalho',
         ],
-        body:
-          'Isso não é falta de dado.\nÉ falta de continuidade entre dado, contexto e decisão.\n\nO custo invisível não aparece no relatório do mês —\nele aparece no resultado do trimestre.',
+        closingHighlight:
+          'Em saúde pública, adiar decisões raramente preserva recursos. Desloca o problema para um estágio mais caro e mais difícil de corrigir.',
+        metrics: [],
       },
     };
   }
 
+  // SLIDE 3 — Quando a coordenação falha, o desperdício vira sistêmico
   if (s.id === 'why-agents') {
     return {
       ...s,
-      title: 'CUSTO INVISÍVEL',
-      subtitle: 'O que não é medido continua crescendo',
+      kind: 'narrative',
+      accent: 'amber',
+      title: 'Quando a coordenação falha, o desperdício também vira sistêmico.',
+      subtitle: 'Evidência: desperdício global e filas no SUS',
       content: {
-        body:
-          'A gestão atual reage ao desvio quando ele já se materializou.\n\nMas grande parte do custo de operar saúde não está no que é registrado —\nestá no retrabalho, no contexto perdido, na decisão tardia.\n\nÉ valor que se dissipa antes de ser percebido.',
-        bullets: [
-          'Retrabalho em áreas críticas',
-          'Decisão fora do contexto',
-          'Informação que chega tarde',
-          'Reunião de alinhamento como gargalo',
-          'Indicadores reativos ao desvio',
+        headline: 'Evidência sistêmica',
+        cardVisual: 'echo',
+        contrastPair: {
+          left: {
+            label: 'US$ 1,9 tri / ano',
+            tone: 'cool',
+            text:
+              'Desperdício global estimado associado à falta de coordenação sistêmica (OECD).\nA ineficiência não nasce apenas do gasto excessivo — nasce da dificuldade de coordenar recursos, fluxos e decisões.',
+          },
+          right: {
+            label: 'Filas no SUS',
+            tone: 'cool',
+            text:
+              'Milhões de pessoas aguardam atendimento sem priorização orientada por risco clínico.\nFila não é apenas volume acumulado — é perda de capacidade de organizar acesso, risco e prioridade.',
+          },
+        },
+        closingQuestionLabel: 'CTA · Pergunta-gatilho',
+        closingQuestion:
+          'Qual é o % de capacidade instalada que sua rede usa de forma desigual hoje?',
+        bullets: [],
+      },
+    };
+  }
+
+  // SLIDE 4 — A pergunta mudou (DE → PARA)
+  if (s.id === 'architecture') {
+    return {
+      ...s,
+      kind: 'narrative',
+      accent: 'emerald',
+      title: 'A pergunta mudou.',
+      subtitle: 'De atender mais para coordenar melhor o que a rede já sustenta',
+      content: {
+        headline: 'Virada de lógica',
+        cardVisual: 'portal',
+        contrastPair: {
+          left: {
+            label: 'Antes',
+            tone: 'warm',
+            text: 'Como atender mais?',
+          },
+          right: {
+            label: 'Agora',
+            tone: 'cool',
+            text: 'Como coordenar melhor o que a rede já precisa sustentar?',
+          },
+        },
+        body: 'Isso exige uma mudança de lógica operacional:',
+        beforeAfter: {
+          before: [
+            'Unidade',
+            'Fila cronológica',
+            'Controle paralelo',
+            'Resposta tardia',
+          ],
+          after: [
+            'Rede coordenada',
+            'Priorização por criticidade',
+            'Leitura integrada',
+            'Antecipação de gargalos',
+          ],
+        },
+        attentionPhrase:
+          'A mudança não está em registrar mais. Está em enxergar melhor, na hora certa, com o recurso certo.',
+        bullets: [],
+      },
+    };
+  }
+
+  // SLIDE 5 — Os 8 pontos de uma rede coordenada
+  if (s.id === 'journey') {
+    return {
+      ...s,
+      kind: 'narrative',
+      accent: 'cyan',
+      title: 'Sustentar escala exige uma base comum de coordenação.',
+      subtitle: 'Os 8 pontos de uma rede coordenada',
+      content: {
+        headline: 'Base de coordenação',
+        cardVisual: 'funnel',
+        valueStagesLead:
+          'Não se trata de informatizar mais uma etapa. Trata-se de fazer todos os elementos da rede funcionarem com a mesma lógica de execução.\n\nOs 8 pontos de uma rede coordenada:',
+        valueStagesFlat: true,
+        valueStagesGridCols: 4,
+        valueStages: [
+          { number: '01', label: 'Entrada na rede' },
+          { number: '02', label: 'Regulação do acesso' },
+          { number: '03', label: 'Atenção ambulatorial' },
+          { number: '04', label: 'Encaminhamento entre níveis' },
+          { number: '05', label: 'Diagnóstico' },
+          { number: '06', label: 'Organização de equipes' },
+          { number: '07', label: 'Gestão da capacidade instalada' },
+          { number: '08', label: 'Governança e decisão' },
         ],
+        attentionPhrase:
+          'Quando esses pontos deixam de operar isoladamente e passam a funcionar como sistema, a rede ganha previsibilidade real.',
+        bullets: [],
+        journeyStages: [],
+      },
+    };
+  }
+
+  // SLIDE 6 — Ecossistema Salux em capacidades
+  if (s.id === 'integration') {
+    return {
+      ...s,
+      kind: 'capacities',
+      accent: 'cyan',
+      title: 'Essa arquitetura já existe na prática.',
+      subtitle: 'Capacidades centrais de coordenação e de sustentação da rede',
+      content: {
+        headline: 'Essa arquitetura já existe na prática.',
+        cardVisual: 'scale',
+        body:
+          'O Ecossistema Salux organiza capacidades para cada ponto da rede — de forma integrada, não como produtos isolados.',
+        capacityGroups: [
+          {
+            title: 'Capacidades centrais de coordenação',
+            tone: 'core',
+            items: [
+              {
+                name: 'Base digital',
+                subtitle: 'Plataforma Salux + INITIA',
+                description:
+                  'Dados, fluxos, regulação e decisão em lógica comum.',
+                tagline: 'Coordenação desde a origem.',
+              },
+              {
+                name: 'Regulação e acesso',
+                subtitle: 'Salux + INITIA · Agentes',
+                description:
+                  'Priorização por criticidade clínica, contexto e capacidade disponível.',
+                tagline: 'Acesso organizado por risco, não por fila.',
+              },
+              {
+                name: 'Capilaridade',
+                subtitle: 'CloudHealth',
+                description:
+                  'Teleatendimento, acompanhamento remoto e cuidado híbrido.',
+                tagline: 'Alcance sem expansão física linear.',
+              },
+              {
+                name: 'Diagnóstico',
+                subtitle: 'Med.Place',
+                description:
+                  'Coordena capacidade diagnóstica e conecta exames à jornada.',
+                tagline: 'Diagnóstico em rede, sem ruptura.',
+              },
+            ],
+          },
+          {
+            title: 'Capacidades de sustentação da rede',
+            tone: 'support',
+            items: [
+              {
+                name: 'Equipe',
+                subtitle: 'StarGrid',
+                description:
+                  'Escala, cobertura e alocação conforme demanda e criticidade.',
+                tagline: 'Capacidade instalada em movimento.',
+              },
+              {
+                name: 'Governança documental',
+                subtitle: 'ZeroDox',
+                description:
+                  'Rastreabilidade, conformidade e continuidade operacional.',
+                tagline: 'Sustentar sem fragilidade.',
+              },
+              {
+                name: 'Áreas críticas',
+                subtitle: 'VisionPilot / AGCOM · SkyMed',
+                description:
+                  'Fluxos, ocupação e sinais operacionais em tempo real.',
+                tagline: 'A operação acompanhada enquanto acontece.',
+              },
+              {
+                name: 'Controle econômico',
+                subtitle: 'TI Hospitalar',
+                description:
+                  'Previsibilidade sobre demanda, produção e uso de recursos.',
+                tagline: 'Decisão pública com base em dados.',
+              },
+            ],
+          },
+        ],
+        bullets: [],
+      },
+    };
+  }
+
+  // SLIDE 7 — INITIA · Agentes
+  if (s.id === 'governance') {
+    return {
+      ...s,
+      kind: 'narrative',
+      accent: 'emerald',
+      title: 'Com o INITIA, a gestão deixa de correr atrás da informação.',
+      subtitle: 'Agentes que ampliam a capacidade de leitura, priorização e decisão',
+      content: {
+        headline: 'INITIA · Agentes',
+        cardVisual: 'relay',
+        contrastPair: {
+          left: {
+            label: 'Sem INITIA',
+            tone: 'warm',
+            text:
+              'A gestão procura dados.\nConsolida informações em planilhas.\nInterpreta filas manualmente.\nIdentifica gargalos tarde.\nDecide sob pressão.',
+          },
+          right: {
+            label: 'Com INITIA',
+            tone: 'cool',
+            text:
+              'A informação se apresenta.\nO contexto da rede acompanha.\nO risco é priorizado.\nO agente orienta.\nA decisão ganha base operacional.',
+          },
+        },
+        body: 'O que os Agentes fazem na prática:',
+        bullets: [
+          'Estruturam dados críticos desde a entrada da rede',
+          'Analisam filas e identificam prioridades clínicas',
+          'Destacam gargalos em tempo contínuo',
+          'Organizam encaminhamentos entre níveis assistenciais',
+          'Apoiam decisões regulatórias com base em contexto',
+          'Antecipam pontos de tensão antes que virem crise',
+        ],
+        attentionPhrase:
+          'Os agentes não substituem o gestor. Ampliam sua capacidade de leitura, priorização e decisão.',
+        closingHighlight:
+          'A tecnologia deixa de apenas registrar a pressão — e passa a transformar pressão em decisão e decisão em execução.',
+        revealPillars: [],
+      },
+    };
+  }
+
+  // SLIDE 8 — Pontos de entrada → resposta sistêmica
+  if (s.id === 'roadmap') {
+    return {
+      ...s,
+      kind: 'narrative',
+      accent: 'cyan',
+      title: 'O ponto de entrada pode variar. A resposta é sempre sistêmica.',
+      subtitle: 'Use este slide para aprofundar a dor específica do visitante',
+      content: {
+        headline: 'Pontos de entrada',
+        cardVisual: 'spiral',
+        valueStagesLead: 'Use este slide para aprofundar a dor específica do visitante:',
+        valueStagesFlat: true,
+        valueStagesGridCols: 3,
+        valueStages: [
+          { number: '🚦', label: 'Fila / Regulação', description: '→ Salux + INITIA + Agentes' },
+          { number: '📈', label: 'Leitura da rede', description: '→ Salux + INITIA' },
+          { number: '📡', label: 'Capilaridade', description: '→ CloudHealth' },
+          { number: '🔬', label: 'Diagnóstico', description: '→ Med.Place' },
+          { number: '👥', label: 'Equipe / Cobertura', description: '→ StarGrid' },
+          { number: '📄', label: 'Documentação', description: '→ ZeroDox' },
+          { number: '🏥', label: 'Áreas críticas', description: '→ VisionPilot / AGCOM + SkyMed' },
+          { number: '💰', label: 'Controle econômico', description: '→ TI Hospitalar' },
+        ],
+        closingQuestionLabel: 'CTA · Pergunta-gatilho',
+        closingQuestion: 'Qual desses pontos está gerando mais pressão na sua rede agora?',
+        bullets: [],
+        roadmapTransform: false,
+      },
+    };
+  }
+
+  // SLIDE 10 — Encerramento
+  if (s.id === 'closing') {
+    return {
+      ...s,
+      accent: 'cyan',
+      title: 'Sua rede está sendo coordenada como sistema — ou administrada por partes?',
+      subtitle: 'Mapear juntos onde a rede mais perde coordenação',
+      content: {
+        headline: 'Sua rede está sendo coordenada como sistema — ou administrada por partes?',
+        cardVisual: 'shield',
+        body:
+          'A nova fase da saúde pública não será definida por quem digitalizou mais processos.\nSerá definida por quem conseguir coordenar informação, capacidade instalada, regulação e cuidado em uma lógica única de execução.',
+        attentionPhrase:
+          'Esse movimento pode começar pelo ponto onde sua rede hoje mais perde coordenação.',
+        valueStagesFlat: true,
+        valueStagesGridCols: 3,
+        valueStages: [
+          { number: '→', label: 'Pressão em decisão.' },
+          { number: '→', label: 'Decisão em execução.' },
+          { number: '→', label: 'Execução em acesso e cuidado.' },
+        ],
+        closingQuestionLabel: 'CTA · Pergunta-gatilho',
+        closingQuestion:
+          'Podemos mapear juntos onde sua rede está perdendo coordenação.',
+        closingHighlight:
+          'Ecossistema Salux · A base para uma nova forma de operar a saúde pública.',
+        highlightPhrases: [],
+        bullets: [],
       },
     };
   }
 
   return s;
 });
+
+/** Card extra 9 — resultado/benefícios. Inserido antes do closing. */
+const gestaoResultsStep: PresentationStep = {
+  id: 'gestao-results',
+  index: 8,
+  title: 'O valor não está em reduzir filas. Está em impedir que a rede acumule passivos.',
+  subtitle: 'Resultado: coordenação sustentável da rede',
+  position: { x: 1320, y: 3320 },
+  scale: 1.2,
+  kind: 'narrative',
+  accent: 'emerald',
+  content: {
+    headline: 'Resultado',
+    cardVisual: 'bridge',
+    valueStagesLead:
+      'Com uma base coordenada, a rede deixa de depender apenas de esforço contínuo de compensação.',
+    valueStagesFlat: true,
+    valueStagesGridCols: 3,
+    valueStages: [
+      { number: '✓', label: 'Mais previsibilidade sobre demanda e capacidade' },
+      { number: '✓', label: 'Mais priorização baseada em risco clínico real' },
+      { number: '✓', label: 'Mais fluidez entre níveis assistenciais' },
+      { number: '✓', label: 'Menos dependência de controles paralelos' },
+      { number: '✓', label: 'Mais governança sobre filas e gargalos' },
+      { number: '✓', label: 'Mais capacidade de decisão pública com base em dados' },
+    ],
+    attentionPhrase:
+      'Eficiência no setor público não é apenas economia. É capacidade de transformar recurso disponível em acesso, cuidado e execução.',
+  },
+};
+
+/** Sequência final — insere `gestao-results` (card 9) antes do closing. */
+export const gestaoSteps: PresentationStep[] = (() => {
+  const closingIdx = gestaoBaseSteps.findIndex((s) => s.id === 'closing');
+  if (closingIdx < 0) return gestaoBaseSteps;
+  const before = gestaoBaseSteps.slice(0, closingIdx);
+  const closing = gestaoBaseSteps[closingIdx];
+  return [...before, gestaoResultsStep, closing].map((s, i) => ({ ...s, index: i }));
+})();

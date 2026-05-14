@@ -28,6 +28,8 @@ import { AnimatedRiskCurve } from '../visuals/AnimatedRiskCurve';
 import { AnimatedNarrativeMetrics } from '../visuals/AnimatedNarrativeMetrics';
 import { KpiCards } from '../visuals/KpiCards';
 import { EvidenceMetricCard } from '../visuals/EvidenceMetricCard';
+import { EvidenceGaugeCard } from '../visuals/EvidenceGaugeCard';
+import { EvidenceRangeCard } from '../visuals/EvidenceRangeCard';
 import { getCardTextVariants } from './cardTextMotion';
 import { ClosingHighlight, EvidenceCardBlock, HighlightPhraseList } from './HighlightBlocks';
 
@@ -307,21 +309,43 @@ export function NarrativeStep({ step, active }: Props) {
 
         {step.content.evidenceMetrics && step.content.evidenceMetrics.length > 0 && (
           <motion.div variants={item} className="space-y-3">
-            {step.content.evidenceMetrics.map((m, i) => (
-              <EvidenceMetricCard
-                key={`${m.value}-${i}`}
-                badge={m.badge}
-                prefix={m.prefix}
-                value={m.value}
-                decimals={m.decimals}
-                unit={m.unit}
-                headline={m.headline}
-                context={m.context}
-                accentColor={accent.base}
-                active={active}
-                delay={i * 0.45}
-              />
-            ))}
+            {step.content.evidenceMetrics.map((m, i) => {
+              if (m.style === 'range') {
+                return (
+                  <EvidenceRangeCard
+                    key={`${m.value}-${i}`}
+                    badge={m.badge}
+                    prefix={m.prefix}
+                    value={m.value}
+                    rangeEnd={m.rangeEnd}
+                    valueLabel={m.valueLabel}
+                    rangeMax={m.rangeMax}
+                    decimals={m.decimals}
+                    headline={m.headline}
+                    context={m.context}
+                    accentColor={accent.base}
+                    active={active}
+                    delay={i * 0.45}
+                  />
+                );
+              }
+              const Card = m.style === 'gauge' ? EvidenceGaugeCard : EvidenceMetricCard;
+              return (
+                <Card
+                  key={`${m.value}-${i}`}
+                  badge={m.badge}
+                  prefix={m.prefix}
+                  value={m.value}
+                  decimals={m.decimals}
+                  unit={m.unit}
+                  headline={m.headline}
+                  context={m.context}
+                  accentColor={accent.base}
+                  active={active}
+                  delay={i * 0.45}
+                />
+              );
+            })}
           </motion.div>
         )}
 
