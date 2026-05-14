@@ -1179,7 +1179,7 @@ function TenseWebBackdrop({
 interface PainPointChipsProps {
   bullets: string[];
   icons?: string[];
-  gridCols?: 2 | 3;
+  gridCols?: 2 | 3 | 4;
   accentColor: string;
   active: boolean;
   reducedMotion: boolean;

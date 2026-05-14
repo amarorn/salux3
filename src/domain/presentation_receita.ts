@@ -1,76 +1,5 @@
-import type { PresentationStep, RoadmapAgentCard } from './types';
+import type { PresentationStep } from './types';
 import { steps as baseSteps } from './presentation';
-
-const receitaRoadmapAgents: RoadmapAgentCard[] = [
-  {
-    title: 'BASE ESTRUTURADA NA ORIGEM',
-    segments: [
-      {
-        type: 'text',
-        text:
-          'Base estruturada na origem\nreduz retrabalho ao longo da operação.',
-      },
-      { type: 'product', name: 'Plataforma Salux' },
-    ],
-  },
-  {
-    title: 'FLUXO DE RECEITA ACOMPANHADO',
-    segments: [
-      {
-        type: 'text',
-        text:
-          'Fluxo de receita acompanhado em tempo real\nreduz perda ao longo da jornada.',
-      },
-      { type: 'product', name: 'Plataforma Salux' },
-    ],
-  },
-  {
-    title: 'DOCUMENTAÇÃO QUE SUSTENTA RECEITA',
-    segments: [
-      {
-        type: 'text',
-        text:
-          'Documentação estruturada\nsustenta receita e reduz glosa.\nO valor deixa de ser questionado\ne passa a ser comprovado.',
-      },
-      { type: 'product', name: 'ZeroDox' },
-    ],
-  },
-  {
-    title: 'FORÇA DE TRABALHO COMO CAPACIDADE',
-    segments: [
-      {
-        type: 'text',
-        text:
-          'Escala, alocação e produtividade\ndeixam de ser ruído\ne passam a ser controláveis.',
-      },
-      { type: 'product', name: 'StarGrid' },
-    ],
-  },
-  {
-    title: 'CENTRO CIRÚRGICO SOB CONTROLE CONTÍNUO',
-    segments: [
-      {
-        type: 'text',
-        text:
-          'Alta complexidade exige controle constante.\nRegistro anestésico estruturado\nreduz risco clínico e financeiro.',
-      },
-      { type: 'product', name: 'SkyMed' },
-      { type: 'text', text: 'Leitura da operação em tempo real' },
-      { type: 'product', name: 'VisionPilot' },
-    ],
-  },
-  {
-    title: 'INTELIGÊNCIA EM TEMPO REAL',
-    segments: [
-      {
-        type: 'text',
-        text:
-          'A operação deixa de ser analisada depois\ne passa a ser acompanhada enquanto acontece.',
-      },
-      { type: 'product', name: 'AGCOM / VisionPilot' },
-    ],
-  },
-];
 
 export const presentationReceitaMeta = {
   title: 'Proteção econômica da operação em saúde',
@@ -471,12 +400,36 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
         valueStagesFlat: true,
         valueStagesGridCols: 3,
         valueStages: [
-          { number: '✓', label: 'Mais previsibilidade sobre receita e margem' },
-          { number: '✓', label: 'Menos retrabalho de faturamento e reconciliação' },
-          { number: '✓', label: 'Mais controle sobre glosa antes do faturamento' },
-          { number: '✓', label: 'Menos valor perdido em rupturas silenciosas' },
-          { number: '✓', label: 'Mais capacidade de antecipar risco operacional' },
-          { number: '✓', label: 'Operação que protege valor enquanto acontece' },
+          {
+            number: '✓',
+            label: 'Mais previsibilidade sobre receita e margem',
+            description: '',
+          },
+          {
+            number: '✓',
+            label: 'Menos retrabalho de faturamento e reconciliação',
+            description: '',
+          },
+          {
+            number: '✓',
+            label: 'Mais controle sobre glosa antes do faturamento',
+            description: '',
+          },
+          {
+            number: '✓',
+            label: 'Menos valor perdido em rupturas silenciosas',
+            description: '',
+          },
+          {
+            number: '✓',
+            label: 'Mais capacidade de antecipar risco operacional',
+            description: '',
+          },
+          {
+            number: '✓',
+            label: 'Operação que protege valor enquanto acontece',
+            description: '',
+          },
         ],
         attentionPhrase:
           'A diferença não está em ter tecnologia. Está na capacidade de operar com ela.',
