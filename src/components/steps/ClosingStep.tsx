@@ -1,13 +1,12 @@
 import { useContext } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight, Orbit } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FloatingCard, FloatingCardContext } from '../FloatingCard';
 import type { PresentationStep } from '@/domain/types';
 import { theme } from '@/domain/theme';
 import { getCardTextVariants } from './cardTextMotion';
 import { HighlightPhraseList } from './HighlightBlocks';
-import { usePresentationStore } from '@/store/presentationStore';
 import { resolveContactFormUrl } from '@/config/contact';
 
 const FORM_BUTTON_CLASS =
@@ -22,7 +21,6 @@ export function ClosingStep({ step, active }: Props) {
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
   const { container, item } = getCardTextVariants(Boolean(reduceMotion), step.index, flipPhoto);
-  const returnToTrackSelection = usePresentationStore((s) => s.returnToTrackSelection);
   const metaContact = step.content.meta?.Contato;
   const formUrl = resolveContactFormUrl(typeof metaContact === 'string' ? metaContact : undefined);
 
@@ -142,20 +140,8 @@ export function ClosingStep({ step, active }: Props) {
         <motion.div
           variants={item}
           data-no-click-advance
-          className="mt-2 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4"
+          className="mt-2 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
         >
-          <button
-            type="button"
-            data-no-click-advance
-            onClick={(e) => {
-              e.stopPropagation();
-              returnToTrackSelection();
-            }}
-            className="pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full border border-white/16 bg-white/[0.04] px-5 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white/90 shadow-[0_12px_40px_-20px_rgba(0,0,0,0.75)] transition-[border-color,background-color,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-white/32 hover:bg-white/[0.09] active:scale-[0.99]"
-          >
-            <Orbit className="h-4 w-4 opacity-80" strokeWidth={2} aria-hidden />
-            Escolher outra trilha
-          </button>
           {formUrl.startsWith('http') || formUrl.startsWith('mailto:') ? (
             <a
               data-no-click-advance
