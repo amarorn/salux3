@@ -15,6 +15,7 @@ import { PathwaysStep } from './steps/PathwaysStep';
 import { AgentsFlowStep } from './steps/AgentsFlowStep';
 import { ResultsStep } from './steps/ResultsStep';
 import { FloatingCardContext } from './FloatingCard';
+import { usePresentationStore } from '@/store/presentationStore';
 
 /** Largura unificada para todos os cards de todas as trilhas (independente do tipo do step).
  *  Layout vertical: foto como banner no topo, conteúdo abaixo.
@@ -141,6 +142,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
   const reducedMotion = useReducedMotion();
   const faded = dimNonActive && !active;
   const forceWidth = UNIFIED_CARD_WIDTH;
+  const currentTrackId = usePresentationStore((s) => s.currentTrackId);
 
   return (
     <motion.div
@@ -165,6 +167,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
             forceWidth,
             bannerVideoSrc: step.content.bannerMedia?.videoSrc,
             bannerVideoPoster: step.content.bannerMedia?.posterSrc,
+            trackId: currentTrackId,
           }}
         >
           <CardFlipShell active={active} flipPhoto={flipPhoto} stepLabel={stepLabel}>

@@ -2,11 +2,16 @@ import { createContext, useContext, type ReactNode } from 'react';
 import clsx from 'clsx';
 import { motion, useReducedMotion } from 'framer-motion';
 import { theme } from '@/domain/theme';
+import type { TrackId } from '@/domain/tracks';
 import type { Accent } from '@/domain/types';
+
 import { getContentPanelVariants, getPhotoColumnVariants } from '@/components/steps/slideLayerMotion';
 import { INTRO_ASSIST_COVER_URL, presentationSidePhotoForStep } from '@/config/assetUrls';
 import { CinematicBanner } from '@/components/visuals/CinematicBanner';
 import { CardVisual, type CardVisualVariant } from '@/components/visuals/CardVisualVariants';
+
+/** Trilha 1 (`era-agentica` — Receita): escala aplicada ao texto/conteúdo do painel. */
+const TRACK1_CARD_TEXT_SCALE = 1.04;
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
@@ -17,6 +22,7 @@ export const FloatingCardContext = createContext<{
   /** Vídeo do banner (loop muted), passado a partir do step content. */
   bannerVideoSrc?: string;
   bannerVideoPoster?: string;
+  trackId?: TrackId;
 } | null>(null);
 
 interface FloatingCardProps {
@@ -63,6 +69,8 @@ export function FloatingCard({
   const resolvedWidth = ctx?.forceWidth ?? width;
   const resolvedVideoSrc = bannerVideoSrc ?? ctx?.bannerVideoSrc;
   const resolvedVideoPoster = bannerVideoPoster ?? ctx?.bannerVideoPoster;
+  const trackId = ctx?.trackId;
+  const track1TypographyBoost = trackId === 'era-agentica';
   const accentColor = theme.accents[accent];
   const reduceMotion = useReducedMotion();
   const photoMotion = getPhotoColumnVariants(resolvedFlip);
@@ -163,36 +171,51 @@ export function FloatingCard({
           }}
         />
         <div className="relative flex h-full min-h-[820px] flex-col">
-          {badge && (
-            <div className="mb-6 flex items-center gap-3">
-              <span
-                className={clsx(
-                  'inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] transition-[box-shadow] duration-500',
-                )}
-                style={{
-                  background: `${accentColor.base}1a`,
-                  color: accentColor.base,
-                  border: `1px solid ${accentColor.base}55`,
-                  boxShadow: active
-                    ? `0 0 18px ${accentColor.base}40, inset 0 1px 0 rgba(255,255,255,0.08)`
-                    : undefined,
-                }}
-              >
+          <div
+            className={clsx(
+              'relative mx-auto flex min-h-0 w-full flex-1 flex-col',
+              track1TypographyBoost && 'origin-top',
+            )}
+            style={
+              track1TypographyBoost
+                ? {
+                    transform: `scale(${TRACK1_CARD_TEXT_SCALE})`,
+                    width: `${(100 / TRACK1_CARD_TEXT_SCALE).toFixed(4)}%`,
+                  }
+                : undefined
+            }
+          >
+            {badge && (
+              <div className="mb-6 flex items-center gap-3">
                 <span
-                  className="h-1 w-1 rounded-full"
-                  style={{ background: accentColor.base }}
+                  className={clsx(
+                    'inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] transition-[box-shadow] duration-500',
+                  )}
+                  style={{
+                    background: `${accentColor.base}1a`,
+                    color: accentColor.base,
+                    border: `1px solid ${accentColor.base}55`,
+                    boxShadow: active
+                      ? `0 0 18px ${accentColor.base}40, inset 0 1px 0 rgba(255,255,255,0.08)`
+                      : undefined,
+                  }}
+                >
+                  <span
+                    className="h-1 w-1 rounded-full"
+                    style={{ background: accentColor.base }}
+                  />
+                  {badge}
+                </span>
+                <span
+                  className="h-px flex-1"
+                  style={{
+                    background: `linear-gradient(90deg, ${accentColor.base}66, transparent)`,
+                  }}
                 />
-                {badge}
-              </span>
-              <span
-                className="h-px flex-1"
-                style={{
-                  background: `linear-gradient(90deg, ${accentColor.base}66, transparent)`,
-                }}
-              />
-            </div>
-          )}
-          <div className="relative">{children}</div>
+              </div>
+            )}
+            <div className="relative flex-1">{children}</div>
+          </div>
 
           {!hideValueFlow && (
             <CardVisual variant={cardVisual} accentColor={accentColor.base} active={active} />
