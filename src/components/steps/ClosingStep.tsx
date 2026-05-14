@@ -43,18 +43,6 @@ export function ClosingStep({ step, active }: Props) {
         initial={reduceMotion ? false : 'hidden'}
         animate={active ? 'visible' : 'hidden'}
       >
-        <motion.span
-          variants={item}
-          className="inline-flex items-center gap-2 self-start rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.22em]"
-          style={{
-            borderColor: `${accent.base}55`,
-            background: `${accent.base}1f`,
-            color: accent.base,
-          }}
-        >
-          Encerramento
-        </motion.span>
-
         <motion.h2
           variants={item}
           className="presentation-ppt-title max-w-[22ch] text-[clamp(1.7rem,4.2vw,2.6rem)] whitespace-pre-line"
@@ -141,38 +129,6 @@ export function ClosingStep({ step, active }: Props) {
               style={{ color: accent.base, textShadow: `0 0 24px ${accent.base}33` }}
             >
               “{step.content.attentionPhrase}”
-            </p>
-          </motion.div>
-        )}
-
-        {step.content.closingQuestion && (
-          <motion.div
-            variants={item}
-            className="relative overflow-hidden rounded-2xl border px-5 py-4"
-            style={{
-              borderColor: `${accent.base}55`,
-              background: `linear-gradient(135deg, ${accent.base}1c 0%, rgba(255,255,255,0.02) 70%)`,
-              boxShadow: `0 0 0 1px ${accent.base}22, inset 0 1px 0 rgba(255,255,255,0.05)`,
-            }}
-          >
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-x-6 -top-px h-px"
-              style={{ background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)` }}
-            />
-            {step.content.closingQuestionLabel && (
-              <span
-                className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.32em]"
-                style={{ color: accent.base, opacity: 0.9 }}
-              >
-                ▸ {step.content.closingQuestionLabel}
-              </span>
-            )}
-            <p
-              className="text-[1.05rem] font-semibold leading-snug text-white"
-              style={{ textShadow: `0 0 24px ${accent.base}25` }}
-            >
-              {step.content.closingQuestion}
             </p>
           </motion.div>
         )}

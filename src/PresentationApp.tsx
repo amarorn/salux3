@@ -7,6 +7,7 @@ import { usePresentationStore } from './store/presentationStore';
 import { IntroBackground } from './components/intro/IntroBackground';
 import { PresentationCornerLogo } from './components/PresentationCornerLogo';
 import { MaestroOrb } from './components/MaestroOrb';
+import { PresentationNavArrows } from './components/PresentationNavArrows';
 import { TransitionMorph } from './components/intro/TransitionMorph';
 import { Stage } from './components/Stage';
 import './styles/presentationHierarchy.css';
@@ -53,6 +54,8 @@ export function PresentationApp() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {hasEntered && transitionPhase !== 'morphing' && <PresentationNavArrows />}
       </main>
     </Stage>
   );

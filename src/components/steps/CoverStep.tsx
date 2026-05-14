@@ -70,10 +70,7 @@ export function CoverStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const contrast = step.content.contrastPair;
   const attention = step.content.attentionPhrase;
-  const cta = step.content.closingQuestion;
-  const ctaLabel = step.content.closingQuestionLabel;
-
-  const enriched = Boolean(contrast || attention || cta);
+  const enriched = Boolean(contrast || attention);
 
   return (
     <FloatingCard
@@ -152,37 +149,6 @@ export function CoverStep({ step, active }: Props) {
           </motion.div>
         )}
 
-        {cta && (
-          <motion.div
-            variants={item}
-            className="relative w-full overflow-hidden rounded-2xl border px-5 py-4"
-            style={{
-              borderColor: `${accent.base}55`,
-              background: `linear-gradient(135deg, ${accent.base}1c 0%, rgba(255,255,255,0.02) 70%)`,
-              boxShadow: `0 0 0 1px ${accent.base}22, inset 0 1px 0 rgba(255,255,255,0.05)`,
-            }}
-          >
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-x-6 -top-px h-px"
-              style={{ background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)` }}
-            />
-            {ctaLabel && (
-              <span
-                className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.32em]"
-                style={{ color: accent.base, opacity: 0.9 }}
-              >
-                ▸ {ctaLabel}
-              </span>
-            )}
-            <p
-              className="text-[1.05rem] font-semibold leading-snug text-white"
-              style={{ textShadow: `0 0 24px ${accent.base}25` }}
-            >
-              {cta}
-            </p>
-          </motion.div>
-        )}
       </motion.div>
     </FloatingCard>
   );
