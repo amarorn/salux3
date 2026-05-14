@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Compass, Loader2 } from 'lucide-react';
+import { usePresentationStore } from '@/store/presentationStore';
 
 interface FormState {
   nome: string;
@@ -51,7 +52,13 @@ async function submitForm(state: FormState): Promise<void> {
 
 export function ContactFormPage() {
   const navigate = useNavigate();
+  const returnToTrackSelection = usePresentationStore((s) => s.returnToTrackSelection);
   const [state, setState] = useState<FormState>(INITIAL_STATE);
+
+  function handleChangeTrack() {
+    returnToTrackSelection();
+    navigate('/', { replace: true });
+  }
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -89,14 +96,24 @@ export function ContactFormPage() {
     <div className="relative min-h-screen overflow-hidden bg-[#05070d] text-white">
       <BackgroundDecor />
 
-      <header className="relative z-10 flex items-center justify-between px-6 py-6 sm:px-10">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/85 transition-[border-color,background-color] hover:border-white/30 hover:bg-white/[0.08]"
-        >
-          <ArrowLeft className="h-4 w-4" strokeWidth={2} aria-hidden />
-          Voltar
-        </Link>
+      <header className="relative z-10 flex flex-wrap items-center justify-between gap-3 px-6 py-6 sm:px-10">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/85 transition-[border-color,background-color] hover:border-white/30 hover:bg-white/[0.08]"
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={2} aria-hidden />
+            Voltar à apresentação
+          </Link>
+          <button
+            type="button"
+            onClick={handleChangeTrack}
+            className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-500/[0.08] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-violet-100 transition-[border-color,background-color] hover:border-violet-400/50 hover:bg-violet-500/[0.14]"
+          >
+            <Compass className="h-4 w-4" strokeWidth={2} aria-hidden />
+            Selecionar outra trilha
+          </button>
+        </div>
         <span className="text-[10px] font-semibold uppercase tracking-[0.32em] text-white/35">
           Contato · Salux
         </span>
@@ -104,7 +121,7 @@ export function ContactFormPage() {
 
       <main className="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-stretch px-6 pb-16 pt-6 sm:px-10">
         {status === 'success' ? (
-          <SuccessPanel onAgain={() => navigate('/', { replace: true })} />
+          <SuccessPanel />
         ) : (
           <FormCard
             state={state}
@@ -284,7 +301,7 @@ function Field({
   );
 }
 
-function SuccessPanel({ onAgain }: { onAgain: () => void }) {
+function SuccessPanel() {
   return (
     <section className="flex flex-col items-center gap-6 rounded-3xl border border-emerald-400/25 bg-emerald-500/[0.05] p-10 text-center shadow-[0_30px_80px_-30px_rgba(16,185,129,0.45)] backdrop-blur-md">
       <span
@@ -299,14 +316,6 @@ function SuccessPanel({ onAgain }: { onAgain: () => void }) {
           Nossa equipe entra em contato em breve para agendar a conversa. Obrigado pelo interesse.
         </p>
       </div>
-      <button
-        type="button"
-        onClick={onAgain}
-        className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/[0.04] px-5 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white/90 hover:border-white/32 hover:bg-white/[0.09]"
-      >
-        Voltar ao início
-        <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
-      </button>
     </section>
   );
 }

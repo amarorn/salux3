@@ -22,7 +22,7 @@ const tecnologiaQueAgeStep: PresentationStep = {
   id: 'tecnologia-que-age',
   index: 8,
   title: 'O ponto de entrada pode variar. A resposta precisa ser coordenada.',
-  subtitle: 'Use este slide para aprofundar a dor específica do visitante',
+  subtitle: 'Pontos de entrada da operação na proteção da receita',
   position: { x: 560, y: -1480 },
   scale: 1.25,
   kind: 'narrative',
@@ -30,7 +30,6 @@ const tecnologiaQueAgeStep: PresentationStep = {
   content: {
     headline: 'Pontos de entrada',
     cardVisual: 'entry-points',
-    valueStagesLead: 'Use este slide para aprofundar a dor específica do visitante:',
     valueStagesFlat: true,
     valueStagesGridCols: 3,
     valueStages: [
@@ -397,6 +396,10 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
         cardVisual: 'flow',
         body:
           'Com uma base operacional coordenada, a receita deixa de ser recuperada no final e passa a ser protegida ao longo da jornada.',
+        bannerMedia: {
+          videoSrc: '/intro/painel-produtividade-loop.mp4',
+          posterSrc: '/intro/painel-produtividade-poster.jpg',
+        },
         valueStagesFlat: true,
         valueStagesGridCols: 3,
         valueStages: [
