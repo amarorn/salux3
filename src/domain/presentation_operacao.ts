@@ -1,4 +1,5 @@
 import type { PresentationStep } from './types';
+import trilha3PathwaysUrl from '@/assets/presentation/trilha3-central-notificacoes.png?url';
 import { steps as baseSteps } from './presentation';
 
 export const presentationOperacaoMeta = {
@@ -450,9 +451,10 @@ const extraOperacao: PresentationStep[] = [
         { number: '💰', label: 'Faturamento / Glosas', description: '→ TI Hospitalar' },
         { number: '🏥', label: 'Centro cirúrgico / Áreas críticas', description: '→ SkyMed + VisionPilot / AGCOM' },
       ],
-      closingQuestionLabel: 'CTA · Pergunta-gatilho',
-      closingQuestion:
-        'Por onde a expansão está gerando mais atrito hoje na sua operação?',
+      heroImage: {
+        src: trilha3PathwaysUrl,
+        alt: 'Central de Notificações ZeroDox — histórico e canais de envio',
+      },
     },
   },
   {
