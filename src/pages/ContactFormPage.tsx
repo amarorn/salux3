@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 
 interface FormState {
@@ -50,7 +50,6 @@ async function submitForm(state: FormState): Promise<void> {
 }
 
 export function ContactFormPage() {
-  const navigate = useNavigate();
   const [state, setState] = useState<FormState>(INITIAL_STATE);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -104,7 +103,7 @@ export function ContactFormPage() {
 
       <main className="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-stretch px-6 pb-16 pt-6 sm:px-10">
         {status === 'success' ? (
-          <SuccessPanel onAgain={() => navigate('/', { replace: true })} />
+          <SuccessPanel />
         ) : (
           <FormCard
             state={state}
@@ -284,7 +283,7 @@ function Field({
   );
 }
 
-function SuccessPanel({ onAgain }: { onAgain: () => void }) {
+function SuccessPanel() {
   return (
     <section className="flex flex-col items-center gap-6 rounded-3xl border border-emerald-400/25 bg-emerald-500/[0.05] p-10 text-center shadow-[0_30px_80px_-30px_rgba(16,185,129,0.45)] backdrop-blur-md">
       <span
@@ -299,14 +298,6 @@ function SuccessPanel({ onAgain }: { onAgain: () => void }) {
           Nossa equipe entra em contato em breve para agendar a conversa. Obrigado pelo interesse.
         </p>
       </div>
-      <button
-        type="button"
-        onClick={onAgain}
-        className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/[0.04] px-5 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white/90 hover:border-white/32 hover:bg-white/[0.09]"
-      >
-        Voltar ao início
-        <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
-      </button>
     </section>
   );
 }
