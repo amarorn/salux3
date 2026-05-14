@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Orbit } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { FloatingCard, FloatingCardContext } from '../FloatingCard';
 import type { PresentationStep } from '@/domain/types';
 import { theme } from '@/domain/theme';
@@ -8,6 +9,9 @@ import { getCardTextVariants } from './cardTextMotion';
 import { HighlightPhraseList } from './HighlightBlocks';
 import { usePresentationStore } from '@/store/presentationStore';
 import { resolveContactFormUrl } from '@/config/contact';
+
+const FORM_BUTTON_CLASS =
+  'pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full border border-violet-400/35 bg-violet-500/10 px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-violet-200 shadow-[0_18px_48px_-22px_rgba(124,58,237,0.55)] transition-[border-color,background-color,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-violet-400/55 hover:bg-violet-500/18';
 
 interface Props {
   step: PresentationStep;
@@ -196,18 +200,29 @@ export function ClosingStep({ step, active }: Props) {
             <Orbit className="h-4 w-4 opacity-80" strokeWidth={2} aria-hidden />
             Escolher outra trilha
           </button>
-          <a
-            data-no-click-advance
-            href={formUrl}
-            {...(formUrl.startsWith('http') || formUrl.startsWith('mailto:')
-              ? { target: '_blank', rel: 'noopener noreferrer' }
-              : {})}
-            onClick={(e) => e.stopPropagation()}
-            className="pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full border border-violet-400/35 bg-violet-500/10 px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-violet-200 shadow-[0_18px_48px_-22px_rgba(124,58,237,0.55)] transition-[border-color,background-color,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-violet-400/55 hover:bg-violet-500/18"
-          >
-            Ir para o formulário
-            <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
-          </a>
+          {formUrl.startsWith('http') || formUrl.startsWith('mailto:') ? (
+            <a
+              data-no-click-advance
+              href={formUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className={FORM_BUTTON_CLASS}
+            >
+              Ir para o formulário
+              <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+            </a>
+          ) : (
+            <Link
+              data-no-click-advance
+              to={formUrl}
+              onClick={(e) => e.stopPropagation()}
+              className={FORM_BUTTON_CLASS}
+            >
+              Ir para o formulário
+              <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+            </Link>
+          )}
         </motion.div>
 
         {step.content.closingHighlight && (
