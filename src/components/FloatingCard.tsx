@@ -6,6 +6,7 @@ import type { Accent } from '@/domain/types';
 import { getContentPanelVariants, getPhotoColumnVariants } from '@/components/steps/slideLayerMotion';
 import { INTRO_ASSIST_COVER_URL, presentationSidePhotoForStep } from '@/config/assetUrls';
 import { CinematicBanner } from '@/components/visuals/CinematicBanner';
+import { CardVisual, type CardVisualVariant } from '@/components/visuals/CardVisualVariants';
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
@@ -34,6 +35,10 @@ interface FloatingCardProps {
   bannerVideoPoster?: string;
   /** Atribui uma foto distinta por slide (`config/assetUrls`). */
   stepId?: string;
+  /** Desativa o visual decorativo no rodapé do painel. */
+  hideValueFlow?: boolean;
+  /** Variante temática do visual de rodapé (default: 'flow'). */
+  cardVisual?: CardVisualVariant;
   children: ReactNode;
 }
 
@@ -49,6 +54,8 @@ export function FloatingCard({
   bannerVideoSrc,
   bannerVideoPoster,
   stepId,
+  hideValueFlow,
+  cardVisual,
   children,
 }: FloatingCardProps) {
   const ctx = useContext(FloatingCardContext);
@@ -155,7 +162,7 @@ export function FloatingCard({
             opacity: active ? 1 : 0.5,
           }}
         />
-        <div className="relative">
+        <div className="relative flex h-full min-h-[820px] flex-col">
           {badge && (
             <div className="mb-6 flex items-center gap-3">
               <span
@@ -185,7 +192,11 @@ export function FloatingCard({
               />
             </div>
           )}
-          {children}
+          <div className="relative">{children}</div>
+
+          {!hideValueFlow && (
+            <CardVisual variant={cardVisual} accentColor={accentColor.base} active={active} />
+          )}
         </div>
       </motion.div>
     </div>
