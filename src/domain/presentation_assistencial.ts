@@ -1,5 +1,10 @@
 import type { PresentationStep } from './types';
-import { INTRO_ASSIST_COVER_URL } from '@/config/assetUrls';
+import trilha2CoverUrl from '@/assets/presentation/trilha2-cover-paciente.png?url';
+import trilha2JornadaUrl from '@/assets/presentation/trilha2-jornada-isometrica.png?url';
+import trilha2ComandoUrl from '@/assets/presentation/trilha2-comando-clinico.png?url';
+import trilha2RedeUrl from '@/assets/presentation/trilha2-rede-conectada.png?url';
+import trilha2IntegracaoUrl from '@/assets/presentation/trilha2-integracao-rede.png?url';
+import trilha2EvolucaoUrl from '@/assets/presentation/trilha2-evolucao-decisao.png?url';
 import { steps as baseSteps } from './presentation';
 
 export const presentationAssistencialMeta = {
@@ -169,9 +174,10 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       body:
         'Em saúde, o risco nem sempre nasce de um evento isolado. Muitas vezes, ele se forma aos poucos — e em silêncio.',
       attentionPhrase: 'O problema não é falta de dado. É falta de continuidade.',
-      closingQuestionLabel: 'CTA · Pergunta-gatilho',
-      closingQuestion: 'Onde o cuidado perde continuidade na sua operação?',
-      heroImage: { src: INTRO_ASSIST_COVER_URL, alt: 'Equipe em corredor hospitalar' },
+      heroImage: {
+        src: trilha2CoverUrl,
+        alt: 'Médica acompanhando paciente em leito hospitalar',
+      },
     }),
   )
   .map(
@@ -195,6 +201,10 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
         'Não falta dado. Falta continuidade entre o dado e a decisão certa, no momento certo.',
       bullets: [],
       metrics: undefined,
+      heroImage: {
+        src: trilha2JornadaUrl,
+        alt: 'Jornada assistencial conectando recepção, consultório, exames e enfermaria',
+      },
     }),
   )
   .map(
@@ -230,6 +240,10 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       },
       attentionPhrase:
         'A operação sustenta o cuidado todos os dias. Mas ainda não sustenta continuidade de decisão ao longo da jornada.',
+      heroImage: {
+        src: trilha2RedeUrl,
+        alt: 'Rede assistencial conectada a um centro de comando clínico',
+      },
     }),
   )
   .map(
@@ -265,6 +279,10 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       body: 'Esses dados não falam apenas de eventos. Eles mostram uma fragilidade estrutural.',
       attentionPhrase:
         'Quando o contexto se perde, o risco cresce em silêncio. E quando se torna visível, parte dele já se materializou.',
+      heroImage: {
+        src: trilha2ComandoUrl,
+        alt: 'Equipe clínica analisando painéis de operação em centro de comando',
+      },
     }),
   )
   .map(
@@ -320,6 +338,10 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       attentionPhrase:
         'O limite não está na ausência de tecnologia. Está na ausência de uma base capaz de transformar informação dispersa em clareza clínica e ação coordenada.',
       bullets: [],
+      heroImage: {
+        src: trilha2IntegracaoUrl,
+        alt: 'Integração da rede assistencial em torno de um centro de operações clínicas',
+      },
     }),
   )
   .map(
@@ -359,6 +381,10 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
         'A mudança não está em digitalizar mais uma etapa. Está em sustentar continuidade ao longo de toda a jornada.',
       bullets: [],
       revealPillars: [],
+      heroImage: {
+        src: trilha2EvolucaoUrl,
+        alt: 'Evolução do registro para a decisão sustentada ao longo da jornada',
+      },
     }),
   )
   .map(

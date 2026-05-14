@@ -91,11 +91,15 @@ export function NarrativeStep({ step, active }: Props) {
     return () => window.removeEventListener('keydown', onKey, true);
   }, [balloonOpen]);
 
+  const hero = step.content.heroImage;
+
   return (
     <FloatingCard
       accent={step.accent}
       active={active}
       stepId={step.id}
+      sidePhotoSrc={hero?.src}
+      sidePhotoAlt={hero?.alt}
       cardVisual={step.content.cardVisual}
       width={
         painPoints
