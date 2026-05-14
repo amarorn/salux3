@@ -15,6 +15,38 @@ const TRACK1_CARD_TEXT_SCALE = 1.04;
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
+/**
+ * Conjunto de "blob shapes" — border-radius compostos (eixo horizontal / vertical)
+ * que dão a cada card uma silhueta orgânica e assimétrica em vez de retângulo.
+ * Cada stepId mapeia para uma forma fixa, então a mesma cara mantém estabilidade
+ * entre renders, mas cada card é único.
+ */
+const CARD_SHAPES = [
+  '58% 42% 52% 48% / 44% 56% 38% 62%',
+  '36% 64% 47% 53% / 60% 40% 55% 45%',
+  '52% 48% 36% 64% / 38% 62% 50% 50%',
+  '64% 36% 58% 42% / 50% 50% 44% 56%',
+  '42% 58% 50% 50% / 56% 44% 60% 40%',
+  '48% 52% 62% 38% / 42% 58% 50% 50%',
+  '54% 46% 40% 60% / 64% 36% 48% 52%',
+  '38% 62% 54% 46% / 50% 50% 56% 44%',
+  '60% 40% 48% 52% / 42% 58% 62% 38%',
+  '44% 56% 58% 42% / 56% 44% 40% 60%',
+  '50% 50% 64% 36% / 36% 64% 52% 48%',
+  '56% 44% 42% 58% / 60% 40% 46% 54%',
+] as const;
+
+function hashStepId(id: string | undefined): number {
+  if (!id) return 0;
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function shapeForStep(stepId: string | undefined): string {
+  return CARD_SHAPES[hashStepId(stepId) % CARD_SHAPES.length]!;
+}
+
 export const FloatingCardContext = createContext<{
   flipPhoto?: boolean;
   /** Quando definido, sobrepõe o `width` solicitado por cada step component. */
@@ -146,30 +178,79 @@ export function FloatingCard({
         variants={panelMotion}
         initial={layerInitial}
         animate={layerAnimate}
-        className={clsx(
-          'relative w-full min-h-[900px] overflow-hidden rounded-3xl border border-white/10 bg-[#0d1018] p-12 transition-[border-color,box-shadow] duration-500 ease-out',
-          active
-            ? 'border-white/20 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.08)]'
-            : 'shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.05)] group-hover:-translate-y-1 group-hover:border-white/16',
-          className,
-        )}
+        className={clsx('relative w-full min-h-[900px] p-12', className)}
       >
+        {/* ── Luz cenográfica de fundo ── duas elipses defasadas + plano vinheta.
+            Sem borda, sem container — o conteúdo "emerge" da escuridão. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute -z-10"
           style={{
-            background: `radial-gradient(ellipse at top, ${accentColor.base}1f, transparent 60%)`,
-            opacity: active ? 1 : 0.5,
+            // expande além das bordas do conteúdo, sem forma fixa
+            inset: '-12% -10% -18% -10%',
+            background: `
+              radial-gradient(58% 42% at 28% 18%, ${accentColor.base}28 0%, transparent 70%),
+              radial-gradient(68% 48% at 78% 72%, ${accentColor.base}18 0%, transparent 75%),
+              radial-gradient(70% 55% at 50% 45%, rgba(13,16,24,0.85) 0%, rgba(6,8,14,0.55) 60%, transparent 100%)
+            `,
+            filter: 'blur(36px)',
+            opacity: active ? 1 : 0.55,
+            transition: 'opacity 500ms ease-out',
           }}
         />
+        {/* Camada de "fumaça" sutil — varia a textura sem desenhar bordas */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-6 -top-px h-px"
+          className="pointer-events-none absolute -z-10"
           style={{
-            background: `linear-gradient(90deg, transparent, ${accentColor.base}cc, transparent)`,
-            opacity: active ? 1 : 0.5,
+            inset: '-4% -6% -12% -6%',
+            background: `radial-gradient(55% 45% at ${20 + (hashStepId(stepId) % 50)}% ${30 + (hashStepId(stepId + 'y') % 40)}%, ${accentColor.base}1a 0%, transparent 70%)`,
+            opacity: active ? 0.9 : 0.4,
+            mixBlendMode: 'screen',
+            filter: 'blur(22px)',
           }}
         />
+        {/* Partículas/grain levíssimo, só pra quebrar planos chapados */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -z-10 opacity-[0.04]"
+          style={{
+            inset: 0,
+            backgroundImage:
+              'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
+            backgroundSize: '3px 3px',
+            mixBlendMode: 'screen',
+          }}
+        />
+        {/* Marca-d'água orgânica do accent na borda — um arco solto, não percorre tudo */}
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute -z-10"
+          style={{ inset: '-6% -8% -10% -8%', opacity: active ? 0.6 : 0.3 }}
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <linearGradient id={`fc-arc-${hashStepId(stepId)}`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={accentColor.base} stopOpacity="0" />
+              <stop offset="50%" stopColor={accentColor.base} stopOpacity="0.5" />
+              <stop offset="100%" stopColor={accentColor.base} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path
+            d={
+              hashStepId(stepId) % 3 === 0
+                ? 'M -5 18 Q 50 4 105 24'
+                : hashStepId(stepId) % 3 === 1
+                  ? 'M -5 85 Q 60 95 105 78'
+                  : 'M 8 -5 Q 30 50 22 105'
+            }
+            fill="none"
+            stroke={`url(#fc-arc-${hashStepId(stepId)})`}
+            strokeWidth="0.3"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
         <div className="relative flex h-full min-h-[820px] flex-col">
           <div
             className={clsx(
