@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, CheckCircle2, Compass, Loader2 } from 'lucide-react';
+import { usePresentationStore } from '@/store/presentationStore';
 
 interface FormState {
   nome: string;
@@ -50,7 +51,14 @@ async function submitForm(state: FormState): Promise<void> {
 }
 
 export function ContactFormPage() {
+  const navigate = useNavigate();
+  const returnToTrackSelection = usePresentationStore((s) => s.returnToTrackSelection);
   const [state, setState] = useState<FormState>(INITIAL_STATE);
+
+  function handleChangeTrack() {
+    returnToTrackSelection();
+    navigate('/', { replace: true });
+  }
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -88,14 +96,24 @@ export function ContactFormPage() {
     <div className="relative min-h-screen overflow-hidden bg-[#05070d] text-white">
       <BackgroundDecor />
 
-      <header className="relative z-10 flex items-center justify-between px-6 py-6 sm:px-10">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/85 transition-[border-color,background-color] hover:border-white/30 hover:bg-white/[0.08]"
-        >
-          <ArrowLeft className="h-4 w-4" strokeWidth={2} aria-hidden />
-          Voltar
-        </Link>
+      <header className="relative z-10 flex flex-wrap items-center justify-between gap-3 px-6 py-6 sm:px-10">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/85 transition-[border-color,background-color] hover:border-white/30 hover:bg-white/[0.08]"
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={2} aria-hidden />
+            Voltar à apresentação
+          </Link>
+          <button
+            type="button"
+            onClick={handleChangeTrack}
+            className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-500/[0.08] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-violet-100 transition-[border-color,background-color] hover:border-violet-400/50 hover:bg-violet-500/[0.14]"
+          >
+            <Compass className="h-4 w-4" strokeWidth={2} aria-hidden />
+            Selecionar outra trilha
+          </button>
+        </div>
         <span className="text-[10px] font-semibold uppercase tracking-[0.32em] text-white/35">
           Contato · Salux
         </span>
