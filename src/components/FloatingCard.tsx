@@ -15,36 +15,13 @@ const TRACK1_CARD_TEXT_SCALE = 1.04;
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
-/**
- * Conjunto de "blob shapes" — border-radius compostos (eixo horizontal / vertical)
- * que dão a cada card uma silhueta orgânica e assimétrica em vez de retângulo.
- * Cada stepId mapeia para uma forma fixa, então a mesma cara mantém estabilidade
- * entre renders, mas cada card é único.
- */
-const CARD_SHAPES = [
-  '58% 42% 52% 48% / 44% 56% 38% 62%',
-  '36% 64% 47% 53% / 60% 40% 55% 45%',
-  '52% 48% 36% 64% / 38% 62% 50% 50%',
-  '64% 36% 58% 42% / 50% 50% 44% 56%',
-  '42% 58% 50% 50% / 56% 44% 60% 40%',
-  '48% 52% 62% 38% / 42% 58% 50% 50%',
-  '54% 46% 40% 60% / 64% 36% 48% 52%',
-  '38% 62% 54% 46% / 50% 50% 56% 44%',
-  '60% 40% 48% 52% / 42% 58% 62% 38%',
-  '44% 56% 58% 42% / 56% 44% 40% 60%',
-  '50% 50% 64% 36% / 36% 64% 52% 48%',
-  '56% 44% 42% 58% / 60% 40% 46% 54%',
-] as const;
-
+/** Hash determinístico do `stepId` — usado para gerar valores estáveis
+ *  (posição de gradiente radial, id do `linearGradient` SVG, etc). */
 function hashStepId(id: string | undefined): number {
   if (!id) return 0;
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
   return Math.abs(h);
-}
-
-function shapeForStep(stepId: string | undefined): string {
-  return CARD_SHAPES[hashStepId(stepId) % CARD_SHAPES.length]!;
 }
 
 export const FloatingCardContext = createContext<{
