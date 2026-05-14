@@ -1,14 +1,11 @@
 /**
- * URL do formulário (Typeform, Google Forms, etc.). Opcional: `VITE_CONTACT_FORM_URL` em `.env`.
- * Sem env, usa e-mail em `meta.Contato` do slide de encerramento (mailto) quando existir.
- * Caso contrário, navega para a página interna `/formulario`.
+ * URL do formulário. Por padrão usa a página interna `/formulario`.
+ * Pode ser sobrescrita por `VITE_CONTACT_FORM_URL` (Typeform, Google Forms, etc.).
+ * O parâmetro `metaContact` é aceito por compatibilidade com chamadas existentes,
+ * mas não força mais um link `mailto:` — todas as chamadas levam ao formulário.
  */
-export function resolveContactFormUrl(metaContact?: string): string {
+export function resolveContactFormUrl(_metaContact?: string): string {
   const env = import.meta.env.VITE_CONTACT_FORM_URL?.trim();
   if (env) return env;
-  if (metaContact && metaContact.includes('@')) {
-    const subj = encodeURIComponent('Contato — apresentação Salux');
-    return `mailto:${metaContact}?subject=${subj}`;
-  }
   return '/formulario';
 }

@@ -4,10 +4,7 @@ import trilha2JornadaUrl from '@/assets/presentation/trilha2-jornada-isometrica.
 import trilha2ComandoUrl from '@/assets/presentation/trilha2-comando-clinico.png?url';
 import trilha2RedeUrl from '@/assets/presentation/trilha2-rede-conectada.png?url';
 import trilha2IntegracaoUrl from '@/assets/presentation/trilha2-integracao-rede.png?url';
-import trilha2Slide7Url from '@/assets/presentation/trilha2-slide7.png?url';
-import trilha2Slide8Url from '@/assets/presentation/trilha2-slide8.png?url';
-import trilha2Slide9Url from '@/assets/presentation/trilha2-slide9.png?url';
-import trilha2Slide10Url from '@/assets/presentation/trilha2-slide10.png?url';
+import trilha2EvolucaoUrl from '@/assets/presentation/trilha2-evolucao-decisao.png?url';
 import { steps as baseSteps } from './presentation';
 
 export const presentationAssistencialMeta = {
@@ -76,10 +73,6 @@ const highlightContextStep: PresentationStep = {
       'Os agentes não substituem a equipe. Ampliam a capacidade de leitura, priorização e decisão ao longo da jornada.',
     closingHighlight:
       'A tecnologia deixa de apenas registrar o cuidado — e passa a sustentar continuidade, visibilidade e capacidade real de decisão.',
-    heroImage: {
-      src: trilha2Slide9Url,
-      alt: 'Trilha 2 — Slide 9',
-    },
   },
 };
 
@@ -389,8 +382,8 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       bullets: [],
       revealPillars: [],
       heroImage: {
-        src: trilha2Slide7Url,
-        alt: 'Trilha 2 — Slide 7',
+        src: trilha2EvolucaoUrl,
+        alt: 'Evolução do registro para a decisão sustentada ao longo da jornada',
       },
     }),
   )
@@ -465,10 +458,6 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       ],
       bullets: [],
       roadmapTransform: false,
-      heroImage: {
-        src: trilha2Slide8Url,
-        alt: 'Trilha 2 — Slide 8',
-      },
     }),
   )
   .map(
@@ -492,10 +481,6 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       closingHighlight:
         'Ecossistema Salux · A base para uma nova forma de operar a saúde.',
       bullets: [],
-      heroImage: {
-        src: trilha2Slide10Url,
-        alt: 'Trilha 2 — Slide 10',
-      },
     }),
   );
 
