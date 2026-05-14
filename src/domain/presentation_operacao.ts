@@ -23,31 +23,28 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
     if (s.id === 'limit') {
       return {
         ...s,
-        title: 'CRESCIMENTO QUE PESA',
-        subtitle: 'Onde a expansão começa a se transformar em custo',
+        kind: 'narrative' as const,
+        accent: 'rose' as const,
+        title: 'Onde o crescimento da sua instituição começa a pesar?',
+        subtitle: 'Pontos de atrito que aparecem com a expansão',
         content: {
-          headline: 'Onde o crescimento da sua instituição começa a pesar?',
-          bullets: [
-            'Abertura de nova unidade',
-            'Integrações que precisam ser costuradas a cada nova frente',
-            'Equipe que não acompanha a demanda',
-            'Diagnóstico que vira gargalo',
-            'Perda de previsibilidade econômica com o crescimento',
-            'Expansão física que exige mais estrutura e mais custo',
-          ],
-          painPointsLayout: true,
-          painPointsLead: 'Reconhece algum destes pontos de atrito?',
-          painPointsGridCols: 3,
-          painPointsIcons: [
-            'building-2',
-            'link',
-            'users',
-            'microscope',
-            'trending-down',
-            'landmark',
+          headline: 'Crescimento que pesa',
+          cardVisual: 'ladder',
+          valueStagesLead: 'Reconhece algum destes pontos de atrito?',
+          valueStagesFlat: true,
+          valueStagesGridCols: 3,
+          valueStages: [
+            { number: '🏗', label: 'Abertura de nova unidade' },
+            { number: '🔗', label: 'Integrações que precisam ser costuradas a cada nova frente' },
+            { number: '👥', label: 'Equipe que não acompanha a demanda' },
+            { number: '🔬', label: 'Diagnóstico que vira gargalo' },
+            { number: '📉', label: 'Perda de previsibilidade econômica com o crescimento' },
+            { number: '🏛', label: 'Expansão física que exige mais estrutura e mais custo' },
           ],
           closingQuestion: 'Sua instituição está crescendo por arquitetura — ou por acúmulo?',
-          closingQuestionLabel: 'CTA / Pergunta-gatilho',
+          closingQuestionLabel: 'CTA · Pergunta-gatilho',
+          bullets: [],
+          painPointsLayout: false,
         },
       };
     }
@@ -55,37 +52,31 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
     if (s.id === 'why-agents') {
       return {
         ...s,
+        kind: 'narrative' as const,
         accent: 'amber' as const,
-        title: 'CRESCER ADICIONANDO ESFORÇO',
+        title: 'O hospital cresce. Mas cresce adicionando esforço.',
         subtitle: 'A expansão amplia capacidade — e também complexidade',
         content: {
-          headline: 'O hospital cresce. Mas cresce adicionando esforço.',
-          bullets: [
-            'Mais sistemas',
-            'Mais integrações',
-            'Mais controles paralelos',
-            'Mais adaptações locais',
-            'Mais dependência de pessoas-chave',
-            'Mais estrutura física para cada nova frente',
-            'Mais pressão sobre equipes e áreas críticas',
+          headline: 'Crescer adicionando esforço',
+          cardVisual: 'tide',
+          valueStagesFlat: true,
+          valueStagesGridCols: 4,
+          valueStages: [
+            { number: '+', label: 'Mais sistemas' },
+            { number: '+', label: 'Mais integrações' },
+            { number: '+', label: 'Mais controles paralelos' },
+            { number: '+', label: 'Mais adaptações locais' },
+            { number: '+', label: 'Mais dependência de pessoas-chave' },
+            { number: '+', label: 'Mais estrutura física para cada nova frente' },
+            { number: '+', label: 'Mais pressão sobre equipes e áreas críticas' },
           ],
-          painPointsLayout: true,
-          painPointsBackdrop: 'stacked' as const,
-          painPointsGridCols: 4,
-          painPointsIcons: [
-            'plus',
-            'plus',
-            'plus',
-            'plus',
-            'plus',
-            'plus',
-            'plus',
-          ],
-          highlightPhrases: [
-            'Isso não é um desvio pontual. É um padrão.',
-            'A instituição amplia capacidade, mas também amplia complexidade.',
+          body:
+            'Isso não é um desvio pontual. É um padrão.\nA instituição amplia capacidade — mas também amplia complexidade.',
+          attentionPhrase:
             'Quando crescer exige sempre mais costura, a expansão começa a virar atrito operacional.',
-          ],
+          bullets: [],
+          highlightPhrases: [],
+          painPointsLayout: false,
         },
       };
     }
@@ -94,28 +85,34 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
       return {
         ...s,
         kind: 'narrative' as const,
-        title: 'O ATRITO QUE SE ACUMULA',
-        subtitle: 'A operação cresce por partes, mas não funciona como ecossistema',
+        accent: 'cyan' as const,
+        title: 'O problema não é falta de tecnologia.',
+        subtitle: 'Um conjunto de sistemas não forma, necessariamente, uma arquitetura',
         content: {
-          headline:
-            'O atrito não aparece em um único ponto. Ele se acumula ao longo da operação.',
-          bullets: [
-            'Abertura de nova unidade',
-            'Implantação de novo serviço',
-            'Integração entre sistemas',
-            'Coordenação das equipes',
-            'Capacidade diagnóstica',
-            'Expansão do atendimento',
-            'Controle econômico',
-            'Áreas críticas',
+          headline: 'Tecnologia × arquitetura',
+          cardVisual: 'gear',
+          lead:
+            'A maioria das instituições já tem sistemas, módulos, BI, prontuário, integrações e controles.',
+          attentionPhrase:
+            'Um conjunto de sistemas não forma, necessariamente, uma arquitetura.',
+          body:
+            'Durante anos, a saúde avançou informatizando partes da operação. Isso foi necessário.\nMas informatizar partes não significa coordenar o todo.',
+          evidenceMetrics: [
+            {
+              style: 'gauge',
+              badge: 'Dado · Evidência',
+              prefix: 'até',
+              value: 80,
+              unit: '%',
+              headline:
+                'do gasto de TI pode ser consumido por operação e manutenção em ambientes com legado pesado.',
+              context:
+                'Quando a base é pesada, crescer custa mais antes mesmo de começar. A instituição investe para sustentar o passado — e perde espaço para construir a próxima base da operação.',
+            },
           ],
-          highlightPhrases: [
-            'Cada ponto parece administrável isoladamente.',
-            'Mas, juntos, revelam o mesmo problema:',
-            'A operação cresce por partes, mas não funciona como ecossistema.',
-          ],
-          painPointsLayout: true,
-          painPointsBackdrop: 'web' as const,
+          bullets: [],
+          highlightPhrases: [],
+          painPointsLayout: false,
         },
       };
     }
@@ -124,25 +121,45 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
       return {
         ...s,
         kind: 'narrative' as const,
-        title: 'NÃO É FALTA DE TECNOLOGIA',
-        subtitle: 'Conjunto de sistemas não forma, necessariamente, uma arquitetura',
+        accent: 'amber' as const,
+        title: 'A pergunta mudou.',
+        subtitle: 'Do sistema-a-adicionar para a base que permite crescer sem multiplicar complexidade',
         content: {
-          headline: 'O problema não é falta de tecnologia.',
-          bullets: [
-            'Sistemas',
-            'Módulos',
-            'BI',
-            'Prontuário',
-            'Integrações',
-            'Controles',
-            'Soluções especializadas',
+          headline: 'A pergunta mudou.',
+          cardVisual: 'lens',
+          contrastPair: {
+            left: {
+              label: 'Antes',
+              tone: 'warm',
+              text: 'Qual sistema precisamos adicionar?',
+            },
+            right: {
+              label: 'Agora',
+              tone: 'cool',
+              text: 'Que base permite crescer sem multiplicar complexidade?',
+            },
+          },
+          evidenceMetrics: [
+            {
+              style: 'range',
+              badge: 'Dado · Evidência',
+              value: 12,
+              rangeEnd: 24,
+              valueLabel: 'meses',
+              rangeMax: 36,
+              headline:
+                'é o tempo que implementações hospitalares amplas podem exigir.',
+              context:
+                'A expansão não espera ciclos pesados de implantação. A demanda não espera. A pressão assistencial não espera.',
+            },
           ],
-          highlightPhrases: [
-            'Mas um conjunto de sistemas não forma, necessariamente, uma arquitetura.',
-            'Durante anos, a saúde avançou informatizando partes da operação. Isso foi necessário — mas informatizar partes não significa coordenar o todo.',
-            'É nesse ponto que o crescimento começa a travar.',
-          ],
-          painPointsLayout: true,
+          body: 'A inovação real não está em adicionar mais camadas.',
+          attentionPhrase:
+            'Está em remover fricção para que a instituição cresça com mais controle.',
+          closingHighlight: 'Crescer por arquitetura é diferente de crescer por acúmulo.',
+          bullets: [],
+          highlightPhrases: [],
+          painPointsLayout: false,
         },
       };
     }
@@ -150,22 +167,29 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
     if (s.id === 'integration') {
       return {
         ...s,
-        kind: 'highlight' as const,
-        title: 'CRESCIMENTO POR ACÚMULO',
-        subtitle: 'Adicionar, integrar, adaptar, ajustar, compensar',
+        kind: 'narrative' as const,
+        accent: 'cyan' as const,
+        title: 'Crescer com controle exige uma base, não uma somatória.',
+        subtitle: 'Os 8 elementos de uma operação coordenada',
         content: {
-          headline: 'O modelo atual ainda cresce por acúmulo.',
-          body:
-            'Adiciona. Integra. Adapta. Ajusta. Compensa.\nNo curto prazo, funciona. No médio prazo, cria peso.\n\nCada nova frente exige nova costura. Cada nova unidade exige novos ajustes. Cada novo serviço aumenta dependências. Cada novo volume pressiona equipe, diagnóstico, atendimento e controle.',
-          evidenceCard: {
-            label: 'Card de evidência',
-            metric: 'Até 80%',
-            text:
-              'do gasto de TI pode ser consumido por operação e manutenção em ambientes intensivos em legado.',
-          },
+          headline: 'Base coordenada',
+          cardVisual: 'alignment',
+          valueStagesLead:
+            'Não se trata de adicionar mais uma solução. Trata-se de fazer todas as capacidades operarem sobre a mesma lógica.\n\nOs 8 elementos de uma operação coordenada:',
+          valueStagesFlat: true,
+          valueStagesGridCols: 4,
+          valueStages: [
+            { number: '01', label: 'Base digital da operação' },
+            { number: '02', label: 'Capilaridade assistencial' },
+            { number: '03', label: 'Continuidade diagnóstica' },
+            { number: '04', label: 'Gestão da força de trabalho' },
+            { number: '05', label: 'Governança documental' },
+            { number: '06', label: 'Controle econômico' },
+            { number: '07', label: 'Áreas críticas' },
+            { number: '08', label: 'Inteligência em tempo real' },
+          ],
           attentionPhrase:
-            'Quando a base é pesada, crescer custa mais antes mesmo de começar.',
-          closingHighlight: 'O limite não está apenas na ferramenta.',
+            'Quando esses elementos operam como ecossistema, crescer deixa de exigir sempre mais costura.',
         },
       };
     }
@@ -173,21 +197,77 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
     if (s.id === 'governance') {
       return {
         ...s,
-        kind: 'highlight' as const,
-        title: 'A PERGUNTA MUDA DE EIXO',
-        subtitle: 'Da pergunta sobre sistema para a pergunta sobre base',
+        kind: 'capacities' as const,
+        accent: 'cyan' as const,
+        title: 'Essa arquitetura já existe na prática.',
+        subtitle: 'Capacidades centrais e de sustentação da escala',
         content: {
-          headline: 'Que base permite crescer sem multiplicar complexidade?',
+          headline: 'Essa arquitetura já existe na prática.',
+          cardVisual: 'modular',
           body:
-            'A pergunta deixa de ser: qual sistema precisamos adicionar?\nE passa a ser: que base permite crescer sem multiplicar complexidade?\n\nA inovação real não está em adicionar mais camadas. Está em remover fricção para que a instituição cresça com mais controle.',
-          evidenceCard: {
-            label: 'Card de evidência',
-            metric: '12 a 24 meses',
-            text:
-              'podem ser necessários em implementações hospitalares amplas. A expansão não espera ciclos pesados de implantação.',
-          },
-          attentionPhrase: 'Crescer por arquitetura é diferente de crescer por acúmulo.',
-          layersToBase: true,
+            'O Ecossistema Salux organiza capacidades para cada ponto da operação — de forma integrada, não como produtos isolados.',
+          capacityGroups: [
+            {
+              title: 'Capacidades centrais da escala',
+              tone: 'core',
+              items: [
+                {
+                  name: 'Base digital',
+                  subtitle: 'Plataforma Salux + INITIA',
+                  description: 'Organiza dados, processos e fluxos críticos.',
+                  tagline: 'Coordenação desde a origem.',
+                },
+                {
+                  name: 'Capilaridade',
+                  subtitle: 'CloudHealth',
+                  description:
+                    'Amplia atendimento, acesso e acompanhamento sem depender de nova unidade física.',
+                  tagline: 'Mais alcance sem expansão física linear.',
+                },
+                {
+                  name: 'Diagnóstico',
+                  subtitle: 'Med.Place',
+                  description:
+                    'Diagnóstico em rede e disponibilidade contínua. O volume cresce sem criar ruptura.',
+                  tagline: 'Escala diagnóstica sem gargalo.',
+                },
+                {
+                  name: 'Força de trabalho',
+                  subtitle: 'StarGrid',
+                  description:
+                    'Coordena demanda, cobertura, absenteísmo e custo.',
+                  tagline: 'Equipe como capacidade instalada.',
+                },
+              ],
+            },
+            {
+              title: 'Capacidades de sustentação da escala',
+              tone: 'support',
+              items: [
+                {
+                  name: 'Governança documental',
+                  subtitle: 'ZeroDox',
+                  description:
+                    'Rastreabilidade, conformidade e continuidade.',
+                  tagline: 'Crescer sem fragilidade documental.',
+                },
+                {
+                  name: 'Controle econômico',
+                  subtitle: 'TI Hospitalar',
+                  description:
+                    'Faturamento, glosas e previsibilidade financeira.',
+                  tagline: 'Crescimento com controle de resultado.',
+                },
+                {
+                  name: 'Áreas críticas',
+                  subtitle: 'SkyMed + VisionPilot · AGCOM',
+                  description:
+                    'Fluxos físicos, ocupação e sinais operacionais acompanhados em tempo real.',
+                  tagline: 'A operação acompanhada enquanto acontece.',
+                },
+              ],
+            },
+          ],
         },
       };
     }
@@ -196,25 +276,40 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
       return {
         ...s,
         kind: 'narrative' as const,
-        title: 'CAPACIDADES COORDENADAS',
-        subtitle: 'Não se resolve com uma solução isolada',
+        accent: 'emerald' as const,
+        title: 'Com o INITIA, a operação deixa de correr atrás da informação.',
+        subtitle: 'Agentes que ampliam a capacidade de resposta da operação',
         content: {
-          headline: 'Isso não se resolve com uma solução isolada.',
+          headline: 'INITIA · Agentes',
+          cardVisual: 'signal',
+          contrastPair: {
+            left: {
+              label: 'Sem INITIA',
+              tone: 'warm',
+              text:
+                'O usuário procura dados.\nInterpreta manualmente.\nDecide com visão parcial.\nAciona tarde.',
+            },
+            right: {
+              label: 'Com INITIA',
+              tone: 'cool',
+              text:
+                'A informação se apresenta.\nO contexto acompanha.\nO agente orienta.\nA ação parte do dado.',
+            },
+          },
+          body: 'O que os Agentes fazem na operação:',
           bullets: [
-            'Base digital da operação',
-            'Capilaridade assistencial',
-            'Continuidade diagnóstica',
-            'Gestão da força de trabalho',
-            'Governança documental',
-            'Controle econômico',
-            'Áreas críticas',
-            'Inteligência em tempo real',
+            'Identificam gargalos e interpretam capacidade disponível',
+            'Organizam contexto e priorizam fluxos operacionais',
+            'Apoiam alocação de equipes conforme demanda e criticidade',
+            'Sinalizam riscos antes que virem problema',
+            'Recomendam ações e executam tarefas sob governança',
           ],
-          highlightPhrases: [
-            'Esses elementos não podem operar como ilhas. Eles precisam funcionar como capacidades coordenadas.',
-            'Crescer com controle exige que dados, processos, equipes, diagnóstico, cuidado e decisão operem sobre uma mesma lógica.',
-          ],
-          painPointsLayout: true,
+          attentionPhrase:
+            'Os agentes não substituem a equipe. Ampliam a capacidade de resposta da operação.',
+          closingHighlight:
+            'A tecnologia deixa de apenas registrar a expansão — e passa a ajudar a coordená-la.',
+          highlightPhrases: [],
+          painPointsLayout: false,
         },
       };
     }
@@ -222,20 +317,31 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
     if (s.id === 'closing') {
       return {
         ...s,
-        title: 'Sua instituição está crescendo por arquitetura ou por acúmulo?',
-        subtitle: 'Ecossistema Salux — a base para uma nova forma de operar a saúde',
+        accent: 'emerald' as const,
+        title: 'Sua instituição está crescendo por arquitetura — ou por acúmulo?',
+        subtitle: 'Mapear juntos onde a expansão gera mais atrito',
         content: {
-          headline: 'Encerramento',
-          body:
-            'Esse movimento pode começar pelo ponto onde a expansão hoje gera mais atrito.\n\nUma nova unidade. Uma nova especialidade. Um gargalo diagnóstico. Uma dificuldade de integração. Um desafio de equipe. Uma frente fora da estrutura física. Uma perda de previsibilidade econômica.',
-          highlightPhrases: [
-            'Mas o impacto real acontece quando esses pontos deixam de ser tratados isoladamente e passam a funcionar como parte de uma mesma arquitetura de crescimento.',
-            'Ecossistema Salux — a base para uma nova forma de operar a saúde.',
+          headline: 'Sua instituição está crescendo por arquitetura — ou por acúmulo?',
+          cardVisual: 'compass',
+          body: 'Esse movimento pode começar pelo ponto onde a expansão hoje gera mais atrito.',
+          valueStagesFlat: true,
+          valueStagesGridCols: 3,
+          valueStages: [
+            { number: '📍', label: 'Uma nova unidade' },
+            { number: '📍', label: 'Uma nova especialidade' },
+            { number: '📍', label: 'Um gargalo diagnóstico' },
+            { number: '📍', label: 'Uma dificuldade de integração' },
+            { number: '📍', label: 'Um desafio de equipe' },
+            { number: '📍', label: 'Uma perda de previsibilidade econômica' },
           ],
-          meta: {
-            Próximo: 'Workshop de descoberta · 2 horas',
-            Contato: 'salux@beanalytic.com.br',
-          },
+          attentionPhrase:
+            'O impacto real acontece quando esses pontos deixam de ser tratados isoladamente e passam a funcionar como parte de uma mesma arquitetura de crescimento.',
+          closingQuestionLabel: 'CTA · Pergunta-gatilho',
+          closingQuestion:
+            'Podemos mapear juntos onde o crescimento está gerando mais atrito!',
+          closingHighlight:
+            'Ecossistema Salux · A base para uma nova forma de operar a saúde.',
+          highlightPhrases: [],
         },
       };
     }
@@ -243,7 +349,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
     return s;
   });
 
-/** Cards adicionais 8 a 11 — capacidades, caminhos, agentes, resultados. */
+/** Cards adicionais — disponíveis para serem inseridos via assemble(). */
 const extraOperacao: PresentationStep[] = [
   {
     id: 'capacities',
@@ -324,47 +430,29 @@ const extraOperacao: PresentationStep[] = [
   {
     id: 'pathways',
     index: 0,
-    title: 'POR ONDE COMEÇA A TRAVA?',
-    subtitle: 'Caminhos consultivos — uma dor, uma resposta coordenada',
+    title: 'O ponto de entrada pode variar. A resposta precisa ser coordenada.',
+    subtitle: 'Caminhos consultivos — onde a expansão está gerando atrito',
     position: { x: 1320, y: 2380 },
     scale: 1.2,
-    kind: 'pathways',
+    kind: 'narrative',
     accent: 'cyan',
     content: {
-      headline: 'Por onde o crescimento está travando hoje?',
-      pathways: [
-        {
-          pain: 'Legado / sistemas / integração',
-          product: 'Plataforma Salux + INITIA',
-        },
-        {
-          pain: 'Capilaridade / acesso / expansão sem nova estrutura física',
-          product: 'CloudHealth',
-        },
-        {
-          pain: 'Imagem / laudo / volume diagnóstico',
-          product: 'Med.Place',
-        },
-        {
-          pain: 'Equipe / escala / absenteísmo / custo operacional',
-          product: 'StarGrid',
-        },
-        {
-          pain: 'Documentação / papel / rastreabilidade / conformidade',
-          product: 'ZeroDox',
-        },
-        {
-          pain: 'Faturamento / glosas / previsibilidade econômica',
-          product: 'TI Hospitalar',
-        },
-        {
-          pain: 'Centro cirúrgico / áreas críticas / visibilidade operacional',
-          product: 'SkyMed + Vision Pilot / AGCOM',
-        },
+      headline: 'Pontos de entrada',
+      cardVisual: 'spotlight',
+      valueStagesFlat: true,
+      valueStagesGridCols: 3,
+      valueStages: [
+        { number: '🔧', label: 'Legado / Integração', description: '→ Plataforma Salux + INITIA' },
+        { number: '📡', label: 'Capilaridade', description: '→ CloudHealth' },
+        { number: '🔬', label: 'Imagem / Diagnóstico', description: '→ Med.Place' },
+        { number: '👥', label: 'Equipe / Custo operacional', description: '→ StarGrid' },
+        { number: '📄', label: 'Documentação', description: '→ ZeroDox' },
+        { number: '💰', label: 'Faturamento / Glosas', description: '→ TI Hospitalar' },
+        { number: '🏥', label: 'Centro cirúrgico / Áreas críticas', description: '→ SkyMed + VisionPilot / AGCOM' },
       ],
-      highlightPhrases: [
-        'O ponto de entrada pode variar. Mas a resposta precisa ser coordenada.',
-      ],
+      closingQuestionLabel: 'CTA · Pergunta-gatilho',
+      closingQuestion:
+        'Por onde a expansão está gerando mais atrito hoje na sua operação?',
     },
   },
   {
@@ -407,38 +495,43 @@ const extraOperacao: PresentationStep[] = [
   {
     id: 'results',
     index: 0,
-    title: 'RESULTADO',
-    subtitle: 'Reduzir o custo estrutural de crescer',
+    title: 'O valor não está em crescer mais. Está em reduzir o custo estrutural de crescer.',
+    subtitle: 'Resultado: base coordenada, expansão sem multiplicar complexidade',
     position: { x: 1320, y: 3320 },
     scale: 1.2,
-    kind: 'results',
-    accent: 'amber',
+    kind: 'narrative',
+    accent: 'emerald',
     content: {
-      headline:
-        'O valor não está apenas em crescer mais. Está em reduzir o custo estrutural de crescer.',
-      resultsCards: [
-        'Mais velocidade',
-        'Mais previsibilidade',
-        'Mais consistência',
-        'Menos retrabalho',
-        'Menos fricção estrutural',
-        'Mais controle sobre a escala',
+      headline: 'Resultado',
+      cardVisual: 'helix',
+      valueStagesLead:
+        'Com uma base coordenada, o crescimento deixa de depender de esforço contínuo de compensação.',
+      valueStagesFlat: true,
+      valueStagesGridCols: 3,
+      valueStages: [
+        { number: '✓', label: 'Mais velocidade na abertura de novas frentes' },
+        { number: '✓', label: 'Mais previsibilidade sobre demanda e capacidade' },
+        { number: '✓', label: 'Mais consistência entre unidades e serviços' },
+        { number: '✓', label: 'Menos retrabalho e costura manual a cada expansão' },
+        { number: '✓', label: 'Menos fricção estrutural e dependências de legado' },
+        { number: '✓', label: 'Mais controle sobre a escala sem ampliar complexidade' },
       ],
-      highlightPhrases: [
-        'O crescimento deixa de depender apenas de esforço contínuo de compensação.',
-        'Passa a ser sustentado por uma base mais coordenada, modular e inteligente.',
-      ],
+      attentionPhrase:
+        'A próxima etapa da saúde não será definida por quem digitalizou mais partes. Será definida por quem fizer suas capacidades operarem como ecossistema.',
     },
   },
 ];
 
-/** Encadeia os steps base (limit → closing) com os 4 novos antes do fechamento. */
+/** Sequência final — insere pathways (card 8) e results (card 9) antes do
+ *  closing (card 10). Os steps `capacities` e `agents-flow` ficam fora pois
+ *  seu conteúdo já está nos cards 6 e 7. */
 function assemble(): PresentationStep[] {
   const closingIdx = baseOperacao.findIndex((s) => s.id === 'closing');
   const before = baseOperacao.slice(0, closingIdx);
   const closing = baseOperacao[closingIdx];
-  const all = [...before, ...extraOperacao, closing];
-  return all.map((s, i) => ({ ...s, index: i }));
+  const pathways = extraOperacao.find((s) => s.id === 'pathways')!;
+  const results = extraOperacao.find((s) => s.id === 'results')!;
+  return [...before, pathways, results, closing].map((s, i) => ({ ...s, index: i }));
 }
 
 export const operacaoSteps: PresentationStep[] = assemble();

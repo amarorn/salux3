@@ -58,8 +58,8 @@ export interface ValueStage {
   number: string;
   /** Rótulo curto em caps (ex.: "REGISTRO"). */
   label: string;
-  /** Descrição curta. */
-  description: string;
+  /** Descrição curta. Opcional — quando ausente, só o número + label aparecem. */
+  description?: string;
 }
 
 export type Accent = 'violet' | 'cyan' | 'emerald' | 'amber' | 'rose' | 'slate';
@@ -191,6 +191,14 @@ export interface StepContent {
     headline: string;
     /** Parágrafo em itálico (contexto/explicação). */
     context?: string;
+    /** Estilo visual do número: 'bar' (default) | 'gauge' | 'range'. */
+    style?: 'bar' | 'gauge' | 'range';
+    /** Valor final do intervalo (apenas para style='range'). Quando definido, exibe "value a rangeEnd". */
+    rangeEnd?: number;
+    /** Rótulo curto após o número (ex.: "meses"). */
+    valueLabel?: string;
+    /** Valor máximo da escala (apenas para style='range'). Default 36. */
+    rangeMax?: number;
   }[];
   /** Duas linhas de etapas — uma "positiva" (o que se faz), outra "negativa" (o que falha). */
   dualStages?: {
@@ -220,7 +228,37 @@ export interface StepContent {
     | 'mesh'
     | 'orbit'
     | 'radar'
-    | 'entry-points';
+    | 'entry-points'
+    | 'alignment'
+    | 'modular'
+    | 'signal'
+    | 'spotlight'
+    | 'bloom'
+    | 'compass'
+    | 'weave'
+    | 'ripple'
+    | 'tide'
+    | 'fragment'
+    | 'converge'
+    | 'ladder'
+    | 'branch'
+    | 'echo'
+    | 'scale'
+    | 'thread'
+    | 'bridge'
+    | 'heartbeat'
+    | 'magnet'
+    | 'prism'
+    | 'spiral'
+    | 'portal'
+    | 'lens'
+    | 'shield'
+    | 'gear'
+    | 'crystal'
+    | 'funnel'
+    | 'relay'
+    | 'fan'
+    | 'helix';
 }
 
 export interface PresentationStep {
