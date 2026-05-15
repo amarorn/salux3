@@ -1,17 +1,17 @@
 export type NodeKind =
-  | 'cover'
-  | 'narrative'
-  | 'architecture'
-  | 'journey'
-  | 'integration'
-  | 'governance'
-  | 'roadmap'
-  | 'highlight'
-  | 'capacities'
-  | 'pathways'
-  | 'agents-flow'
-  | 'results'
-  | 'closing';
+  | "cover"
+  | "narrative"
+  | "architecture"
+  | "journey"
+  | "integration"
+  | "governance"
+  | "roadmap"
+  | "highlight"
+  | "capacities"
+  | "pathways"
+  | "agents-flow"
+  | "results"
+  | "closing";
 
 export interface CapacityItem {
   name: string;
@@ -22,7 +22,7 @@ export interface CapacityItem {
 
 export interface CapacityGroup {
   title: string;
-  tone: 'core' | 'support';
+  tone: "core" | "support";
   items: CapacityItem[];
 }
 
@@ -45,7 +45,7 @@ export interface ContrastItem {
   /** Texto descritivo (pode usar \n para quebrar). */
   text: string;
   /** Tom visual — 'warm' (rose/amber, alerta) | 'cool' (cyan, silencioso). */
-  tone?: 'warm' | 'cool';
+  tone?: "warm" | "cool";
 }
 
 export interface ContrastPair {
@@ -62,7 +62,7 @@ export interface ValueStage {
   description?: string;
 }
 
-export type Accent = 'violet' | 'cyan' | 'emerald' | 'amber' | 'rose' | 'slate';
+export type Accent = "violet" | "cyan" | "emerald" | "amber" | "rose" | "slate";
 
 export interface NodePosition {
   x: number;
@@ -95,8 +95,8 @@ export interface BannerMedia {
 }
 
 export type RoadmapSegment =
-  | { type: 'text'; text: string }
-  | { type: 'product'; name: string };
+  | { type: "text"; text: string }
+  | { type: "product"; name: string };
 
 export interface RoadmapAgentCard {
   title: string;
@@ -112,7 +112,10 @@ export interface StepContent {
   roadmapAgents?: RoadmapAgentCard[];
   metrics?: NarrativeMetric[];
   meta?: Record<string, string>;
-  visual?: { type: 'risk-curve' | 'stats-fragilidade' | 'custo-reconstrucao'; caption?: string };
+  visual?: {
+    type: "risk-curve" | "stats-fragilidade" | "custo-reconstrucao";
+    caption?: string;
+  };
   heroImage?: { src: string; alt?: string };
   /** Trilha assistencial: oculta diagrama de camadas; foco em texto e evidência. */
   architectureMinimal?: boolean;
@@ -128,6 +131,8 @@ export interface StepContent {
   bulletSplitAfter?: number;
   /** Highlight step: frase de atenção exibida com pulso após o body principal. */
   attentionPhrase?: string;
+  /** Trilha de ruptura acumulada: URLs de notícias relacionadas. */
+  newsUrls?: string[];
   /** Highlight step: insere visual "camadas acumuladas → base coordenada" antes da frase de atenção. */
   layersToBase?: boolean;
   /** Trilha Operação: headline grande + bullets como chips animados (pain points). */
@@ -139,7 +144,7 @@ export interface StepContent {
   /** Número de colunas da grid (default 2). */
   painPointsGridCols?: 2 | 3 | 4;
   /** Camadas decorativas atrás dos chips: 'stacked' (acúmulo) | 'web' (teia tensa). */
-  painPointsBackdrop?: 'stacked' | 'web';
+  painPointsBackdrop?: "stacked" | "web";
   /** Substitui chips inline por botão central que abre balão flutuante com os tópicos. */
   painPointsBalloon?: boolean;
   /** Rótulo do botão que abre o balão flutuante (default: "Abrir os 7 pontos"). */
@@ -194,7 +199,7 @@ export interface StepContent {
     /** Parágrafo em itálico (contexto/explicação). */
     context?: string;
     /** Estilo visual do número: 'bar' (default) | 'gauge' | 'range'. */
-    style?: 'bar' | 'gauge' | 'range';
+    style?: "bar" | "gauge" | "range";
     /** Valor final do intervalo (apenas para style='range'). Quando definido, exibe "value a rangeEnd". */
     rangeEnd?: number;
     /** Rótulo curto após o número (ex.: "meses"). */
@@ -221,46 +226,46 @@ export interface StepContent {
   valueStagesGridCols?: 2 | 3 | 4 | 5;
   /** Variante do visual decorativo no rodapé do card (default: 'flow'). */
   cardVisual?:
-    | 'flow'
-    | 'reveal'
-    | 'pattern'
-    | 'accumulation'
-    | 'late-reaction'
-    | 'transform'
-    | 'mesh'
-    | 'orbit'
-    | 'radar'
-    | 'entry-points'
-    | 'alignment'
-    | 'modular'
-    | 'signal'
-    | 'spotlight'
-    | 'bloom'
-    | 'compass'
-    | 'weave'
-    | 'ripple'
-    | 'tide'
-    | 'fragment'
-    | 'converge'
-    | 'ladder'
-    | 'branch'
-    | 'echo'
-    | 'scale'
-    | 'thread'
-    | 'bridge'
-    | 'heartbeat'
-    | 'magnet'
-    | 'prism'
-    | 'spiral'
-    | 'portal'
-    | 'lens'
-    | 'shield'
-    | 'gear'
-    | 'crystal'
-    | 'funnel'
-    | 'relay'
-    | 'fan'
-    | 'helix';
+    | "flow"
+    | "reveal"
+    | "pattern"
+    | "accumulation"
+    | "late-reaction"
+    | "transform"
+    | "mesh"
+    | "orbit"
+    | "radar"
+    | "entry-points"
+    | "alignment"
+    | "modular"
+    | "signal"
+    | "spotlight"
+    | "bloom"
+    | "compass"
+    | "weave"
+    | "ripple"
+    | "tide"
+    | "fragment"
+    | "converge"
+    | "ladder"
+    | "branch"
+    | "echo"
+    | "scale"
+    | "thread"
+    | "bridge"
+    | "heartbeat"
+    | "magnet"
+    | "prism"
+    | "spiral"
+    | "portal"
+    | "lens"
+    | "shield"
+    | "gear"
+    | "crystal"
+    | "funnel"
+    | "relay"
+    | "fan"
+    | "helix";
 }
 
 export interface PresentationStep {

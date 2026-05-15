@@ -1049,6 +1049,18 @@ export function NarrativeStep({ step, active }: Props) {
                 “{step.content.attentionPhrase}”
               </p>
             </motion.div>
+            {step.content.newsUrls &&
+              step.content.newsUrls.length > 0 &&
+              step.content.newsUrls.map((url, i) => (
+                <>
+                  <img
+                    src={url}
+                    width={600}
+                    height={200}
+                    alt={`News ${i + 1}`}
+                  />
+                </>
+              ))}
           </EraRevealBand>
         )}
 
@@ -1089,24 +1101,6 @@ export function NarrativeStep({ step, active }: Props) {
             </motion.div>
           </EraRevealBand>
         )}
-
-        <EraRevealBand
-          bandId="newsHighlight"
-          bandIndex={b("newsHighlight")}
-          stepId={step.id}
-          stepIndex={step.index}
-          eraStaging={eraStaging}
-          active={active}
-        >
-          <motion.div {...innerMotion}>
-            {/* <NewsHighlight
-              text={step.content.newsHighlight}
-              source={step.content.newsHighlightSource}
-              active={active}
-              accentColor={accent.base}
-            /> */}
-          </motion.div>
-        </EraRevealBand>
 
         {step.content.closingHighlight && (
           <EraRevealBand

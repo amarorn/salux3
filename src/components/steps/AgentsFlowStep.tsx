@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { FloatingCard, FloatingCardContext } from '../FloatingCard';
-import type { PresentationStep } from '@/domain/types';
-import { theme } from '@/domain/theme';
-import { getCardTextVariants } from './cardTextMotion';
-import { HighlightPhraseList } from './HighlightBlocks';
+import { useContext, useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { FloatingCard, FloatingCardContext } from "../FloatingCard";
+import type { PresentationStep } from "@/domain/types";
+import { theme } from "@/domain/theme";
+import { getCardTextVariants } from "./cardTextMotion";
+import { HighlightPhraseList } from "./HighlightBlocks";
 
 interface Props {
   step: PresentationStep;
@@ -38,8 +38,8 @@ export function AgentsFlowStep({ step, active }: Props) {
       <motion.div
         className="flex flex-col gap-5"
         variants={container}
-        initial={reduce ? false : 'hidden'}
-        animate={active ? 'visible' : 'hidden'}
+        initial={reduce ? false : "hidden"}
+        animate={active ? "visible" : "hidden"}
       >
         <motion.div variants={item}>
           <h2
@@ -73,7 +73,10 @@ export function AgentsFlowStep({ step, active }: Props) {
 
         {step.content.highlightPhrases && (
           <motion.div variants={item}>
-            <HighlightPhraseList items={step.content.highlightPhrases} active={active} />
+            <HighlightPhraseList
+              items={step.content.highlightPhrases}
+              active={active}
+            />
           </motion.div>
         )}
       </motion.div>
@@ -100,10 +103,7 @@ function InitiaHub({
   const count = functions.length || 8;
 
   return (
-    <div
-      className="relative mx-auto"
-      style={{ width: size, height: size }}
-    >
+    <div className="relative mx-auto" style={{ width: size, height: size }}>
       <svg
         width={size}
         height={size}
@@ -127,7 +127,7 @@ function InitiaHub({
             r={rOrbit * t}
             stroke={`${color}22`}
             strokeWidth={0.5}
-            strokeDasharray={i === 1 ? '2 3' : '0'}
+            strokeDasharray={i === 1 ? "2 3" : "0"}
             fill="none"
           />
         ))}
@@ -141,10 +141,18 @@ function InitiaHub({
           fill="none"
           stroke={color}
           strokeWidth={1}
-          animate={reduce ? undefined : { r: [28, 36, 28], opacity: [0.75, 0.3, 0.75] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+          animate={
+            reduce ? undefined : { r: [28, 36, 28], opacity: [0.75, 0.3, 0.75] }
+          }
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
         />
-        <circle cx={cx} cy={cy} r={5} fill={color} style={{ filter: `drop-shadow(0 0 6px ${color})` }} />
+        <circle
+          cx={cx}
+          cy={cy}
+          r={5}
+          fill={color}
+          style={{ filter: `drop-shadow(0 0 6px ${color})` }}
+        />
       </svg>
 
       {/* Label central */}
@@ -167,14 +175,27 @@ function InitiaHub({
       </div>
 
       {/* Humano + Agente nos polos */}
-      <PoleIcon side="left" color={color} label="Humano" reduce={reduce} active={active} />
-      <PoleIcon side="right" color={color} label="Agente" reduce={reduce} active={active} variant="agent" />
+      <PoleIcon
+        side="left"
+        color={color}
+        label="Humano"
+        reduce={reduce}
+        active={active}
+      />
+      <PoleIcon
+        side="right"
+        color={color}
+        label="Agente"
+        reduce={reduce}
+        active={active}
+        variant="agent"
+      />
 
       {/* Funções orbitando — rotação contínua do contêiner, contra-rotação dos chips */}
       <motion.div
         className="absolute inset-0"
         animate={reduce ? undefined : { rotate: 360 }}
-        transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
       >
         {functions.slice(0, count).map((f, i) => {
           const a = (i / count) * Math.PI * 2 - Math.PI / 2;
@@ -187,10 +208,16 @@ function InitiaHub({
               style={{
                 left: x,
                 top: y,
-                transform: 'translate(-50%, -50%)',
+                transform: "translate(-50%, -50%)",
               }}
               initial={reduce ? false : { opacity: 0, scale: 0.6 }}
-              animate={active ? { opacity: 1, scale: 1 } : reduce ? undefined : { opacity: 0, scale: 0.6 }}
+              animate={
+                active
+                  ? { opacity: 1, scale: 1 }
+                  : reduce
+                    ? undefined
+                    : { opacity: 0, scale: 0.6 }
+              }
               transition={{
                 duration: 0.5,
                 delay: 0.5 + i * 0.06,
@@ -205,7 +232,7 @@ function InitiaHub({
                   boxShadow: `0 0 14px -4px ${color}99, inset 0 1px 0 rgba(255,255,255,0.08)`,
                 }}
                 animate={reduce ? undefined : { rotate: -360 }}
-                transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+                transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
               >
                 {f}
               </motion.span>
@@ -225,21 +252,27 @@ function PoleIcon({
   active,
   variant,
 }: {
-  side: 'left' | 'right';
+  side: "left" | "right";
   color: string;
   label: string;
   reduce: boolean;
   active: boolean;
-  variant?: 'agent';
+  variant?: "agent";
 }) {
-  const isAgent = variant === 'agent';
+  const isAgent = variant === "agent";
   return (
     <motion.div
       aria-hidden
       className="absolute top-1/2 -translate-y-1/2"
       style={{ [side]: -10 }}
-      initial={reduce ? false : { opacity: 0, x: side === 'left' ? -8 : 8 }}
-      animate={active ? { opacity: 1, x: 0 } : reduce ? undefined : { opacity: 0, x: side === 'left' ? -8 : 8 }}
+      initial={reduce ? false : { opacity: 0, x: side === "left" ? -8 : 8 }}
+      animate={
+        active
+          ? { opacity: 1, x: 0 }
+          : reduce
+            ? undefined
+            : { opacity: 0, x: side === "left" ? -8 : 8 }
+      }
       transition={{ duration: 0.55, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
       <div
@@ -252,12 +285,24 @@ function PoleIcon({
       >
         {isAgent ? (
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <path d="M11 2l8 8-8 8-8-8z" stroke={color} strokeWidth="1.5" fill={`${color}33`} />
+            <path
+              d="M11 2l8 8-8 8-8-8z"
+              stroke={color}
+              strokeWidth="1.5"
+              fill={`${color}33`}
+            />
             <circle cx="11" cy="11" r="2" fill={color} />
           </svg>
         ) : (
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <circle cx="10" cy="6" r="3" stroke="#e2e8f0" strokeWidth="1.4" fill="none" />
+            <circle
+              cx="10"
+              cy="6"
+              r="3"
+              stroke="#e2e8f0"
+              strokeWidth="1.4"
+              fill="none"
+            />
             <path
               d="M3 19c0-3.5 3.1-6 7-6s7 2.5 7 6"
               stroke="#e2e8f0"
@@ -270,7 +315,7 @@ function PoleIcon({
       </div>
       <p
         className="mt-1 text-center text-[8.5px] font-semibold uppercase tracking-[0.22em]"
-        style={{ color: isAgent ? color : 'rgba(255,255,255,0.65)' }}
+        style={{ color: isAgent ? color : "rgba(255,255,255,0.65)" }}
       >
         {label}
       </p>
@@ -292,29 +337,29 @@ function TransitionPipeline({
   reduce: boolean;
   active: boolean;
 }) {
-  const [phase, setPhase] = useState<'before' | 'after'>('before');
+  const [phase, setPhase] = useState<"before" | "after">("before");
 
   useEffect(() => {
     if (!active || reduce) {
-      setPhase('after');
+      setPhase("after");
       return;
     }
-    setPhase('before');
-    const t = window.setTimeout(() => setPhase('after'), 1400);
+    setPhase("before");
+    const t = window.setTimeout(() => setPhase("after"), 1400);
     return () => window.clearTimeout(t);
   }, [active, reduce]);
 
-  const steps = phase === 'before' ? before : after;
-  const isAfter = phase === 'after';
+  const steps = phase === "before" ? before : after;
+  const isAfter = phase === "after";
 
   return (
     <div
       className="relative overflow-hidden rounded-2xl border px-4 py-3"
       style={{
-        borderColor: isAfter ? `${color}55` : 'rgba(255,255,255,0.08)',
+        borderColor: isAfter ? `${color}55` : "rgba(255,255,255,0.08)",
         background: isAfter
           ? `linear-gradient(135deg, ${color}14 0%, rgba(255,255,255,0.02) 100%)`
-          : 'rgba(255,255,255,0.025)',
+          : "rgba(255,255,255,0.025)",
         boxShadow: isAfter ? `0 0 28px -12px ${color}99` : undefined,
       }}
     >
@@ -323,9 +368,11 @@ function TransitionPipeline({
           <span
             className="rounded-full px-2 py-0.5"
             style={{
-              color: isAfter ? 'rgba(255,255,255,0.45)' : '#e2e8f0',
-              background: isAfter ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              color: isAfter ? "rgba(255,255,255,0.45)" : "#e2e8f0",
+              background: isAfter
+                ? "rgba(255,255,255,0.04)"
+                : "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.06)",
             }}
           >
             Antes
@@ -334,9 +381,9 @@ function TransitionPipeline({
           <span
             className="rounded-full px-2 py-0.5"
             style={{
-              color: isAfter ? color : 'rgba(255,255,255,0.45)',
-              background: isAfter ? `${color}1a` : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${isAfter ? `${color}55` : 'rgba(255,255,255,0.06)'}`,
+              color: isAfter ? color : "rgba(255,255,255,0.45)",
+              background: isAfter ? `${color}1a` : "rgba(255,255,255,0.04)",
+              border: `1px solid ${isAfter ? `${color}55` : "rgba(255,255,255,0.06)"}`,
             }}
           >
             Com INITIA
@@ -347,7 +394,7 @@ function TransitionPipeline({
           data-no-click-advance
           onClick={(e) => {
             e.stopPropagation();
-            setPhase((p) => (p === 'before' ? 'after' : 'before'));
+            setPhase((p) => (p === "before" ? "after" : "before"));
           }}
           className="rounded-full border border-white/10 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/55 transition-colors hover:border-white/20 hover:text-white/80"
         >
@@ -359,8 +406,10 @@ function TransitionPipeline({
         {steps.map((t, i) => (
           <div key={`${phase}-${t}`} className="flex flex-1 items-center">
             <motion.div
-              initial={reduce ? false : { opacity: 0, y: 8, filter: 'blur(6px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              initial={
+                reduce ? false : { opacity: 0, y: 8, filter: "blur(6px)" }
+              }
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{
                 duration: 0.45,
                 ease: [0.22, 1, 0.36, 1],
@@ -368,22 +417,22 @@ function TransitionPipeline({
               }}
               className="relative flex-1 rounded-lg border px-2.5 py-2"
               style={{
-                borderColor: isAfter ? `${color}55` : 'rgba(255,255,255,0.1)',
+                borderColor: isAfter ? `${color}55` : "rgba(255,255,255,0.1)",
                 background: isAfter
                   ? `linear-gradient(135deg, ${color}1a 0%, rgba(255,255,255,0.02) 100%)`
-                  : 'rgba(255,255,255,0.03)',
+                  : "rgba(255,255,255,0.03)",
                 boxShadow: isAfter ? `0 0 14px -8px ${color}` : undefined,
               }}
             >
               <span
                 className="block text-[8.5px] font-bold uppercase tracking-[0.22em]"
-                style={{ color: isAfter ? color : 'rgba(255,255,255,0.45)' }}
+                style={{ color: isAfter ? color : "rgba(255,255,255,0.45)" }}
               >
-                {String(i + 1).padStart(2, '0')}
+                {String(i + 1).padStart(2, "0")}
               </span>
               <span
                 className="block text-[0.78rem] leading-snug"
-                style={{ color: isAfter ? '#f1f5ff' : 'rgba(255,255,255,0.7)' }}
+                style={{ color: isAfter ? "#f1f5ff" : "rgba(255,255,255,0.7)" }}
               >
                 {t}
               </span>
@@ -396,7 +445,7 @@ function TransitionPipeline({
                   style={{
                     background: isAfter
                       ? `linear-gradient(90deg, ${color}aa, ${color})`
-                      : 'rgba(255,255,255,0.18)',
+                      : "rgba(255,255,255,0.18)",
                     boxShadow: isAfter ? `0 0 8px ${color}` : undefined,
                   }}
                 />
@@ -404,12 +453,12 @@ function TransitionPipeline({
                   <motion.span
                     className="absolute -top-[2px] h-[5px] w-[5px] rounded-full"
                     style={{ background: color, boxShadow: `0 0 8px ${color}` }}
-                    initial={{ left: '-10%' }}
-                    animate={{ left: '110%' }}
+                    initial={{ left: "-10%" }}
+                    animate={{ left: "110%" }}
                     transition={{
                       duration: 1.6,
                       repeat: Infinity,
-                      ease: 'easeInOut',
+                      ease: "easeInOut",
                       delay: i * 0.2,
                     }}
                   />
