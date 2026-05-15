@@ -51,7 +51,7 @@ interface FloatingCardProps {
   accent: Accent;
   active?: boolean;
   width?: number;
-  height?: number | false;
+  height?: 640 | 820 | false;
   className?: string;
   badge?: string;
   flipPhoto?: boolean;
@@ -177,8 +177,9 @@ export function FloatingCard({
         className={clsx(
           "relative w-full p-12",
           omitSidePhoto
-            ? `min-h-[${+height + 200}px] rounded-3xl border border-white/10`
-            : `min-h-[${+height}px]`,
+            ? "min-h-[1100px] rounded-3xl border border-white/10"
+            : "min-h-[900px]",
+          height ? `min-h-[${height}px]` : "min-h-[0px]",
           omitSidePhoto &&
             (active
               ? "border-white/18 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"

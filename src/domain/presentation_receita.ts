@@ -1,6 +1,9 @@
 import type { PresentationStep } from "./types";
 import { steps as baseSteps } from "./presentation";
 
+import news1Url from "@/assets/presentation/news-1.png?url";
+import news2Url from "@/assets/presentation/news-2.png?url";
+
 export const presentationReceitaMeta = {
   title: "Proteção econômica da operação em saúde",
   subtitle: "Valor, continuidade e receita na operação",
@@ -136,6 +139,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
           body: "Esses números não indicam má gestão. Indicam um modelo operacional que foi construído para reagir — e não para prevenir.",
           attentionPhrase:
             "Não se trata apenas de ineficiência. É valor que deixa de se converter ao longo da operação.",
+          newsUrls: [news1Url, news2Url],
         },
       };
     }
