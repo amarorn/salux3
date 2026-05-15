@@ -2,7 +2,7 @@ import assistCoverUrl from "@/assets/intro/assist-cover.png?url";
 import careHeroUrl from "@/assets/intro/care-hero.jpg?url";
 import landingPremiumUrl from "@/assets/landing/premium-photo.png?url";
 import landingPhotoClinicUrl from "@/assets/landing/photo-clinic.png?url";
-import landingImgDashboardUrl from "@/assets/landing/img-dashboard.png?url";
+import landingImgDashboardUrl from "@/assets/landing/trilha-1-slide-4.png?url";
 import landingImgReceptionUrl from "@/assets/landing/img-reception.png?url";
 import landingImgCorridorUrl from "@/assets/landing/img-corridor.png?url";
 import zerodoxPainelUrl from "@/assets/presentation/zerodox-painel-produtividade.png?url";

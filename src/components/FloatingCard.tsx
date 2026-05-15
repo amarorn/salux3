@@ -121,7 +121,7 @@ export function FloatingCard({
           initial={layerInitial}
           animate={layerAnimate}
           className={clsx(
-            "relative h-[460px] w-full mt-5 shrink-0 overflow-hidden rounded-3xl border border-white/10 transition-[border-color,box-shadow] duration-500 ease-out",
+            "relative h-[460px] w-full mt-5 shrink-0 overflow-hidden rounded-3xl duration-500 ease-out",
             active
               ? "border-white/20 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"
               : "shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)] group-hover:-translate-y-1 group-hover:border-white/16",
