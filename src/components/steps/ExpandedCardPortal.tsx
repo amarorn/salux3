@@ -5,6 +5,8 @@ interface ExpandedCardPortalProps {
   text: string;
   prefix?: string;
   description?: string;
+  imageSrc?: string;
+  imageAlt?: string;
   accentColor: string;
   reducedMotion: boolean;
   origin: HTMLElement | null;
@@ -15,6 +17,8 @@ export function ExpandedCardPortal({
   text,
   prefix,
   description,
+  imageSrc,
+  imageAlt,
   accentColor,
   reducedMotion,
   origin,
@@ -55,7 +59,7 @@ export function ExpandedCardPortal({
       <motion.div
         role="dialog"
         aria-modal="true"
-        className="relative w-full max-w-[440px] cursor-pointer overflow-hidden rounded-3xl border px-9 py-9"
+        className="relative w-full max-w-[min(92vw,560px)] cursor-pointer overflow-hidden rounded-3xl border px-9 py-9"
         style={{
           borderColor: `${accentColor}66`,
           background: `linear-gradient(145deg, ${accentColor}1e 0%, rgba(11,15,24,0.97) 100%)`,
@@ -96,7 +100,25 @@ export function ExpandedCardPortal({
           transition={{ duration: 2.6, ease: 'easeInOut', repeat: Infinity }}
         />
 
-        <div className="relative flex items-start gap-4">
+        {imageSrc && (
+          <motion.div
+            className="relative mb-5 overflow-hidden rounded-2xl border"
+            style={{ borderColor: `${accentColor}44` }}
+            initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.12 }}
+          >
+            <img
+              src={imageSrc}
+              alt={imageAlt ?? text}
+              className="max-h-[220px] w-full object-cover object-top"
+            />
+          </motion.div>
+        )}
+
+        <motion.div
+          className="relative flex items-start gap-4"
+        >
           {prefix && (
             <span
               aria-hidden
@@ -122,7 +144,7 @@ export function ExpandedCardPortal({
               <p className="mt-3 text-[1rem] leading-relaxed text-slate-200/80">{description}</p>
             )}
           </div>
-        </div>
+        </motion.div>
 
         <p className="relative mt-7 text-center text-[11px] uppercase tracking-[0.3em] text-white/32">
           Clique para fechar · ESC

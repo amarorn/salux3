@@ -67,6 +67,9 @@ export function buildCapacitiesBandKeys(content: StepContent): string[] {
   if (content.body) keys.push('body');
   const groups = content.capacityGroups ?? [];
   groups.forEach((g, i) => keys.push(`group:${i}:${g.title}`));
+  if (content.productExamples && content.productExamples.length > 0) {
+    keys.push('productExamples');
+  }
   return keys;
 }
 

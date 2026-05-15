@@ -18,6 +18,14 @@ export interface CapacityItem {
   subtitle: string;
   description?: string;
   tagline: string;
+  /** Captura de tela do produto — exibida ao expandir o card. */
+  productImage?: string;
+}
+
+export interface ProductExample {
+  caption: string;
+  imageSrc: string;
+  alt?: string;
 }
 
 export interface CapacityGroup {
@@ -163,6 +171,8 @@ export interface StepContent {
   closingHighlight?: string;
   /** Card 8 — capacidades centrais e de sustentação. */
   capacityGroups?: CapacityGroup[];
+  /** Faixa com capturas de produto (substitui slide de “pontos de entrada”). */
+  productExamples?: ProductExample[];
   /** Card 9 — caminhos: dor → produto. */
   pathways?: PathwayItem[];
   /** Card 10 — comparação antes/com INITIA + funções dos agentes. */
