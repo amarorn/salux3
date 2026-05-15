@@ -210,6 +210,90 @@ function computeBubbleShift(orbX: number, stageWidth: number): number {
   return 0;
 }
 
+/** Slides em que o Maestro voa ao centro do palco e decompõe em fragmentos para cada ponta. */
+const PILGRIMAGE_STEP_IDS = new Set<string>(['tecnologia-que-age']);
+const PILGRIMAGE_ARM_MS = 2800;
+const PILGRIMAGE_FLY_MS = 1150;
+const PILGRIMAGE_BURST_MS = 920;
+const PILGRIMAGE_RETURN_MS = 1380;
+
+type PilgrimagePhase = 'off' | 'fly' | 'burst' | 'back';
+
+const RADIAL_SHARD_COUNT = 8;
+
+function MaestroRadialShards({
+  accent,
+  burstKey,
+  stageW,
+  stageH,
+}: {
+  accent: string;
+  burstKey: number;
+  stageW: number;
+  stageH: number;
+}) {
+  const dist = Math.min(stageW, stageH) * 0.4;
+  return (
+    <>
+      {Array.from({ length: RADIAL_SHARD_COUNT }).map((_, i) => {
+        const angle = (i / RADIAL_SHARD_COUNT) * Math.PI * 2 - Math.PI / 2;
+        const w = 9 + (i % 3);
+        const h = 14 + (i % 4) * 2;
+        return (
+          <motion.span
+            key={`shard-${burstKey}-${i}`}
+            className="absolute rounded-full"
+            style={{
+              width: w,
+              height: h,
+              left: -w / 2,
+              top: -h / 2,
+              background: `linear-gradient(${135 + i * 25}deg, ${GOLD_BRIGHT} 0%, ${GOLD} 45%, ${accent} 100%)`,
+              boxShadow: `0 0 16px ${GOLD}aa, 0 0 4px ${accent}`,
+            }}
+            initial={{ x: 0, y: 0, scale: 0.2, opacity: 0, rotate: 0 }}
+            animate={{
+              x: Math.cos(angle) * dist,
+              y: Math.sin(angle) * dist,
+              scale: [0.2, 1.15, 0.35],
+              opacity: [0, 1, 0.9, 0],
+              rotate: i % 2 === 0 ? 220 : -200,
+            }}
+            transition={{ duration: 0.88, ease: [0.16, 1, 0.28, 1], delay: i * 0.025 }}
+          />
+        );
+      })}
+      {Array.from({ length: RADIAL_SHARD_COUNT }).map((_, i) => {
+        const angle = (i / RADIAL_SHARD_COUNT) * Math.PI * 2 - Math.PI / 2 + Math.PI / RADIAL_SHARD_COUNT;
+        const dist2 = dist * 0.72;
+        const tiny = 3 + (i % 2);
+        return (
+          <motion.span
+            key={`spark-${burstKey}-${i}`}
+            className="absolute rounded-full"
+            style={{
+              width: tiny,
+              height: tiny,
+              left: -tiny / 2,
+              top: -tiny / 2,
+              background: i % 2 === 0 ? GOLD : accent,
+              boxShadow: `0 0 10px ${GOLD}`,
+            }}
+            initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
+            animate={{
+              x: Math.cos(angle) * dist2,
+              y: Math.sin(angle) * dist2,
+              opacity: [0, 0.95, 0],
+              scale: [0, 1.4, 0.2],
+            }}
+            transition={{ duration: 0.75, ease: [0.12, 0.95, 0.2, 1], delay: 0.08 + i * 0.03 }}
+          />
+        );
+      })}
+    </>
+  );
+}
+
 export function MaestroOrb({ visible }: Props) {
   const reduceMotion = useReducedMotion();
   const stepId = usePresentationStore((s) => s.currentStepId);
@@ -256,6 +340,58 @@ export function MaestroOrb({ visible }: Props) {
     return high.includes(current.kind) ? 1.18 : 1;
   }, [current]);
 
+  const [pilgrimage, setPilgrimage] = useState<PilgrimagePhase>('off');
+  const [burstKey, setBurstKey] = useState(0);
+
+  const stageCenter = useMemo(
+    () => ({ x: stage.width * 0.5, y: stage.height * 0.43 }),
+    [stage.width, stage.height],
+  );
+
+  const pilgrimageActive =
+    Boolean(visible && current && PILGRIMAGE_STEP_IDS.has(current.id) && !reduceMotion);
+
+  useEffect(() => {
+    if (!pilgrimageActive) {
+      setPilgrimage('off');
+      return;
+    }
+    setPilgrimage('off');
+    const arm = window.setTimeout(() => setPilgrimage('fly'), PILGRIMAGE_ARM_MS);
+    return () => window.clearTimeout(arm);
+  }, [stepId, visible, current?.id, pilgrimageActive]);
+
+  useEffect(() => {
+    if (pilgrimage !== 'fly') return;
+    const t = window.setTimeout(() => {
+      setBurstKey((k) => k + 1);
+      setPilgrimage('burst');
+    }, PILGRIMAGE_FLY_MS);
+    return () => window.clearTimeout(t);
+  }, [pilgrimage]);
+
+  useEffect(() => {
+    if (pilgrimage !== 'burst') return;
+    const t = window.setTimeout(() => setPilgrimage('back'), PILGRIMAGE_BURST_MS);
+    return () => window.clearTimeout(t);
+  }, [pilgrimage]);
+
+  useEffect(() => {
+    if (pilgrimage !== 'back') return;
+    const t = window.setTimeout(() => setPilgrimage('off'), PILGRIMAGE_RETURN_MS);
+    return () => window.clearTimeout(t);
+  }, [pilgrimage]);
+
+  const targetSlot = pilgrimage === 'fly' || pilgrimage === 'burst' ? stageCenter : slot;
+
+  const moveTransition = useMemo(() => {
+    if (pilgrimage === 'back') return { duration: 1.18, ease: [0.22, 1, 0.36, 1] as const };
+    if (pilgrimage === 'fly') return { duration: 1.08, ease: [0.16, 1, 0.3, 1] as const };
+    return { duration: 1.4, ease: [0.65, 0, 0.35, 1] as const };
+  }, [pilgrimage]);
+
+  const whisperDuringPilgrimage = pilgrimage === 'off';
+
   return (
     <AnimatePresence>
       {visible && (
@@ -264,18 +400,18 @@ export function MaestroOrb({ visible }: Props) {
           className="pointer-events-none absolute z-30 select-none"
           style={{ top: 0, left: 0 }}
           initial={{ opacity: 0, x: slot.x, y: slot.y, scale: 0.6 }}
-          animate={{ opacity: 1, x: slot.x, y: slot.y, scale: 1 }}
+          animate={{ opacity: 1, x: targetSlot.x, y: targetSlot.y, scale: 1 }}
           exit={{ opacity: 0, scale: 0.7 }}
           transition={{
             opacity: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
             scale: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
-            x: { duration: 1.4, ease: [0.65, 0, 0.35, 1] },
-            y: { duration: 1.4, ease: [0.65, 0, 0.35, 1] },
+            x: moveTransition,
+            y: moveTransition,
           }}
         >
           <motion.div
             animate={
-              reduceMotion
+              reduceMotion || pilgrimage !== 'off'
                 ? undefined
                 : {
                     x: [0, 6, -4, 8, -2, 0],
@@ -284,20 +420,35 @@ export function MaestroOrb({ visible }: Props) {
             }
             transition={{ duration: 9.5, repeat: Infinity, ease: 'easeInOut' }}
             className="relative -translate-x-1/2 -translate-y-1/2"
+            style={{ width: TOTAL_WIDTH, height: SIZE }}
           >
             <MaestroVisual
               accent={accent}
               intensity={intensity}
               reduceMotion={Boolean(reduceMotion)}
               whisper={whisper}
-              showWhisper={showWhisper}
+              showWhisper={showWhisper && whisperDuringPilgrimage}
               whisperPlacement={placement}
               bubbleShift={bubbleShift}
               stepId={stepId}
+              hideCore={pilgrimage === 'burst'}
             />
+            {pilgrimage === 'burst' && (
+              <div
+                className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-0 w-0 overflow-visible"
+                style={{ transform: 'translate(-50%, -50%)' }}
+              >
+                <MaestroRadialShards
+                  accent={accent}
+                  burstKey={burstKey}
+                  stageW={stage.width}
+                  stageH={stage.height}
+                />
+              </div>
+            )}
           </motion.div>
 
-          {!reduceMotion && (
+          {!reduceMotion && pilgrimage === 'off' && (
             <motion.span
               key={`trail-${stepId}`}
               aria-hidden
@@ -449,6 +600,8 @@ interface MaestroVisualProps {
   whisperPlacement: 'above' | 'below';
   bubbleShift: number;
   stepId: string;
+  /** Esconde o núcleo do orbe (ex.: durante decomposição radial). */
+  hideCore?: boolean;
 }
 
 function MaestroVisual({
@@ -460,6 +613,7 @@ function MaestroVisual({
   whisperPlacement,
   bubbleShift,
   stepId,
+  hideCore = false,
 }: MaestroVisualProps) {
   return (
     <div className="relative" style={{ width: TOTAL_WIDTH, height: SIZE }}>
@@ -476,9 +630,11 @@ function MaestroVisual({
         )}
       </AnimatePresence>
 
-      <div
+      <motion.div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ width: SIZE, height: SIZE }}
+        animate={{ opacity: hideCore ? 0 : 1, scale: hideCore ? 0.85 : 1 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
       >
         <motion.div
           className="absolute inset-[-40px] rounded-full"
@@ -711,7 +867,7 @@ function MaestroVisual({
               }}
             />
           ))}
-      </div>
+      </motion.div>
     </div>
   );
 }

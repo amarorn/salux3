@@ -168,6 +168,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
             bannerVideoSrc: step.content.bannerMedia?.videoSrc,
             bannerVideoPoster: step.content.bannerMedia?.posterSrc,
             trackId: currentTrackId,
+            omitSidePhoto: step.content.omitSidePhoto,
           }}
         >
           <CardFlipShell active={active} flipPhoto={flipPhoto} stepLabel={stepLabel}>

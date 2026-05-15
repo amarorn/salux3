@@ -1,10 +1,11 @@
-import { useContext, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Link2, Unlink } from 'lucide-react';
 import { SaluxSymbol } from '../intro/SaluxLogo';
 import { FloatingCard, FloatingCardContext } from '../FloatingCard';
 import type { PresentationStep, RoadmapAgentCard } from '@/domain/types';
 import { getCardTextVariants } from './cardTextMotion';
+import { ExpandedCardPortal } from './ExpandedCardPortal';
 
 interface Props {
   step: PresentationStep;
@@ -262,35 +263,57 @@ function FragmentedVsCoordinatedPreview({
   );
 }
 
-function AgentCard({ card }: { card: RoadmapAgentCard }) {
+function AgentCard({
+  card,
+  selected,
+  onClick,
+  refCallback,
+}: {
+  card: RoadmapAgentCard;
+  selected: boolean;
+  onClick: () => void;
+  refCallback: (el: HTMLElement | null) => void;
+}) {
   const [hovered, setHovered] = useState(false);
+  const active = hovered || selected;
 
   return (
     <div
-      className="flex h-full flex-col rounded-2xl p-4"
+      ref={refCallback}
+      data-no-click-advance
+      role="button"
+      tabIndex={0}
+      aria-expanded={selected}
+      aria-label={card.title}
+      className="flex h-full flex-col rounded-2xl p-4 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); }
+      }}
       style={{
-        background: hovered ? 'rgba(139,92,246,0.1)' : 'rgba(255,255,255,0.035)',
-        border: `1px solid ${hovered ? 'rgba(139,92,246,0.45)' : 'rgba(139,92,246,0.22)'}`,
-        boxShadow: hovered ? '0 8px 28px -8px rgba(139,92,246,0.3), inset 0 1px 0 rgba(255,255,255,0.07)' : 'inset 0 1px 0 rgba(255,255,255,0.04)',
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
+        background: active ? 'rgba(139,92,246,0.1)' : 'rgba(255,255,255,0.035)',
+        border: `1px solid ${active ? 'rgba(139,92,246,0.45)' : 'rgba(139,92,246,0.22)'}`,
+        boxShadow: active ? '0 8px 28px -8px rgba(139,92,246,0.3), inset 0 1px 0 rgba(255,255,255,0.07)' : 'inset 0 1px 0 rgba(255,255,255,0.04)',
+        transform: hovered && !selected ? 'translateY(-3px)' : 'translateY(0)',
         transition: 'background 300ms, border 300ms, box-shadow 300ms, transform 280ms ease',
+        cursor: 'pointer',
       }}
     >
       <div
         className="flex items-start gap-2.5 pb-2.5"
-        style={{ borderBottom: `1px solid ${hovered ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)'}`, transition: 'border-color 300ms' }}
+        style={{ borderBottom: `1px solid ${active ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)'}`, transition: 'border-color 300ms' }}
       >
         <span
           className="mt-0.5 shrink-0 transition-[filter] duration-300"
-          style={{ filter: hovered ? 'drop-shadow(0 0 10px rgba(139,92,246,0.7))' : 'drop-shadow(0 0 6px rgba(139,92,246,0.3))' }}
+          style={{ filter: active ? 'drop-shadow(0 0 10px rgba(139,92,246,0.7))' : 'drop-shadow(0 0 6px rgba(139,92,246,0.3))' }}
         >
           <SaluxSymbol width={22} idle={false} className="h-[22px] w-[22px]" />
         </span>
         <p
           className="min-w-0 flex-1 text-[10px] font-bold uppercase leading-tight tracking-[0.12em] transition-colors duration-300"
-          style={{ color: hovered ? '#c4b5fd' : '#a78bfa' }}
+          style={{ color: active ? '#c4b5fd' : '#a78bfa' }}
         >
           {card.title}
         </p>
@@ -302,7 +325,7 @@ function AgentCard({ card }: { card: RoadmapAgentCard }) {
               {seg.text}
             </p>
           ) : (
-            <p key={i} className="font-semibold transition-colors duration-300" style={{ color: hovered ? '#c4b5fd' : '#a78bfa' }}>
+            <p key={i} className="font-semibold transition-colors duration-300" style={{ color: active ? '#c4b5fd' : '#a78bfa' }}>
               → {seg.name}
             </p>
           ),
@@ -322,6 +345,22 @@ export function RoadmapStep({ step, active }: Props) {
     `${step.id}:${step.title}`,
     flipPhoto,
   );
+
+  const [selectedAgent, setSelectedAgent] = useState<number | null>(null);
+  const agentRefs = useRef<(HTMLElement | null)[]>([]);
+
+  useEffect(() => {
+    if (!active) setSelectedAgent(null);
+  }, [active]);
+
+  useEffect(() => {
+    if (selectedAgent === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { e.stopPropagation(); setSelectedAgent(null); }
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [selectedAgent]);
 
   if (agents?.length) {
     const COLS = 3;
@@ -359,6 +398,8 @@ export function RoadmapStep({ step, active }: Props) {
             const rowDelay = layerPad + 0.18 + row * 0.42;
             const delay = rowDelay + col * 0.1;
             const yFrom = row === 0 ? -18 : 18;  // cima desce, baixo sobe
+            const isSelected = selectedAgent === i;
+            const isDimmed = selectedAgent !== null && !isSelected;
 
             return (
               <motion.div
@@ -366,17 +407,41 @@ export function RoadmapStep({ step, active }: Props) {
                 className="min-h-0"
                 initial={reduceMotion ? false : { opacity: 0, y: yFrom, scale: 0.95, filter: 'blur(5px)' }}
                 animate={
-                  active
-                    ? { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
-                    : { opacity: 0, y: yFrom, scale: 0.95, filter: 'blur(5px)' }
+                  !active
+                    ? { opacity: 0, y: yFrom, scale: 0.95, filter: 'blur(5px)' }
+                    : isDimmed
+                      ? { opacity: 0.35, scale: 0.97, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }
+                      : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
                 }
                 transition={{ delay, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               >
-                <AgentCard card={card} />
+                <AgentCard
+                  card={card}
+                  selected={isSelected}
+                  onClick={() => setSelectedAgent((s) => (s === i ? null : i))}
+                  refCallback={(el) => { agentRefs.current[i] = el; }}
+                />
               </motion.div>
             );
           })}
         </div>
+
+        <AnimatePresence>
+          {selectedAgent !== null && agents[selectedAgent] !== undefined && (
+            <ExpandedCardPortal
+              key={`agent-expanded-${selectedAgent}`}
+              text={agents[selectedAgent]!.title}
+              description={agents[selectedAgent]!.segments
+                .map((seg) => (seg.type === 'text' ? (seg.text ?? '') : `→ ${seg.name ?? ''}`))
+                .filter(Boolean)
+                .join('\n') || undefined}
+              accentColor="#8b5cf6"
+              reducedMotion={Boolean(reduceMotion)}
+              origin={agentRefs.current[selectedAgent] ?? null}
+              onClose={() => setSelectedAgent(null)}
+            />
+          )}
+        </AnimatePresence>
       </FloatingCard>
     );
   }

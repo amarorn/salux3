@@ -1,6 +1,6 @@
-import { forwardRef, useContext, useEffect, useRef, useState, type RefObject } from 'react';
+import { forwardRef, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion';
 import {
   Building2,
   Link as LinkIcon,
@@ -32,6 +32,9 @@ import { EvidenceGaugeCard } from '../visuals/EvidenceGaugeCard';
 import { EvidenceRangeCard } from '../visuals/EvidenceRangeCard';
 import { getCardTextVariants } from './cardTextMotion';
 import { ClosingHighlight, EvidenceCardBlock, HighlightPhraseList } from './HighlightBlocks';
+import { usePresentationStore } from '@/store/presentationStore';
+import { EraRevealBand } from '@/components/motion/EraAgenticaReveal';
+import { buildNarrativeBandKeys } from '@/lib/eraAgenticaRevealBands';
 
 interface Props {
   step: PresentationStep;
@@ -42,6 +45,8 @@ export function NarrativeStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
+  const trackId = useContext(FloatingCardContext)?.trackId;
+  const eraStaging = trackId === 'era-agentica';
   const { container, item } = getCardTextVariants(
     Boolean(reduceMotion),
     step.index,
@@ -50,11 +55,37 @@ export function NarrativeStep({ step, active }: Props) {
   );
   const painPoints = step.content.painPointsLayout;
   const useBalloon = painPoints && step.content.painPointsBalloon;
+  const bandKeys = useMemo(
+    () => buildNarrativeBandKeys(step.content, Boolean(painPoints), Boolean(useBalloon)),
+    [step.content, painPoints, useBalloon],
+  );
+  const b = (id: string) => bandKeys.indexOf(id);
+  const setEraCfg = usePresentationStore((s) => s.setEraStagedRevealConfig);
+  const clearEra = usePresentationStore((s) => s.clearEraStagedReveal);
+  const stagingLayout = Boolean(active && eraStaging && !reduceMotion);
+  const innerMotion = stagingLayout ? {} : { variants: item };
+  const outerContainer: Variants = stagingLayout ? { hidden: {}, visible: {} } : container;
+
+  useLayoutEffect(() => {
+    if (!active || !eraStaging) return;
+    if (reduceMotion) {
+      setEraCfg(step.id, 1);
+      return () => {
+        if (usePresentationStore.getState().eraStagedRevealStepId === step.id) clearEra();
+      };
+    }
+    setEraCfg(step.id, bandKeys.length);
+    return () => {
+      if (usePresentationStore.getState().eraStagedRevealStepId === step.id) clearEra();
+    };
+  }, [active, eraStaging, reduceMotion, step.id, bandKeys.length, setEraCfg, clearEra]);
+
   const [balloonOpen, setBalloonOpen] = useState(false);
   const [tracerActive, setTracerActive] = useState(false);
   const [impactActive, setImpactActive] = useState(false);
   const [valueStageSpotlight, setValueStageSpotlight] = useState<number | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Fecha o balão e reseta o tracer quando o slide deixa de estar ativo
   useEffect(() => {
@@ -143,64 +174,108 @@ export function NarrativeStep({ step, active }: Props) {
     >
       <motion.div
         className="flex flex-col gap-5"
-        variants={container}
+        variants={outerContainer}
         initial={reduceMotion ? false : 'hidden'}
         animate={active ? 'visible' : 'hidden'}
       >
         {painPoints && step.content.headline ? (
-          <motion.div variants={item} className="space-y-3">
-            <span
-              className="block text-[10px] font-semibold uppercase tracking-[0.32em]"
-              style={{ color: accent.base, opacity: 0.85 }}
-            >
-              {step.title}
-            </span>
-            <h2
-              className="presentation-ppt-title max-w-[20ch] text-[clamp(1.9rem,4.2vw,2.9rem)] leading-[1.08]"
-              style={{ textShadow: `0 0 28px ${accent.base}22` }}
-            >
-              {step.content.headline}
-            </h2>
-          </motion.div>
+          <EraRevealBand
+            bandId="title"
+            bandIndex={b('title')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion} className="space-y-3">
+              <span
+                className="block text-[10px] font-semibold uppercase tracking-[0.32em]"
+                style={{ color: accent.base, opacity: 0.85 }}
+              >
+                {step.title}
+              </span>
+              <h2
+                className="presentation-ppt-title max-w-[20ch] text-[clamp(1.9rem,4.2vw,2.9rem)] leading-[1.08]"
+                style={{ textShadow: `0 0 28px ${accent.base}22` }}
+              >
+                {step.content.headline}
+              </h2>
+            </motion.div>
+          </EraRevealBand>
         ) : (
-          <motion.div variants={item}>
-            <h2 className="presentation-ppt-title max-w-[24ch] text-[clamp(1.8rem,4vw,2.55rem)]">
-              {step.title}
-            </h2>
-          </motion.div>
+          <EraRevealBand
+            bandId="title"
+            bandIndex={b('title')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion}>
+              <h2 className="presentation-ppt-title max-w-[24ch] text-[clamp(1.8rem,4vw,2.55rem)]">
+                {step.title}
+              </h2>
+            </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.metrics && step.content.metrics.length > 0 && (
-          <motion.div variants={item}>
-            {step.content.metrics.some((m) => m.trend || m.label || m.delta !== undefined) ? (
-              <KpiCards
-                items={step.content.metrics}
-                active={active}
-                reducedMotion={Boolean(reduceMotion)}
-                accentColor={accent.base}
-              />
-            ) : (
-              <AnimatedNarrativeMetrics
-                items={step.content.metrics}
-                active={active}
-                reducedMotion={Boolean(reduceMotion)}
-                accentColor={accent.base}
-              />
-            )}
-          </motion.div>
+          <EraRevealBand
+            bandId="metrics"
+            bandIndex={b('metrics')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion}>
+              {step.content.metrics.some((m) => m.trend || m.label || m.delta !== undefined) ? (
+                <KpiCards
+                  items={step.content.metrics}
+                  active={active}
+                  reducedMotion={Boolean(reduceMotion)}
+                  accentColor={accent.base}
+                />
+              ) : (
+                <AnimatedNarrativeMetrics
+                  items={step.content.metrics}
+                  active={active}
+                  reducedMotion={Boolean(reduceMotion)}
+                  accentColor={accent.base}
+                />
+              )}
+            </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.lead && (
-          <motion.p
-            variants={item}
-            className="presentation-ppt-body max-w-prose whitespace-pre-line text-slate-200/90"
+          <EraRevealBand
+            bandId="lead"
+            bandIndex={b('lead')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
           >
-            {step.content.lead}
-          </motion.p>
+            <motion.p
+              {...innerMotion}
+              className="presentation-ppt-body max-w-prose whitespace-pre-line text-slate-100/95"
+            >
+              {step.content.lead}
+            </motion.p>
+          </EraRevealBand>
         )}
 
         {step.content.contrastPair && (
-          <motion.div variants={item} className="flex w-full gap-3">
+          <EraRevealBand
+            bandId="contrastPair"
+            bandIndex={b('contrastPair')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion} className="flex w-full gap-3">
             {(['left', 'right'] as const).map((side, idx) => {
               const it = step.content.contrastPair![side];
               const c = it.tone === 'cool'
@@ -247,55 +322,35 @@ export function NarrativeStep({ step, active }: Props) {
                 </motion.div>
               );
             })}
-          </motion.div>
+            </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.valueStages && step.content.valueStages.length > 0 && (
-          <motion.div variants={item} className="relative space-y-3 overflow-visible py-1">
+          <EraRevealBand
+            bandId="valueStages"
+            bandIndex={b('valueStages')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion} className="relative space-y-3 overflow-visible py-1">
             {step.content.valueStagesLead && (
               <p
-                className="whitespace-pre-line text-[1.02rem] leading-relaxed text-slate-200/90"
+                className="whitespace-pre-line text-[1.05rem] leading-relaxed text-slate-100/95"
                 style={{ textShadow: `0 0 18px ${accent.base}1f` }}
               >
                 {step.content.valueStagesLead}
               </p>
             )}
-            <AnimatePresence>
-              {valueStageSpotlight !== null && (
-                <motion.button
-                  key="value-stages-spotlight-backdrop"
-                  type="button"
-                  aria-label="Fechar destaque"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: reduceMotion ? 0.12 : 0.38, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute -inset-x-6 -inset-y-[min(26vh,240px)] z-[1] cursor-default rounded-[1.35rem] border border-white/[0.06] bg-black/[0.52] backdrop-blur-[6px]"
-                  style={{ WebkitTapHighlightColor: 'transparent' }}
-                  onClick={() => setValueStageSpotlight(null)}
-                />
-              )}
-            </AnimatePresence>
-
-            <motion.div
-              className="relative z-[2] grid gap-2.5"
+            <div
+              className="grid gap-2.5"
               style={{
                 gridTemplateColumns: `repeat(${
                   step.content.valueStagesGridCols ?? step.content.valueStages.length
                 }, minmax(0, 1fr))`,
-                ...(valueStageSpotlight !== null
-                  ? {
-                      filter: `drop-shadow(0 0 1px ${accent.base}) drop-shadow(0 18px 40px rgba(0,0,0,0.5))`,
-                    }
-                  : {}),
               }}
-              animate={
-                reduceMotion
-                  ? {}
-                  : valueStageSpotlight !== null
-                    ? { scale: 0.94, y: 3, transition: { duration: 0.72, ease: [0.16, 1, 0.3, 1] } }
-                    : { scale: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }
-              }
             >
               {step.content.valueStages.map((stage, i) => {
                 const intensity = step.content.valueStagesFlat
@@ -305,67 +360,34 @@ export function NarrativeStep({ step, active }: Props) {
                   Math.round(intensity * mult)
                     .toString(16)
                     .padStart(2, '0');
-                const dimmed =
-                  valueStageSpotlight !== null && valueStageSpotlight !== i;
+                const dimmed = valueStageSpotlight !== null && valueStageSpotlight !== i;
                 const focused = valueStageSpotlight === i;
                 return (
                   <motion.div
+                    ref={(el) => { stageRefs.current[i] = el; }}
                     key={`${stage.number}-${stage.label}`}
+                    data-no-click-advance
                     role="button"
                     tabIndex={0}
                     aria-expanded={focused}
                     aria-label={`Destacar: ${stage.label}`}
-                    className="relative cursor-pointer overflow-hidden rounded-xl border px-3.5 py-3 outline-none transition-[border-color,box-shadow] duration-500 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
+                    className="relative cursor-pointer overflow-hidden rounded-xl border px-3.5 py-3 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
                     style={{
-                      borderColor: focused
-                        ? `${accent.base}aa`
-                        : `${accent.base}${hex(95)}`,
+                      borderColor: focused ? `${accent.base}aa` : `${accent.base}${hex(95)}`,
                       background: `linear-gradient(160deg, ${accent.base}${hex(30)} 0%, rgba(255,255,255,0.02) 70%)`,
                       boxShadow: focused
                         ? `inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px ${accent.base}55, 0 16px 40px -8px ${accent.base}44`
                         : `inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px -16px ${accent.base}${hex(88)}`,
-                      zIndex: focused ? 3 : 0,
                     }}
                     initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                     animate={
                       !active
-                        ? reduceMotion
-                          ? undefined
-                          : { opacity: 0, y: 12 }
+                        ? reduceMotion ? undefined : { opacity: 0, y: 12 }
                         : dimmed
-                          ? {
-                              opacity: 0.42,
-                              y: 0,
-                              scale: 0.96,
-                              transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-                            }
-                          : focused
-                            ? {
-                                opacity: 1,
-                                y: 0,
-                                scale: 1.05,
-                                transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
-                              }
-                            : {
-                                opacity: 1,
-                                y: 0,
-                                scale: 1,
-                                transition: {
-                                  duration: 0.55,
-                                  ease: [0.22, 1, 0.36, 1],
-                                  delay: 0.45 + i * 0.12,
-                                },
-                              }
+                          ? { opacity: 0.35, scale: 0.97, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } }
+                          : { opacity: 1, scale: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: active && valueStageSpotlight === null ? 0.45 + i * 0.12 : 0 } }
                     }
-                    transition={
-                      active && valueStageSpotlight === null
-                        ? {
-                            duration: 0.55,
-                            ease: [0.22, 1, 0.36, 1],
-                            delay: 0.45 + i * 0.12,
-                          }
-                        : undefined
-                    }
+                    whileTap={reduceMotion ? undefined : { scale: 0.96 }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setValueStageSpotlight((s) => (s === i ? null : i));
@@ -380,9 +402,7 @@ export function NarrativeStep({ step, active }: Props) {
                     <span
                       aria-hidden
                       className="pointer-events-none absolute inset-x-3 -top-px h-px"
-                      style={{
-                        background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)`,
-                      }}
+                      style={{ background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)` }}
                     />
                     <div className="flex items-baseline gap-1.5">
                       <span
@@ -398,18 +418,44 @@ export function NarrativeStep({ step, active }: Props) {
                         {stage.label}
                       </span>
                     </div>
-                    <p className="mt-2 text-[0.92rem] leading-relaxed text-slate-200/90">
-                      {stage.description}
-                    </p>
+                    {stage.description && (
+                      <p className="mt-2 text-[0.96rem] leading-relaxed text-slate-100/92">
+                        {stage.description}
+                      </p>
+                    )}
                   </motion.div>
                 );
               })}
-            </motion.div>
+            </div>
+
+            <AnimatePresence>
+              {valueStageSpotlight !== null && step.content.valueStages[valueStageSpotlight] !== undefined && (
+                <ExpandedChip
+                  key={`stage-expanded-${valueStageSpotlight}`}
+                  text={step.content.valueStages[valueStageSpotlight]!.label}
+                  accentColor={accent.base}
+                  reducedMotion={Boolean(reduceMotion)}
+                  origin={stageRefs.current[valueStageSpotlight] ?? null}
+                  onClose={() => setValueStageSpotlight(null)}
+                  prefix={step.content.valueStages[valueStageSpotlight]!.number}
+                  description={step.content.valueStages[valueStageSpotlight]!.description || undefined}
+                />
+              )}
+            </AnimatePresence>
           </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.evidenceMetrics && step.content.evidenceMetrics.length > 0 && (
-          <motion.div variants={item} className="space-y-3">
+          <EraRevealBand
+            bandId="evidenceMetrics"
+            bandIndex={b('evidenceMetrics')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion} className="space-y-3">
             {step.content.evidenceMetrics.map((m, i) => {
               if (m.style === 'range') {
                 return (
@@ -447,11 +493,20 @@ export function NarrativeStep({ step, active }: Props) {
                 />
               );
             })}
-          </motion.div>
+            </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.dualStages && (
-          <motion.div variants={item} className="space-y-5">
+          <EraRevealBand
+            bandId="dualStages"
+            bandIndex={b('dualStages')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion} className="space-y-5">
             {(['positive', 'negative'] as const).map((group, gi) => {
               const cfg = step.content.dualStages![group];
               const c = group === 'positive' ? theme.accents.emerald : theme.accents.rose;
@@ -522,12 +577,22 @@ export function NarrativeStep({ step, active }: Props) {
               );
             })}
           </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.body && !painPoints && (
-          <motion.p variants={item} className="presentation-ppt-body whitespace-pre-line">
-            {step.content.body}
-          </motion.p>
+          <EraRevealBand
+            bandId="body"
+            bandIndex={b('body')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.p {...innerMotion} className="presentation-ppt-body whitespace-pre-line">
+              {step.content.body}
+            </motion.p>
+          </EraRevealBand>
         )}
 
         {step.content.bullets &&
@@ -535,7 +600,15 @@ export function NarrativeStep({ step, active }: Props) {
           typeof step.content.bulletSplitAfter === 'number' &&
           step.content.bulletSplitAfter > 0 &&
           step.content.bullets.length > step.content.bulletSplitAfter && (
-            <motion.div variants={item} className="space-y-5">
+            <EraRevealBand
+              bandId="bulletSplit"
+              bandIndex={b('bulletSplit')}
+              stepId={step.id}
+              stepIndex={step.index}
+              eraStaging={eraStaging}
+              active={active}
+            >
+              <motion.div {...innerMotion} className="space-y-5">
               <div>
                 <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-cyan-300/85">
                   O que a instituição faz hoje
@@ -568,10 +641,19 @@ export function NarrativeStep({ step, active }: Props) {
                 </ul>
               </div>
             </motion.div>
+            </EraRevealBand>
           )}
 
         {painPoints && !useBalloon && step.content.bullets && step.content.bullets.length > 0 && (
-          <motion.div variants={item} className="relative space-y-3">
+          <EraRevealBand
+            bandId="painChips"
+            bandIndex={b('painChips')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion} className="relative space-y-3">
             {step.content.painPointsLead && (
               <p
                 className="text-[1.02rem] font-semibold leading-relaxed text-slate-100/90"
@@ -606,10 +688,19 @@ export function NarrativeStep({ step, active }: Props) {
               />
             </div>
           </motion.div>
+          </EraRevealBand>
         )}
 
         {useBalloon && step.content.bullets && step.content.bullets.length > 0 && (
-          <motion.div variants={item} className="flex justify-center py-3">
+          <EraRevealBand
+            bandId="balloonTrigger"
+            bandIndex={b('balloonTrigger')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion} className="flex justify-center py-3">
             <BalloonTrigger
               ref={triggerRef}
               label={step.content.painPointsTriggerLabel ?? 'Abrir os 7 pontos'}
@@ -620,6 +711,7 @@ export function NarrativeStep({ step, active }: Props) {
               impact={impactActive}
             />
           </motion.div>
+          </EraRevealBand>
         )}
 
         {!painPoints &&
@@ -630,7 +722,15 @@ export function NarrativeStep({ step, active }: Props) {
             step.content.bulletSplitAfter > 0 &&
             step.content.bullets.length > step.content.bulletSplitAfter
           ) && (
-          <motion.ul variants={item} className="mt-1 space-y-2.5">
+          <EraRevealBand
+            bandId="bullets"
+            bandIndex={b('bullets')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.ul {...innerMotion} className="mt-1 space-y-2.5">
             {step.content.bullets.map((bullet) => (
               <li key={bullet} className="flex items-start gap-3 text-[0.96rem] leading-relaxed text-slate-200">
                 <span
@@ -641,25 +741,43 @@ export function NarrativeStep({ step, active }: Props) {
               </li>
             ))}
           </motion.ul>
+          </EraRevealBand>
         )}
 
         {painPoints && step.content.body && (
-          <motion.div variants={item} className="relative mt-1 pl-4">
+          <EraRevealBand
+            bandId="painBody"
+            bandIndex={b('painBody')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion} className="relative mt-1 pl-4">
             <span
               aria-hidden
               className="absolute left-0 top-1 bottom-1 w-px"
               style={{ background: `linear-gradient(180deg, ${accent.base}, transparent)` }}
             />
-            <p className="presentation-ppt-body whitespace-pre-line text-[1.02rem] leading-relaxed text-slate-300/95">
+            <p className="presentation-ppt-body whitespace-pre-line text-[1.06rem] leading-relaxed text-slate-100/96">
               {step.content.body}
             </p>
           </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.beforeAfter &&
           step.content.beforeAfter.before.length > 0 &&
           step.content.beforeAfter.before.length === step.content.beforeAfter.after.length && (
-            <motion.div variants={item} className="space-y-2">
+            <EraRevealBand
+              bandId="beforeAfter"
+              bandIndex={b('beforeAfter')}
+              stepId={step.id}
+              stepIndex={step.index}
+              eraStaging={eraStaging}
+              active={active}
+            >
+              <motion.div {...innerMotion} className="space-y-2">
               {step.content.beforeAfter.before.map((from, i) => {
                 const to = step.content.beforeAfter!.after[i]!;
                 const rose = theme.accents.rose;
@@ -691,7 +809,7 @@ export function NarrativeStep({ step, active }: Props) {
                       >
                         DE →
                       </span>
-                      <p className="mt-0.5 text-[0.96rem] leading-relaxed text-slate-200/90">{from}</p>
+                      <p className="mt-0.5 text-[0.98rem] leading-relaxed text-slate-100/92">{from}</p>
                     </div>
                     <div
                       className="relative overflow-hidden rounded-lg border px-3.5 py-2.5"
@@ -725,11 +843,20 @@ export function NarrativeStep({ step, active }: Props) {
                 );
               })}
             </motion.div>
+            </EraRevealBand>
           )}
 
         {step.content.attentionPhrase && (
+          <EraRevealBand
+            bandId="attention"
+            bandIndex={b('attention')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
           <motion.div
-            variants={item}
+            {...innerMotion}
             className="relative mt-1 overflow-hidden rounded-2xl border px-5 py-4"
             style={{
               borderColor: `${accent.base}55`,
@@ -757,34 +884,71 @@ export function NarrativeStep({ step, active }: Props) {
               “{step.content.attentionPhrase}”
             </p>
           </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.highlightPhrases && step.content.highlightPhrases.length > 0 && (
-          <motion.div variants={item}>
-            <HighlightPhraseList items={step.content.highlightPhrases} active={active} />
-          </motion.div>
+          <EraRevealBand
+            bandId="highlightPhrases"
+            bandIndex={b('highlightPhrases')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion}>
+              <HighlightPhraseList items={step.content.highlightPhrases} active={active} />
+            </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.evidenceCard && (
-          <motion.div variants={item}>
-            <EvidenceCardBlock
-              card={step.content.evidenceCard}
-              active={active}
-              accentColor={accent.base}
-            />
-          </motion.div>
+          <EraRevealBand
+            bandId="evidenceCard"
+            bandIndex={b('evidenceCard')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion}>
+              <EvidenceCardBlock
+                card={step.content.evidenceCard}
+                active={active}
+                accentColor={accent.base}
+              />
+            </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.closingHighlight && (
-          <motion.div variants={item}>
-            <ClosingHighlight text={step.content.closingHighlight} active={active} />
-          </motion.div>
+          <EraRevealBand
+            bandId="closingHighlight"
+            bandIndex={b('closingHighlight')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion}>
+              <ClosingHighlight text={step.content.closingHighlight} active={active} />
+            </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.visual?.type === 'risk-curve' && (
-          <motion.div variants={item}>
-            <AnimatedRiskCurve active={active} />
-          </motion.div>
+          <EraRevealBand
+            bandId="riskCurve"
+            bandIndex={b('riskCurve')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion}>
+              <AnimatedRiskCurve active={active} />
+            </motion.div>
+          </EraRevealBand>
         )}
       </motion.div>
 
@@ -1392,6 +1556,22 @@ function PainPointChips({
   active,
   reducedMotion,
 }: PainPointChipsProps) {
+  const [selected, setSelected] = useState<number | null>(null);
+  const chipRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    if (selected === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { e.stopPropagation(); setSelected(null); }
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [selected]);
+
+  useEffect(() => {
+    if (!active) setSelected(null);
+  }, [active]);
+
   const container = {
     hidden: {},
     visible: {
@@ -1414,84 +1594,268 @@ function PainPointChips({
   };
 
   return (
-    <motion.ul
-      variants={container}
-      initial={reducedMotion ? false : 'hidden'}
-      animate={active ? 'visible' : 'hidden'}
-      className={
-        gridCols === 4
-          ? 'grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4'
-          : gridCols === 3
-            ? 'grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3'
-            : 'grid grid-cols-1 gap-2.5 sm:grid-cols-2'
-      }
-    >
-      {bullets.map((text, i) => {
-        const iconKey = icons?.[i];
-        const Icon = iconKey ? PAIN_POINT_ICONS[iconKey] : undefined;
-        return (
-        <motion.li key={text} variants={chip}>
-          <motion.div
-            whileHover={
-              reducedMotion
-                ? undefined
-                : { y: -2, scale: 1.015, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }
-            }
-            className="group relative flex items-start gap-3 overflow-hidden rounded-2xl border px-4 py-3"
-            style={{
-              borderColor: `${accentColor}33`,
-              background: `linear-gradient(135deg, ${accentColor}10 0%, rgba(255,255,255,0.02) 100%)`,
-              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04)`,
-            }}
-          >
-            {Icon ? (
-              <span
-                aria-hidden
-                className="mt-0.5 inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg"
-                style={{
-                  background: `${accentColor}22`,
-                  border: `1px solid ${accentColor}44`,
-                  color: accentColor,
-                  boxShadow: `0 0 12px ${accentColor}33`,
-                }}
-              >
-                <Icon size={15} strokeWidth={2} />
-              </span>
-            ) : (
-              <motion.span
-                aria-hidden
-                className="relative mt-2 h-2 w-2 flex-shrink-0 rounded-full"
-                style={{ background: accentColor, boxShadow: `0 0 10px ${accentColor}` }}
+    <>
+      <motion.ul
+        variants={container}
+        initial={reducedMotion ? false : 'hidden'}
+        animate={active ? 'visible' : 'hidden'}
+        className={
+          gridCols === 4
+            ? 'grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4'
+            : gridCols === 3
+              ? 'grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3'
+              : 'grid grid-cols-1 gap-2.5 sm:grid-cols-2'
+        }
+      >
+        {bullets.map((text, i) => {
+          const iconKey = icons?.[i];
+          const Icon = iconKey ? PAIN_POINT_ICONS[iconKey] : undefined;
+          const isSelected = selected === i;
+          const isDimmed = selected !== null && !isSelected;
+          return (
+            <motion.li key={text} variants={chip}>
+              <motion.div
+                ref={(el) => { chipRefs.current[i] = el; }}
+                data-no-click-advance
+                role="button"
+                tabIndex={0}
+                aria-expanded={isSelected}
+                aria-label={text}
+                whileHover={
+                  reducedMotion || selected !== null
+                    ? undefined
+                    : { y: -2, scale: 1.015, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }
+                }
+                whileTap={reducedMotion ? undefined : { scale: 0.96 }}
                 animate={
                   reducedMotion
-                    ? undefined
-                    : {
-                        opacity: [0.55, 1, 0.55],
-                        scale: [0.85, 1.1, 0.85],
-                      }
+                    ? {}
+                    : isDimmed
+                      ? { opacity: 0.35, scale: 0.97, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } }
+                      : { opacity: 1, scale: 1, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } }
                 }
-                transition={{
-                  duration: 2.6,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  delay: i * 0.18,
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelected((s) => (s === i ? null : i));
                 }}
-              />
-            )}
-            <span className="flex-1 text-[1.02rem] font-medium leading-relaxed text-slate-100">
-              {text}
-            </span>
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelected((s) => (s === i ? null : i));
+                  }
+                }}
+                className="group relative flex cursor-pointer items-start gap-3 overflow-hidden rounded-2xl border px-4 py-3 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
+                style={{
+                  borderColor: isSelected ? `${accentColor}99` : `${accentColor}33`,
+                  background: isSelected
+                    ? `linear-gradient(135deg, ${accentColor}22 0%, rgba(255,255,255,0.04) 100%)`
+                    : `linear-gradient(135deg, ${accentColor}10 0%, rgba(255,255,255,0.02) 100%)`,
+                  boxShadow: isSelected
+                    ? `inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px ${accentColor}55, 0 8px 28px -8px ${accentColor}44`
+                    : `inset 0 1px 0 rgba(255,255,255,0.04)`,
+                }}
+              >
+                {Icon ? (
+                  <span
+                    aria-hidden
+                    className="mt-0.5 inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg"
+                    style={{
+                      background: `${accentColor}22`,
+                      border: `1px solid ${accentColor}44`,
+                      color: accentColor,
+                      boxShadow: `0 0 12px ${accentColor}33`,
+                    }}
+                  >
+                    <Icon size={15} strokeWidth={2} />
+                  </span>
+                ) : (
+                  <motion.span
+                    aria-hidden
+                    className="relative mt-2 h-2 w-2 flex-shrink-0 rounded-full"
+                    style={{ background: accentColor, boxShadow: `0 0 10px ${accentColor}` }}
+                    animate={
+                      reducedMotion
+                        ? undefined
+                        : { opacity: [0.55, 1, 0.55], scale: [0.85, 1.1, 0.85] }
+                    }
+                    transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut', delay: i * 0.18 }}
+                  />
+                )}
+                <span className="flex-1 text-[1.02rem] font-medium leading-relaxed text-slate-100">
+                  {text}
+                </span>
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-y-0 right-0 w-12 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{ background: `linear-gradient(270deg, ${accentColor}22, transparent)` }}
+                />
+              </motion.div>
+            </motion.li>
+          );
+        })}
+      </motion.ul>
+
+      <AnimatePresence>
+        {selected !== null && bullets[selected] !== undefined && (
+          <ExpandedChip
+            key={`expanded-${selected}`}
+            text={bullets[selected]!}
+            iconKey={icons?.[selected]}
+            accentColor={accentColor}
+            reducedMotion={reducedMotion}
+            origin={chipRefs.current[selected] ?? null}
+            onClose={() => setSelected(null)}
+          />
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+interface ExpandedChipProps {
+  text: string;
+  iconKey?: string;
+  accentColor: string;
+  reducedMotion: boolean;
+  origin: HTMLElement | null;
+  onClose: () => void;
+  prefix?: string;
+  description?: string;
+}
+
+function ExpandedChip({ text, iconKey, accentColor, reducedMotion, origin, onClose, prefix, description }: ExpandedChipProps) {
+  const Icon = iconKey ? PAIN_POINT_ICONS[iconKey] : undefined;
+
+  const startOffset = (() => {
+    if (reducedMotion || typeof window === 'undefined' || !origin) return { dx: 0, dy: 0 };
+    const rect = origin.getBoundingClientRect();
+    return {
+      dx: (rect.left + rect.width / 2) - window.innerWidth / 2,
+      dy: (rect.top + rect.height / 2) - window.innerHeight / 2,
+    };
+  })();
+
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <motion.div
+      data-no-click-advance
+      className="fixed inset-0 z-[80] flex items-center justify-center p-10"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {/* Backdrop */}
+      <motion.div
+        aria-hidden
+        className="absolute inset-0 cursor-pointer"
+        onClick={onClose}
+        initial={{ backdropFilter: 'blur(0px)', background: 'rgba(4,6,12,0)' }}
+        animate={{ backdropFilter: 'blur(14px)', background: 'rgba(4,6,12,0.68)' }}
+        exit={{ backdropFilter: 'blur(0px)', background: 'rgba(4,6,12,0)' }}
+        transition={{ duration: 0.4 }}
+      />
+
+      {/* Card expandido */}
+      <motion.div
+        role="dialog"
+        aria-modal="true"
+        className="relative w-full max-w-[440px] cursor-pointer overflow-hidden rounded-3xl border px-9 py-9"
+        style={{
+          borderColor: `${accentColor}66`,
+          background: `linear-gradient(145deg, ${accentColor}1e 0%, rgba(11,15,24,0.97) 100%)`,
+          boxShadow: `0 0 0 1px ${accentColor}33, 0 50px 130px -20px ${accentColor}44, 0 50px 130px -20px rgba(0,0,0,0.88)`,
+        }}
+        initial={
+          reducedMotion
+            ? { opacity: 0, scale: 0.9 }
+            : { opacity: 0, scale: 0.08, x: startOffset.dx, y: startOffset.dy }
+        }
+        animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+        exit={
+          reducedMotion
+            ? { opacity: 0, scale: 0.9 }
+            : { opacity: 0, scale: 0.88, y: 10, filter: 'blur(8px)' }
+        }
+        transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
+        onClick={(e) => { e.stopPropagation(); onClose(); }}
+      >
+        {/* Linha de destaque superior */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-8 -top-px h-px"
+          style={{ background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }}
+        />
+        {/* Halo de fundo */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{ background: `radial-gradient(ellipse at top, ${accentColor}1c, transparent 62%)` }}
+        />
+        {/* Pulso de borda */}
+        <motion.span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-3xl"
+          style={{ boxShadow: `0 0 0 1px ${accentColor}44, 0 0 40px ${accentColor}22` }}
+          animate={reducedMotion ? {} : { opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 2.6, ease: 'easeInOut', repeat: Infinity }}
+        />
+
+        <div className="relative flex items-start gap-4">
+          {prefix ? (
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-y-0 right-0 w-12 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              className="mt-0.5 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-[1.2rem] font-bold"
               style={{
-                background: `linear-gradient(270deg, ${accentColor}22, transparent)`,
+                background: `${accentColor}22`,
+                border: `1px solid ${accentColor}55`,
+                color: accentColor,
+                boxShadow: `0 0 22px ${accentColor}44`,
               }}
+            >
+              {prefix}
+            </span>
+          ) : Icon ? (
+            <span
+              aria-hidden
+              className="mt-0.5 inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl"
+              style={{
+                background: `${accentColor}22`,
+                border: `1px solid ${accentColor}55`,
+                color: accentColor,
+                boxShadow: `0 0 22px ${accentColor}44`,
+              }}
+            >
+              <Icon size={22} strokeWidth={1.8} />
+            </span>
+          ) : (
+            <motion.span
+              aria-hidden
+              className="mt-2 h-3 w-3 flex-shrink-0 rounded-full"
+              style={{ background: accentColor, boxShadow: `0 0 18px ${accentColor}` }}
+              animate={reducedMotion ? {} : { scale: [0.9, 1.25, 0.9], opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             />
-          </motion.div>
-        </motion.li>
-        );
-      })}
-    </motion.ul>
+          )}
+          <div>
+            <p
+              className="text-[1.3rem] font-semibold leading-snug text-white"
+              style={{ textShadow: `0 0 30px ${accentColor}33` }}
+            >
+              {text}
+            </p>
+            {description && (
+              <p className="mt-3 text-[1rem] leading-relaxed text-slate-200/80">{description}</p>
+            )}
+          </div>
+        </div>
+
+        <p className="relative mt-7 text-center text-[11px] uppercase tracking-[0.3em] text-white/32">
+          Clique para fechar · ESC
+        </p>
+      </motion.div>
+    </motion.div>,
+    document.body,
   );
 }

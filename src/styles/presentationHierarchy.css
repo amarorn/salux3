@@ -7,8 +7,8 @@ body.presentation-body {
   --ppt-kicker-tracking: 0.24em;
   --ppt-title-weight: 700;
   --ppt-title-tracking: -0.02em;
-  --ppt-body-size: 19px;
-  --ppt-body-leading: 1.78;
+  --ppt-body-size: 20px;
+  --ppt-body-leading: 1.72;
 }
 
 .presentation-ppt-kicker {
@@ -16,7 +16,8 @@ body.presentation-body {
   letter-spacing: var(--ppt-kicker-tracking);
   font-weight: 600;
   text-transform: uppercase;
-  color: rgb(255 255 255 / 0.42);
+  color: rgb(255 255 255 / 0.52);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
 }
 
 .presentation-ppt-title {
@@ -24,18 +25,26 @@ body.presentation-body {
   font-weight: var(--ppt-title-weight);
   letter-spacing: var(--ppt-title-tracking);
   line-height: 1.08;
-  font-size: clamp(1.85rem, 4.1vw, 2.85rem);
-  color: #fff;
+  font-size: clamp(1.95rem, 4.35vw, 3.05rem);
+  color: #fafafa;
+  text-shadow:
+    0 2px 28px rgb(0 0 0 / 0.55),
+    0 1px 0 rgb(0 0 0 / 0.35),
+    0 0 1px rgb(0 0 0 / 0.8);
 }
 
 .presentation-ppt-body {
   font-size: var(--ppt-body-size);
   line-height: var(--ppt-body-leading);
-  color: rgb(226 232 240 / 0.96);
+  font-weight: 500;
+  color: rgb(241 245 249 / 0.98);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
 }
 
 .presentation-ppt-caption {
-  font-size: 14px;
-  line-height: 1.55;
-  color: rgb(148 163 184);
+  font-size: 15px;
+  line-height: 1.58;
+  font-weight: 500;
+  color: rgb(203 213 225 / 0.95);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.45);
 }

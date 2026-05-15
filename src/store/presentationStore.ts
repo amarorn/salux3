@@ -26,6 +26,10 @@ interface PresentationState {
   transitionPhase: TransitionPhase;
   /** Slides governance com `revealPillars`: primeiro clique expande em vez de avançar. */
   governanceRevealExpanded: boolean;
+  /** Trilha Receita (`era-agentica`): revelação por cliques dentro do slide. */
+  eraStagedRevealStepId: string | null;
+  eraStagedRevealPhase: number;
+  eraStagedRevealMax: number;
   /** Totem vertical (9:16) ou tela de apresentação (16:9). Afeta escala do palco e câmera. */
   stageAspectMode: StageAspectMode;
   setGovernanceRevealExpanded: (value: boolean) => void;
@@ -44,6 +48,9 @@ interface PresentationState {
   reset: () => void;
   /** Volta ao ecrã inicial para escolher outra trilha (mantém a sessão na mesma rota). */
   returnToTrackSelection: () => void;
+  setEraStagedRevealConfig: (stepId: string, maxPhases: number) => void;
+  clearEraStagedReveal: () => void;
+  tryAdvanceEraStagedReveal: () => boolean;
 }
 
 const defaultTrackId: TrackId = 'era-agentica';
@@ -56,6 +63,12 @@ function firstIdForTrack(trackId: TrackId) {
   return tracksById[trackId].steps[0]!.id;
 }
 
+const eraRevealCleared = {
+  eraStagedRevealStepId: null as string | null,
+  eraStagedRevealPhase: 0,
+  eraStagedRevealMax: 0,
+};
+
 export const usePresentationStore = create<PresentationState>((set, get) => ({
   currentTrackId: defaultTrackId,
   currentStepId: firstIdForTrack(defaultTrackId),
@@ -64,6 +77,7 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
   showCornerLogo: false,
   transitionPhase: 'idle',
   governanceRevealExpanded: false,
+  ...eraRevealCleared,
   stageAspectMode: readStoredStageAspect(),
   setGovernanceRevealExpanded: (value) => set({ governanceRevealExpanded: value }),
   setStageAspectMode: (mode) => {
@@ -76,30 +90,56 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
   },
   setTrack: (id) => {
     const firstId = firstIdForTrack(id);
-    set({ currentTrackId: id, currentStepId: firstId, isOverview: false, governanceRevealExpanded: false });
+    set({
+      currentTrackId: id,
+      currentStepId: firstId,
+      isOverview: false,
+      governanceRevealExpanded: false,
+      ...eraRevealCleared,
+    });
   },
   setShowCornerLogo: (value) => set({ showCornerLogo: value }),
   setStep: (id) => {
     const orderedIds = orderedIdsForTrack(get().currentTrackId);
     if (!orderedIds.includes(id)) return;
-    set({ currentStepId: id, isOverview: false, governanceRevealExpanded: false });
+    set({
+      currentStepId: id,
+      isOverview: false,
+      governanceRevealExpanded: false,
+      ...eraRevealCleared,
+    });
   },
   next: () => {
     const orderedIds = orderedIdsForTrack(get().currentTrackId);
     const i = orderedIds.indexOf(get().currentStepId);
     const nextId = orderedIds[Math.min(i + 1, orderedIds.length - 1)]!;
-    set({ currentStepId: nextId, isOverview: false, governanceRevealExpanded: false });
+    set({
+      currentStepId: nextId,
+      isOverview: false,
+      governanceRevealExpanded: false,
+      ...eraRevealCleared,
+    });
   },
   prev: () => {
     const orderedIds = orderedIdsForTrack(get().currentTrackId);
     const i = orderedIds.indexOf(get().currentStepId);
     const prevId = orderedIds[Math.max(i - 1, 0)]!;
-    set({ currentStepId: prevId, isOverview: false, governanceRevealExpanded: false });
+    set({
+      currentStepId: prevId,
+      isOverview: false,
+      governanceRevealExpanded: false,
+      ...eraRevealCleared,
+    });
   },
   goToIndex: (index) => {
     const orderedIds = orderedIdsForTrack(get().currentTrackId);
     const id = orderedIds[Math.max(0, Math.min(index, orderedIds.length - 1))]!;
-    set({ currentStepId: id, isOverview: false, governanceRevealExpanded: false });
+    set({
+      currentStepId: id,
+      isOverview: false,
+      governanceRevealExpanded: false,
+      ...eraRevealCleared,
+    });
   },
   toggleOverview: () => set((s) => ({ isOverview: !s.isOverview })),
   setOverview: (value) => set({ isOverview: value }),
@@ -114,6 +154,7 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       hasEntered: false,
       transitionPhase: 'morphing',
       governanceRevealExpanded: false,
+      ...eraRevealCleared,
     });
   },
   reset: () =>
@@ -125,6 +166,7 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       showCornerLogo: false,
       transitionPhase: 'idle',
       governanceRevealExpanded: false,
+      ...eraRevealCleared,
     }),
   returnToTrackSelection: () =>
     set({
@@ -133,5 +175,24 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       showCornerLogo: false,
       isOverview: false,
       governanceRevealExpanded: false,
+      ...eraRevealCleared,
     }),
+  setEraStagedRevealConfig: (stepId, maxPhases) =>
+    set({
+      eraStagedRevealStepId: stepId,
+      eraStagedRevealPhase: 0,
+      eraStagedRevealMax: Math.max(1, maxPhases),
+    }),
+  clearEraStagedReveal: () => set(eraRevealCleared),
+  tryAdvanceEraStagedReveal: () => {
+    const s = get();
+    if (s.currentTrackId !== 'era-agentica') return false;
+    if (!s.eraStagedRevealStepId || s.eraStagedRevealStepId !== s.currentStepId) return false;
+    if (s.eraStagedRevealMax <= 1) return false;
+    if (s.eraStagedRevealPhase < s.eraStagedRevealMax - 1) {
+      set({ eraStagedRevealPhase: s.eraStagedRevealPhase + 1 });
+      return true;
+    }
+    return false;
+  },
 }));

@@ -20,6 +20,8 @@ export function usePresentationClickAdvance() {
 
       if (tryRevealGovernanceBeforeAdvance()) return;
 
+      if (usePresentationStore.getState().tryAdvanceEraStagedReveal()) return;
+
       store.next();
     };
 

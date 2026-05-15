@@ -29,6 +29,7 @@ const tecnologiaQueAgeStep: PresentationStep = {
   accent: 'cyan',
   content: {
     headline: 'Pontos de entrada',
+    omitSidePhoto: true,
     cardVisual: 'entry-points',
     valueStagesFlat: true,
     valueStagesGridCols: 3,
@@ -93,6 +94,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       subtitle: 'A perda se forma dentro da operação, todos os dias',
       content: {
         headline: 'Diagnóstico',
+        omitSidePhoto: true,
         cardVisual: 'pattern',
         metrics: [
           {
@@ -219,6 +221,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       subtitle: 'Da recuperação no final à proteção ao longo da jornada',
       content: {
         headline: 'Virada de lógica',
+        omitSidePhoto: true,
         cardVisual: 'transform',
         contrastPair: {
           left: {
@@ -253,6 +256,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       subtitle: 'Os 6 pontos que precisam funcionar como base coordenada',
       content: {
         headline: 'Base coordenada',
+        omitSidePhoto: true,
         cardVisual: 'mesh',
         valueStagesLead:
           'A proteção da receita depende de como a operação funciona como um todo — da origem ao faturamento.\n\nOs 6 pontos que precisam funcionar como base coordenada:',
@@ -355,6 +359,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map((s): Presentati
       subtitle: 'Sem agentes × Com agentes (Maria) — antecipação em vez de retrabalho',
       content: {
         headline: 'Agentes',
+        omitSidePhoto: true,
         cardVisual: 'radar',
         contrastPair: {
           left: {

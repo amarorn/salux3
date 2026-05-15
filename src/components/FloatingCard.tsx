@@ -34,6 +34,8 @@ export const FloatingCardContext = createContext<{
   bannerVideoSrc?: string;
   bannerVideoPoster?: string;
   trackId?: TrackId;
+  /** Esconde a faixa de foto/vídeo no topo; só o painel de conteúdo. */
+  omitSidePhoto?: boolean;
 } | null>(null);
 
 interface FloatingCardProps {
@@ -81,6 +83,7 @@ export function FloatingCard({
   const resolvedVideoSrc = bannerVideoSrc ?? ctx?.bannerVideoSrc;
   const resolvedVideoPoster = bannerVideoPoster ?? ctx?.bannerVideoPoster;
   const trackId = ctx?.trackId;
+  const omitSidePhoto = Boolean(ctx?.omitSidePhoto);
   const cardTextScale = trackId === 'era-agentica' ? TRACK1_CARD_TEXT_SCALE : BASE_CARD_TEXT_SCALE;
   const accentColor = theme.accents[accent];
   const reduceMotion = useReducedMotion();
@@ -100,6 +103,7 @@ export function FloatingCard({
       )}
       style={{ width: resolvedWidth }}
     >
+      {!omitSidePhoto && (
       <motion.div
         variants={photoMotion}
         initial={layerInitial}
@@ -152,12 +156,21 @@ export function FloatingCard({
           />
         )}
       </motion.div>
+      )}
 
       <motion.div
         variants={panelMotion}
         initial={layerInitial}
         animate={layerAnimate}
-        className={clsx('relative w-full min-h-[900px] p-12', className)}
+        className={clsx(
+          'relative w-full p-12',
+          omitSidePhoto ? 'min-h-[1100px] rounded-3xl border border-white/10' : 'min-h-[900px]',
+          omitSidePhoto &&
+            (active
+              ? 'border-white/18 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]'
+              : 'shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)]'),
+          className,
+        )}
       >
         {/* ── Luz cenográfica de fundo ── duas elipses defasadas + plano vinheta.
             Sem borda, sem container — o conteúdo "emerge" da escuridão. */}

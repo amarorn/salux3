@@ -1,9 +1,13 @@
-import { useContext } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion';
 import { FloatingCard, FloatingCardContext } from '../FloatingCard';
 import type { CapacityGroup, CapacityItem, PresentationStep } from '@/domain/types';
 import { theme } from '@/domain/theme';
 import { getCardTextVariants } from './cardTextMotion';
+import { usePresentationStore } from '@/store/presentationStore';
+import { EraRevealBand } from '@/components/motion/EraAgenticaReveal';
+import { buildCapacitiesBandKeys } from '@/lib/eraAgenticaRevealBands';
+import { ExpandedCardPortal } from './ExpandedCardPortal';
 
 interface Props {
   step: PresentationStep;
@@ -18,7 +22,8 @@ const TONE_COLORS: Record<CapacityGroup['tone'], { ring: string; chip: string }>
 export function CapacitiesStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const reduce = useReducedMotion();
-  const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
+  const cardCtx = useContext(FloatingCardContext);
+  const flipPhoto = cardCtx?.flipPhoto ?? false;
   const { container, item } = getCardTextVariants(
     Boolean(reduce),
     step.index,
@@ -26,6 +31,52 @@ export function CapacitiesStep({ step, active }: Props) {
     flipPhoto,
   );
   const groups = step.content.capacityGroups ?? [];
+  const trackId = cardCtx?.trackId;
+  const eraStaging = trackId === 'era-agentica';
+  const bandKeys = useMemo(() => buildCapacitiesBandKeys(step.content), [step.content]);
+  const b = (id: string) => bandKeys.indexOf(id);
+  const setEraCfg = usePresentationStore((s) => s.setEraStagedRevealConfig);
+  const clearEra = usePresentationStore((s) => s.clearEraStagedReveal);
+  const stagingLayout = Boolean(active && eraStaging && !reduce);
+
+  const [selectedCapacity, setSelectedCapacity] = useState<number | null>(null);
+  const capacityRefs = useRef<(HTMLLIElement | null)[]>([]);
+
+  const flatItems = useMemo(
+    () => groups.flatMap((group) =>
+      group.items.map((item) => ({ item, ring: TONE_COLORS[group.tone].ring })),
+    ),
+    [groups],
+  );
+
+  useEffect(() => {
+    if (!active) setSelectedCapacity(null);
+  }, [active]);
+
+  useEffect(() => {
+    if (selectedCapacity === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { e.stopPropagation(); setSelectedCapacity(null); }
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [selectedCapacity]);
+  const innerMotion = stagingLayout ? {} : { variants: item };
+  const outerContainer: Variants = stagingLayout ? { hidden: {}, visible: {} } : container;
+
+  useLayoutEffect(() => {
+    if (!active || !eraStaging) return;
+    if (reduce) {
+      setEraCfg(step.id, 1);
+      return () => {
+        if (usePresentationStore.getState().eraStagedRevealStepId === step.id) clearEra();
+      };
+    }
+    setEraCfg(step.id, bandKeys.length);
+    return () => {
+      if (usePresentationStore.getState().eraStagedRevealStepId === step.id) clearEra();
+    };
+  }, [active, eraStaging, reduce, step.id, bandKeys.length, setEraCfg, clearEra]);
 
   return (
     <FloatingCard
@@ -38,27 +89,60 @@ export function CapacitiesStep({ step, active }: Props) {
     >
       <motion.div
         className="flex flex-col gap-6"
-        variants={container}
+        variants={outerContainer}
         initial={reduce ? false : 'hidden'}
         animate={active ? 'visible' : 'hidden'}
       >
-        <motion.div variants={item}>
-          <h2
-            className="presentation-ppt-title max-w-[26ch] text-[clamp(1.9rem,4.2vw,2.75rem)] leading-[1.1]"
-            style={{ textShadow: `0 0 28px ${accent.base}22` }}
-          >
-            {step.content.headline ?? 'Capacidades coordenadas'}
-          </h2>
-        </motion.div>
+        <EraRevealBand
+          bandId="headline"
+          bandIndex={b('headline')}
+          stepId={step.id}
+          stepIndex={step.index}
+          eraStaging={eraStaging}
+          active={active}
+        >
+          <motion.div {...innerMotion}>
+            <h2
+              className="presentation-ppt-title max-w-[26ch] text-[clamp(1.9rem,4.2vw,2.75rem)] leading-[1.1]"
+              style={{ textShadow: `0 0 28px ${accent.base}22` }}
+            >
+              {step.content.headline ?? 'Capacidades coordenadas'}
+            </h2>
+          </motion.div>
+        </EraRevealBand>
 
         {step.content.body && (
-          <motion.p variants={item} className="presentation-ppt-body text-[1.05rem] leading-relaxed text-slate-200/95 whitespace-pre-line">
-            {step.content.body}
-          </motion.p>
+          <EraRevealBand
+            bandId="body"
+            bandIndex={b('body')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.p
+              {...innerMotion}
+              className="presentation-ppt-body text-[1.08rem] leading-relaxed text-slate-100/96 whitespace-pre-line"
+            >
+              {step.content.body}
+            </motion.p>
+          </EraRevealBand>
         )}
 
-        {groups.map((group, gi) => (
-          <motion.section variants={item} key={group.title} className="flex flex-col gap-3">
+        {groups.map((group, gi) => {
+          const groupBandKey = `group:${gi}:${group.title}`;
+          const groupOffset = groups.slice(0, gi).reduce((acc, g) => acc + g.items.length, 0);
+          return (
+          <EraRevealBand
+            key={group.title}
+            bandId={groupBandKey}
+            bandIndex={b(groupBandKey)}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+          <motion.section {...innerMotion} className="flex flex-col gap-3">
             <header className="flex items-center gap-3">
               <span
                 className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em]"
@@ -87,19 +171,42 @@ export function CapacitiesStep({ step, active }: Props) {
             </header>
 
             <ul className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-              {group.items.map((it, i) => (
-                <CapacityCard
-                  key={it.name}
-                  item={it}
-                  ring={TONE_COLORS[group.tone].ring}
-                  delay={gi * 0.1 + i * 0.06}
-                  reduce={Boolean(reduce)}
-                  active={active}
-                />
-              ))}
+              {group.items.map((it, i) => {
+                const fi = groupOffset + i;
+                return (
+                  <CapacityCard
+                    key={it.name}
+                    item={it}
+                    ring={TONE_COLORS[group.tone].ring}
+                    delay={gi * 0.1 + i * 0.06}
+                    reduce={Boolean(reduce)}
+                    active={active}
+                    selected={selectedCapacity === fi}
+                    dimmed={selectedCapacity !== null && selectedCapacity !== fi}
+                    onClick={() => setSelectedCapacity((s) => (s === fi ? null : fi))}
+                    refCallback={(el) => { capacityRefs.current[fi] = el; }}
+                  />
+                );
+              })}
             </ul>
           </motion.section>
-        ))}
+          </EraRevealBand>
+          );
+        })}
+
+        <AnimatePresence>
+          {selectedCapacity !== null && flatItems[selectedCapacity] !== undefined && (
+            <ExpandedCardPortal
+              key={`cap-expanded-${selectedCapacity}`}
+              text={flatItems[selectedCapacity]!.item.name}
+              description={[flatItems[selectedCapacity]!.item.subtitle, flatItems[selectedCapacity]!.item.description, flatItems[selectedCapacity]!.item.tagline].filter(Boolean).join('\n\n') || undefined}
+              accentColor={flatItems[selectedCapacity]!.ring}
+              reducedMotion={Boolean(reduce)}
+              origin={capacityRefs.current[selectedCapacity] ?? null}
+              onClose={() => setSelectedCapacity(null)}
+            />
+          )}
+        </AnimatePresence>
       </motion.div>
     </FloatingCard>
   );
@@ -111,34 +218,57 @@ function CapacityCard({
   delay,
   reduce,
   active,
+  selected,
+  dimmed,
+  onClick,
+  refCallback,
 }: {
   item: CapacityItem;
   ring: string;
   delay: number;
   reduce: boolean;
   active: boolean;
+  selected: boolean;
+  dimmed: boolean;
+  onClick: () => void;
+  refCallback: (el: HTMLLIElement | null) => void;
 }) {
   return (
     <motion.li
+      ref={refCallback}
+      data-no-click-advance
+      role="button"
+      tabIndex={0}
+      aria-expanded={selected}
+      aria-label={item.name}
       initial={reduce ? false : { opacity: 0, y: 12, scale: 0.96, filter: 'blur(6px)' }}
       animate={
-        active
-          ? { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
-          : reduce
-            ? undefined
-            : { opacity: 0, y: 12, scale: 0.96, filter: 'blur(6px)' }
+        !active
+          ? reduce ? undefined : { opacity: 0, y: 12, scale: 0.96, filter: 'blur(6px)' }
+          : dimmed
+            ? { opacity: 0.35, scale: 0.97, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }
+            : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
       }
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.2 + delay }}
       whileHover={
-        reduce
+        reduce || dimmed
           ? undefined
           : { y: -2, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }
       }
-      className="group relative overflow-hidden rounded-2xl border px-4 py-3"
+      whileTap={reduce ? undefined : { scale: 0.96 }}
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); }
+      }}
+      className="group relative cursor-pointer overflow-hidden rounded-2xl border px-4 py-3 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
       style={{
-        borderColor: `${ring}44`,
-        background: `linear-gradient(135deg, ${ring}14 0%, rgba(255,255,255,0.02) 100%)`,
-        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05)`,
+        borderColor: selected ? `${ring}aa` : `${ring}44`,
+        background: selected
+          ? `linear-gradient(135deg, ${ring}24 0%, rgba(255,255,255,0.04) 100%)`
+          : `linear-gradient(135deg, ${ring}14 0%, rgba(255,255,255,0.02) 100%)`,
+        boxShadow: selected
+          ? `inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px ${ring}55, 0 16px 40px -8px ${ring}44`
+          : `inset 0 1px 0 rgba(255,255,255,0.05)`,
       }}
     >
       <motion.span

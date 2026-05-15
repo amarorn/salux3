@@ -165,6 +165,8 @@ export interface StepContent {
   agentFunctions?: string[];
   /** Card 11 — cards de resultados. */
   resultsCards?: string[];
+  /** Sem coluna de foto/banner no topo — só o painel de texto (layout vertical do card). */
+  omitSidePhoto?: boolean;
   /** Vídeo no banner do card (substitui a foto lateral). */
   bannerMedia?: BannerMedia;
   /** Par de contraste (ex.: visível × despercebido) usado na capa. */

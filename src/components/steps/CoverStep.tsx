@@ -1,9 +1,12 @@
-import { useContext } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useContext, useLayoutEffect, useMemo } from 'react';
+import { motion, useReducedMotion, type Variants } from 'framer-motion';
 import { FloatingCard, FloatingCardContext } from '../FloatingCard';
 import type { ContrastItem, PresentationStep } from '@/domain/types';
 import { theme } from '@/domain/theme';
 import { getCardTextVariants } from './cardTextMotion';
+import { usePresentationStore } from '@/store/presentationStore';
+import { EraRevealBand } from '@/components/motion/EraAgenticaReveal';
+import { buildCoverBandKeys } from '@/lib/eraAgenticaRevealBands';
 
 interface Props {
   step: PresentationStep;
@@ -57,7 +60,7 @@ function ContrastColumn({
           {item.label}
         </span>
       </div>
-      <p className="text-[0.92rem] leading-snug text-white/85 whitespace-pre-line">{item.text}</p>
+      <p className="text-[0.96rem] leading-snug text-white/92 whitespace-pre-line">{item.text}</p>
     </motion.div>
   );
 }
@@ -76,6 +79,29 @@ export function CoverStep({ step, active }: Props) {
   const contrast = step.content.contrastPair;
   const attention = step.content.attentionPhrase;
   const enriched = Boolean(contrast || attention);
+  const trackId = useContext(FloatingCardContext)?.trackId;
+  const eraStaging = trackId === 'era-agentica';
+  const bandKeys = useMemo(() => buildCoverBandKeys(step.content), [step.content]);
+  const b = (id: string) => bandKeys.indexOf(id);
+  const setEraCfg = usePresentationStore((s) => s.setEraStagedRevealConfig);
+  const clearEra = usePresentationStore((s) => s.clearEraStagedReveal);
+  const stagingLayout = Boolean(active && eraStaging && !reduceMotion);
+  const innerMotion = stagingLayout ? {} : { variants: item };
+  const outerContainer: Variants = stagingLayout ? { hidden: {}, visible: {} } : container;
+
+  useLayoutEffect(() => {
+    if (!active || !eraStaging) return;
+    if (reduceMotion) {
+      setEraCfg(step.id, 1);
+      return () => {
+        if (usePresentationStore.getState().eraStagedRevealStepId === step.id) clearEra();
+      };
+    }
+    setEraCfg(step.id, bandKeys.length);
+    return () => {
+      if (usePresentationStore.getState().eraStagedRevealStepId === step.id) clearEra();
+    };
+  }, [active, eraStaging, reduceMotion, step.id, bandKeys.length, setEraCfg, clearEra]);
 
   return (
     <FloatingCard
@@ -89,43 +115,87 @@ export function CoverStep({ step, active }: Props) {
     >
       <motion.div
         className="flex flex-col items-start gap-5"
-        variants={container}
+        variants={outerContainer}
         initial={reduceMotion ? false : 'hidden'}
         animate={active ? 'visible' : 'hidden'}
       >
-        <motion.h1
-          variants={item}
-          className="presentation-ppt-title max-w-[22ch] text-[clamp(2.2rem,5.5vw,3.15rem)] whitespace-pre-line"
+        <EraRevealBand
+          bandId="title"
+          bandIndex={b('title')}
+          stepId={step.id}
+          stepIndex={step.index}
+          eraStaging={eraStaging}
+          active={active}
         >
-          {step.title}
-        </motion.h1>
+          <motion.h1
+            {...innerMotion}
+            className="presentation-ppt-title max-w-[22ch] text-[clamp(2.2rem,5.5vw,3.15rem)] whitespace-pre-line"
+          >
+            {step.title}
+          </motion.h1>
+        </EraRevealBand>
 
         {step.content.lead && (
-          <motion.p
-            variants={item}
-            className="presentation-ppt-body max-w-prose whitespace-pre-line text-slate-200/90"
+          <EraRevealBand
+            bandId="lead"
+            bandIndex={b('lead')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
           >
-            {step.content.lead}
-          </motion.p>
+            <motion.p
+              {...innerMotion}
+              className="presentation-ppt-body max-w-prose whitespace-pre-line text-slate-100/95"
+            >
+              {step.content.lead}
+            </motion.p>
+          </EraRevealBand>
         )}
 
         {contrast && (
-          <motion.div variants={item} className="flex w-full gap-3">
-            <ContrastColumn item={contrast.left} active={active} reduce={Boolean(reduceMotion)} delay={0.55} />
-            <ContrastColumn item={contrast.right} active={active} reduce={Boolean(reduceMotion)} delay={0.7} />
-          </motion.div>
+          <EraRevealBand
+            bandId="contrastPair"
+            bandIndex={b('contrastPair')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion} className="flex w-full gap-3">
+              <ContrastColumn item={contrast.left} active={active} reduce={Boolean(reduceMotion)} delay={0.55} />
+              <ContrastColumn item={contrast.right} active={active} reduce={Boolean(reduceMotion)} delay={0.7} />
+            </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.body && (
-          <motion.p variants={item} className="presentation-ppt-body max-w-prose whitespace-pre-line">
-            {step.content.body}
-          </motion.p>
+          <EraRevealBand
+            bandId="body"
+            bandIndex={b('body')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.p {...innerMotion} className="presentation-ppt-body max-w-prose whitespace-pre-line">
+              {step.content.body}
+            </motion.p>
+          </EraRevealBand>
         )}
 
         {attention && (
-          <motion.div
-            variants={item}
-            className="relative w-full overflow-hidden rounded-2xl border px-5 py-4"
+          <EraRevealBand
+            bandId="attention"
+            bandIndex={b('attention')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div
+              {...innerMotion}
+              className="relative w-full overflow-hidden rounded-2xl border px-5 py-4"
             style={{
               borderColor: `${accent.base}55`,
               background: `linear-gradient(135deg, ${accent.base}1f 0%, transparent 65%)`,
@@ -152,6 +222,7 @@ export function CoverStep({ step, active }: Props) {
               “{attention}”
             </p>
           </motion.div>
+          </EraRevealBand>
         )}
 
       </motion.div>
