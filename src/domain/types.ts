@@ -15,7 +15,7 @@ export type NodeKind =
 
 export interface CapacityItem {
   name: string;
-  subtitle: string;
+  subtitle?: string;
   description?: string;
   tagline: string;
 }
@@ -60,6 +60,8 @@ export interface ValueStage {
   label: string;
   /** Descrição curta. Opcional — quando ausente, só o número + label aparecem. */
   description?: string;
+  /** URL do mídia associada (ex.: vídeo ou imagem). */
+  mediaUrl?: string;
 }
 
 export type Accent = "violet" | "cyan" | "emerald" | "amber" | "rose" | "slate";

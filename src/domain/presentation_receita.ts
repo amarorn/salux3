@@ -42,11 +42,17 @@ const tecnologiaQueAgeStep: PresentationStep = {
         label: "Glosa / Faturamento",
         description: "→ Plataforma Salux (Ciclo de Receita)",
       },
-      { number: "📄", label: "Documentação", description: "→ ZeroDox" },
+      {
+        number: "📄",
+        label: "Documentação",
+        description: "→ ZeroDox",
+        mediaUrl: "/intro/zerodox.mp4",
+      },
       {
         number: "🏥",
         label: "Centro cirúrgico",
         description: "→ SkyMed + VisionPilot",
+        mediaUrl: "/intro/skymed.mp4",
       },
       { number: "👥", label: "Equipe / Custo", description: "→ StarGrid" },
       {
@@ -342,21 +348,18 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
               items: [
                 {
                   name: "Base operacional",
-                  subtitle: "Plataforma Salux",
                   description:
                     "Base estruturada que reduz retrabalho na origem.",
                   tagline: "A consistência da operação começa aqui.",
                 },
                 {
                   name: "Ciclo de receita",
-                  subtitle: "Plataforma Salux",
                   description:
                     "Acompanhamento do fluxo que reduz perda ao longo da jornada.",
                   tagline: "A glosa deixa de ser descoberta no final.",
                 },
                 {
                   name: "Governança documental",
-                  subtitle: "ZeroDox",
                   description:
                     "Documentação estruturada que sustenta receita e reduz glosa.",
                   tagline:
@@ -370,20 +373,17 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
               items: [
                 {
                   name: "Força de trabalho",
-                  subtitle: "StarGrid",
                   description: "Reduz custo invisível e aumenta produtividade.",
                   tagline: "Escala e alocação deixam de ser ruído.",
                 },
                 {
                   name: "Centro cirúrgico",
-                  subtitle: "SkyMed · VisionPilot",
                   description:
                     "Registro anestésico estruturado e leitura da operação em tempo real.",
                   tagline: "Alta complexidade exige controle constante.",
                 },
                 {
                   name: "Inteligência em tempo real",
-                  subtitle: "VisionPilot",
                   description: "A operação deixa de ser analisada depois.",
                   tagline: "Passa a ser acompanhada enquanto acontece.",
                 },
@@ -445,10 +445,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
           headline: "A perda deixa de ser invisível.",
           cardVisual: "flow",
           body: "Com uma base operacional coordenada, a receita deixa de ser recuperada no final e passa a ser protegida ao longo da jornada.",
-          bannerMedia: {
-            videoSrc: "/intro/painel-produtividade-loop.mp4",
-            posterSrc: "/intro/painel-produtividade-poster.jpg",
-          },
+
           valueStagesFlat: true,
           valueStagesGridCols: 3,
           valueStages: [
