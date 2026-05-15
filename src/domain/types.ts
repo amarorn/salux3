@@ -126,7 +126,8 @@ export interface StepContent {
     type: "risk-curve" | "stats-fragilidade" | "custo-reconstrucao";
     caption?: string;
   };
-  heroImage?: { src: string; alt?: string };
+  /** `transparentCutout`: PNG com alpha — fundo do banner = app; sem vinheta pesada. */
+  heroImage?: { src: string; alt?: string; transparentCutout?: boolean };
   /** Trilha assistencial: oculta diagrama de camadas; foco em texto e evidência. */
   architectureMinimal?: boolean;
   /** Trilha assistencial: oculta grelha de sistemas; foco narrativo. */

@@ -23,6 +23,7 @@ import { getCardTextVariants } from "./cardTextMotion";
 import { usePresentationStore } from "@/store/presentationStore";
 import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildCapacitiesBandKeys } from "@/lib/eraAgenticaRevealBands";
+import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
 import { ExpandedCardPortal } from "./ExpandedCardPortal";
 import { ProductExamplesStrip } from "./ProductExamplesStrip";
 
@@ -52,8 +53,7 @@ export function CapacitiesStep({ step, active }: Props) {
   );
   const groups = step.content.capacityGroups ?? [];
   const productExamples = step.content.productExamples ?? [];
-  const trackId = cardCtx?.trackId;
-  const eraStaging = trackId === "era-agentica";
+  const eraStaging = trackUsesEraStagedReveal(cardCtx?.trackId);
   const bandKeys = useMemo(
     () => buildCapacitiesBandKeys(step.content),
     [step.content],
@@ -128,6 +128,9 @@ export function CapacitiesStep({ step, active }: Props) {
       stepId={step.id}
       sidePhotoSrc={step.content.heroImage?.src}
       sidePhotoAlt={step.content.heroImage?.alt}
+      bannerTransparentCutout={Boolean(
+        step.content.heroImage?.transparentCutout,
+      )}
       width={760}
       badge={step.title}
       cardVisual={step.content.cardVisual}

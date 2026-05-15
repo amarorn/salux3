@@ -12,6 +12,8 @@ interface CinematicBannerProps {
   active: boolean;
   /** Quantidade de partículas (default 5). */
   particles?: number;
+  /** Arte com transparência: fundo escuro fixo, `object-contain`, overlays mínimos. */
+  transparentCutout?: boolean;
 }
 
 /**
@@ -27,10 +29,10 @@ export function CinematicBanner({
   accentColor,
   active,
   particles = 5,
+  transparentCutout = false,
 }: CinematicBannerProps) {
   const reduceMotion = useReducedMotion();
 
-  // Posições aleatórias estáveis para as partículas (memoized por src)
   const particleSeeds = useMemo(() => {
     let seed = 0;
     for (let i = 0; i < src.length; i++) seed = (seed * 31 + src.charCodeAt(i)) >>> 0;
@@ -52,6 +54,22 @@ export function CinematicBanner({
       opacity: 0.4 + rand() * 0.4,
     }));
   }, [src, particles]);
+
+  if (transparentCutout) {
+    return (
+      <>
+        <div className="absolute inset-0 bg-[#05070d]" aria-hidden />
+        <div className="absolute inset-0 flex items-center justify-center p-3">
+          <img
+            src={src}
+            alt={alt ?? ""}
+            {...(!alt ? { "aria-hidden": true as const } : {})}
+            className="max-h-full max-w-full object-contain object-center"
+          />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

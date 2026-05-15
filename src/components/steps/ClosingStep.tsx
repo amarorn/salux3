@@ -23,6 +23,7 @@ import { resolveContactFormUrl } from "@/config/contact";
 import { usePresentationStore } from "@/store/presentationStore";
 import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildClosingBandKeys } from "@/lib/eraAgenticaRevealBands";
+import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
 import { ExpandedCardPortal } from "./ExpandedCardPortal";
 
 const FORM_BUTTON_CLASS =
@@ -68,7 +69,7 @@ export function ClosingStep({ step, active }: Props) {
     return () => window.removeEventListener("keydown", onKey, true);
   }, [selectedBenefit]);
   const trackId = useContext(FloatingCardContext)?.trackId;
-  const eraStaging = trackId === "era-agentica";
+  const eraStaging = trackUsesEraStagedReveal(trackId);
   const bandKeys = useMemo(
     () => buildClosingBandKeys(step.content),
     [step.content],

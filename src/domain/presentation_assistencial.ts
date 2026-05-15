@@ -1,6 +1,6 @@
 import type { PresentationStep } from "./types";
 import trilha2CoverUrl from "@/assets/presentation/trilha2-cover-paciente.png?url";
-import trilha2JornadaUrl from "@/assets/presentation/trilha2-jornada-isometrica.png?url";
+import trilha2JornadaUrl from "@/assets/presentation/trilha2-jornada-isometrica-sf.png?url";
 import trilha2ComandoUrl from "@/assets/presentation/trilha2-comando-clinico.png?url";
 import trilha2RedeUrl from "@/assets/presentation/trilha2-rede-conectada.png?url";
 import trilha2IntegracaoUrl from "@/assets/presentation/trilha2-integracao-rede.png?url";
@@ -232,6 +232,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       heroImage: {
         src: trilha2JornadaUrl,
         alt: "Jornada assistencial conectando recepção, consultório, exames e enfermaria",
+        transparentCutout: true,
       },
     }),
   )

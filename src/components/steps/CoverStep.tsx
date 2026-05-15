@@ -7,6 +7,7 @@ import { getCardTextVariants } from "./cardTextMotion";
 import { usePresentationStore } from "@/store/presentationStore";
 import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildCoverBandKeys } from "@/lib/eraAgenticaRevealBands";
+import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
 
 interface Props {
   step: PresentationStep;
@@ -97,7 +98,7 @@ export function CoverStep({ step, active }: Props) {
   const attention = step.content.attentionPhrase;
   const enriched = Boolean(contrast || attention);
   const trackId = useContext(FloatingCardContext)?.trackId;
-  const eraStaging = trackId === "era-agentica";
+  const eraStaging = trackUsesEraStagedReveal(trackId);
   const bandKeys = useMemo(
     () => buildCoverBandKeys(step.content),
     [step.content],
@@ -144,6 +145,7 @@ export function CoverStep({ step, active }: Props) {
       stepId={step.id}
       sidePhotoSrc={hero?.src}
       sidePhotoAlt={hero?.alt}
+      bannerTransparentCutout={Boolean(hero?.transparentCutout)}
       hideValueFlow={true}
       // cardVisual={step.content.cardVisual}
     >

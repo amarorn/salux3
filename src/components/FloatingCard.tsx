@@ -19,10 +19,8 @@ import {
   type CardVisualVariant,
 } from "@/components/visuals/CardVisualVariants";
 
-/** Escala base para melhorar leitura sem perder composição do layout. */
+/** Escala base para melhorar leitura sem perder composição do layout (todas as trilhas). */
 const BASE_CARD_TEXT_SCALE = 1.08;
-/** Trilha 1 (`era-agentica` — Receita): mantém um pequeno ganho adicional. */
-const TRACK1_CARD_TEXT_SCALE = 1.12;
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
@@ -64,6 +62,8 @@ interface FloatingCardProps {
   bannerVideoPoster?: string;
   /** Atribui uma foto distinta por slide (`config/assetUrls`). */
   stepId?: string;
+  /** Banner com PNG transparente: fundo `#05070d`, sem tratamento “foto cheia”. */
+  bannerTransparentCutout?: boolean;
   /** Desativa o visual decorativo no rodapé do painel. */
   hideValueFlow?: boolean;
   /** Variante temática do visual de rodapé (default: 'flow'). */
@@ -84,6 +84,7 @@ export function FloatingCard({
   bannerVideoSrc,
   bannerVideoPoster,
   stepId,
+  bannerTransparentCutout = false,
   hideValueFlow,
   cardVisual,
   children,
@@ -93,10 +94,8 @@ export function FloatingCard({
   const resolvedWidth = ctx?.forceWidth ?? width;
   const resolvedVideoSrc = bannerVideoSrc ?? ctx?.bannerVideoSrc;
   const resolvedVideoPoster = bannerVideoPoster ?? ctx?.bannerVideoPoster;
-  const trackId = ctx?.trackId;
   const omitSidePhoto = Boolean(ctx?.omitSidePhoto);
-  const cardTextScale =
-    trackId === "era-agentica" ? TRACK1_CARD_TEXT_SCALE : BASE_CARD_TEXT_SCALE;
+  const cardTextScale = BASE_CARD_TEXT_SCALE;
   const accentColor = theme.accents[accent];
   const reduceMotion = useReducedMotion();
   const photoMotion = getPhotoColumnVariants(resolvedFlip);
@@ -122,6 +121,7 @@ export function FloatingCard({
           animate={layerAnimate}
           className={clsx(
             "relative h-[460px] w-full mt-5 shrink-0 overflow-hidden rounded-3xl duration-500 ease-out",
+            bannerTransparentCutout && "bg-[#05070d]",
             active
               ? "border-white/20 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"
               : "shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)] group-hover:-translate-y-1 group-hover:border-white/16",
@@ -165,6 +165,7 @@ export function FloatingCard({
               alt={photoAlt}
               accentColor={accentColor.base}
               active={active}
+              transparentCutout={bannerTransparentCutout}
             />
           )}
         </motion.div>

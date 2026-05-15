@@ -53,6 +53,7 @@ import {
 import { usePresentationStore } from "@/store/presentationStore";
 import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildNarrativeBandKeys } from "@/lib/eraAgenticaRevealBands";
+import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
 import { ExpandedCardPortal, renderExpandedCardPrefixContent } from "./ExpandedCardPortal";
 
 interface Props {
@@ -70,7 +71,7 @@ export function NarrativeStep({ step, active }: Props) {
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
   const trackId = useContext(FloatingCardContext)?.trackId;
-  const eraStaging = trackId === "era-agentica";
+  const eraStaging = trackUsesEraStagedReveal(trackId);
   const { container, item } = getCardTextVariants(
     Boolean(reduceMotion),
     step.index,
@@ -218,6 +219,7 @@ export function NarrativeStep({ step, active }: Props) {
       stepId={step.id}
       sidePhotoSrc={hero?.src}
       sidePhotoAlt={hero?.alt}
+      bannerTransparentCutout={Boolean(hero?.transparentCutout)}
       cardVisual={step.content.cardVisual}
       hideValueFlow={true}
       width={
