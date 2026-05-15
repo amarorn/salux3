@@ -1,16 +1,16 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { IntroScreen } from './components/IntroScreen';
-import { PresentationCanvas } from './components/PresentationCanvas';
-import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
-import { usePresentationClickAdvance } from './hooks/usePresentationClickAdvance';
-import { usePresentationStore } from './store/presentationStore';
-import { IntroBackground } from './components/intro/IntroBackground';
-import { PresentationCornerLogo } from './components/PresentationCornerLogo';
-import { MaestroOrb } from './components/MaestroOrb';
-import { PresentationNavArrows } from './components/PresentationNavArrows';
-import { TransitionMorph } from './components/intro/TransitionMorph';
-import { Stage } from './components/Stage';
-import './styles/presentationHierarchy.css';
+import { AnimatePresence, motion } from "framer-motion";
+import { IntroScreen } from "./components/IntroScreen";
+import { PresentationCanvas } from "./components/PresentationCanvas";
+import { useKeyboardNavigation } from "./hooks/useKeyboardNavigation";
+import { usePresentationClickAdvance } from "./hooks/usePresentationClickAdvance";
+import { usePresentationStore } from "./store/presentationStore";
+import { IntroBackground } from "./components/intro/IntroBackground";
+import { PresentationCornerLogo } from "./components/PresentationCornerLogo";
+import { MaestroOrb } from "./components/MaestroOrb";
+import { PresentationNavArrows } from "./components/PresentationNavArrows";
+import { TransitionMorph } from "./components/intro/TransitionMorph";
+import { Stage } from "./components/Stage";
+import "./styles/presentationHierarchy.css";
 
 /** Fluxo original: intro → morph → apresentação espacial (rota `/apresentacao`). */
 export function PresentationApp() {
@@ -21,7 +21,7 @@ export function PresentationApp() {
   const transitionPhase = usePresentationStore((s) => s.transitionPhase);
   const finishTransition = usePresentationStore((s) => s.finishTransition);
   const cornerLogoVisible =
-    (showCornerLogo || hasEntered) && transitionPhase !== 'morphing';
+    (showCornerLogo || hasEntered) && transitionPhase !== "morphing";
 
   return (
     <Stage>
@@ -32,11 +32,13 @@ export function PresentationApp() {
         <MaestroOrb visible={cornerLogoVisible} />
 
         <AnimatePresence>
-          {transitionPhase === 'idle' && !hasEntered && <IntroScreen key="intro" />}
+          {transitionPhase === "idle" && !hasEntered && (
+            <IntroScreen key="intro" />
+          )}
         </AnimatePresence>
 
         <AnimatePresence>
-          {transitionPhase === 'morphing' && (
+          {transitionPhase === "morphing" && (
             <TransitionMorph key="transition" onComplete={finishTransition} />
           )}
         </AnimatePresence>
@@ -45,8 +47,8 @@ export function PresentationApp() {
           {hasEntered && (
             <motion.div
               key="presentation"
-              initial={{ opacity: 0, scale: 0.96, filter: 'blur(6px)' }}
-              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              initial={{ opacity: 0, scale: 0.96, filter: "blur(6px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "" }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="absolute inset-0"
             >
@@ -55,7 +57,9 @@ export function PresentationApp() {
           )}
         </AnimatePresence>
 
-        {hasEntered && transitionPhase !== 'morphing' && <PresentationNavArrows />}
+        {hasEntered && transitionPhase !== "morphing" && (
+          <PresentationNavArrows />
+        )}
       </main>
     </Stage>
   );

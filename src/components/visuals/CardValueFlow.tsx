@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from "framer-motion";
 
 interface Props {
   accentColor: string;
@@ -21,9 +21,10 @@ export function CardValueFlow({ accentColor, active, caption }: Props) {
   const height = 120;
 
   // Caminho "ruptura" — sobe e desce, com falhas
-  const brokenPath = 'M 20 50 L 100 50 M 130 50 L 230 28 M 260 28 L 360 64 M 390 64 L 490 36 M 520 36 L 580 50';
+  const brokenPath =
+    "M 20 50 L 100 50 M 130 50 L 230 28 M 260 28 L 360 64 M 390 64 L 490 36 M 520 36 L 580 50";
   // Caminho "contínuo" — uma curva suave e ascendente
-  const flowPath = 'M 20 90 C 120 90, 180 80, 280 70 S 460 50, 580 40';
+  const flowPath = "M 20 90 C 120 90, 180 80, 280 70 S 460 50, 580 40";
 
   // Pontos no caminho contínuo para os dots pulsantes
   const dots = [
@@ -41,7 +42,7 @@ export function CardValueFlow({ accentColor, active, caption }: Props) {
         className="block w-full"
         aria-hidden
         preserveAspectRatio="none"
-        style={{ height: 'clamp(110px, 18vh, 160px)' }}
+        style={{ height: "clamp(110px, 18vh, 160px)" }}
       >
         <defs>
           <linearGradient id="flow-grad" x1="0" y1="0" x2="1" y2="0">
@@ -57,7 +58,11 @@ export function CardValueFlow({ accentColor, active, caption }: Props) {
           </linearGradient>
           <filter id="flow-glow" x="-20%" y="-50%" width="140%" height="200%">
             <feGaussianBlur stdDeviation="2.5" />
-            <feComposite in="SourceGraphic" in2="SourceGraphic" operator="over" />
+            <feComposite
+              in="SourceGraphic"
+              in2="SourceGraphic"
+              operator="over"
+            />
           </filter>
         </defs>
 
@@ -167,7 +172,7 @@ export function CardValueFlow({ accentColor, active, caption }: Props) {
               }
               transition={{
                 duration: 2.6,
-                ease: 'easeOut',
+                ease: "easeOut",
                 repeat: Infinity,
                 delay: 1.5 + d.d * 0.3,
               }}
