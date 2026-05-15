@@ -103,6 +103,7 @@ export const steps: PresentationStep[] = [
     accent: "emerald",
     content: {
       headline: "O agente é discreto — a experiência é evidente.",
+      omitSidePhoto: true,
       body: "O paciente conversa em linguagem natural. Por trás, agentes coordenam triagem, agenda, autorização e follow-up sem fricção visível.",
       bullets: [
         "Triagem assistida em segundos, com explicabilidade clínica",

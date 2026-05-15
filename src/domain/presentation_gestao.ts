@@ -164,6 +164,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
       content: {
         headline: 'Base de coordenação',
         cardVisual: 'funnel',
+        omitSidePhoto: true,
         valueStagesLead:
           'Não se trata de informatizar mais uma etapa. Trata-se de fazer todos os elementos da rede funcionarem com a mesma lógica de execução.\n\nOs 8 pontos de uma rede coordenada:',
         valueStagesFlat: true,
