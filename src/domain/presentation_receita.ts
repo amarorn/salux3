@@ -163,6 +163,8 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
           cardVisual: "accumulation",
           valueStagesLead:
             "Ao longo da jornada assistencial, a conversão do cuidado em receita passa por quatro etapas críticas:",
+          valueStagesFlat: true,
+          valueStagesGridCols: 4,
           valueStages: [
             {
               number: "01",

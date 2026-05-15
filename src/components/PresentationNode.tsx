@@ -127,7 +127,7 @@ function CardFlipShell({
           aria-roledescription="Slide"
           aria-current={active ? 'step' : undefined}
           aria-label={stepLabel}
-          className="group block cursor-pointer rounded-3xl text-left outline-none focus-visible:ring-4 focus-visible:ring-violet-300/60"
+          className="group block rounded-3xl text-left outline-none focus-visible:ring-4 focus-visible:ring-violet-300/60"
         >
           {children}
         </div>
@@ -147,7 +147,12 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
   return (
     <motion.div
       className="absolute"
-      style={{ left: step.position.x, top: step.position.y }}
+      style={{
+        left: step.position.x,
+        top: step.position.y,
+        zIndex: active ? 30 : step.index,
+        pointerEvents: faded ? 'none' : 'auto',
+      }}
       initial={{ opacity: 0, y: 24 }}
       animate={{
         opacity: faded ? 0.34 : 1,
