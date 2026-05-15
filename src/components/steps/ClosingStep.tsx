@@ -16,6 +16,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FloatingCard, FloatingCardContext } from "../FloatingCard";
 import type { PresentationStep } from "@/domain/types";
+import { trackUsesPremiumStagedPresentation } from "@/domain/trackPresentation";
 import { theme } from "@/domain/theme";
 import { getCardTextVariants } from "./cardTextMotion";
 import { ClosingHighlight, HighlightPhraseList } from "./HighlightBlocks";
@@ -68,7 +69,7 @@ export function ClosingStep({ step, active }: Props) {
     return () => window.removeEventListener("keydown", onKey, true);
   }, [selectedBenefit]);
   const trackId = useContext(FloatingCardContext)?.trackId;
-  const eraStaging = trackId === "era-agentica";
+  const eraStaging = trackUsesPremiumStagedPresentation(trackId);
   const bandKeys = useMemo(
     () => buildClosingBandKeys(step.content),
     [step.content],

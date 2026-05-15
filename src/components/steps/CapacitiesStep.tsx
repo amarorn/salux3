@@ -18,6 +18,7 @@ import type {
   CapacityItem,
   PresentationStep,
 } from "@/domain/types";
+import { trackUsesPremiumStagedPresentation } from "@/domain/trackPresentation";
 import { theme } from "@/domain/theme";
 import { getCardTextVariants } from "./cardTextMotion";
 import { usePresentationStore } from "@/store/presentationStore";
@@ -53,8 +54,7 @@ export function CapacitiesStep({ step, active }: Props) {
   const groups = step.content.capacityGroups ?? [];
   const productExamples = step.content.productExamples ?? [];
   const trackId = cardCtx?.trackId;
-  const hideProductLabels = trackId === "assistencial";
-  const eraStaging = trackId === "era-agentica";
+  const eraStaging = trackUsesPremiumStagedPresentation(trackId);
   const bandKeys = useMemo(
     () => buildCapacitiesBandKeys(step.content),
     [step.content],
@@ -235,7 +235,6 @@ export function CapacitiesStep({ step, active }: Props) {
                         dimmed={
                           selectedCapacity !== null && selectedCapacity !== fi
                         }
-                        hideSubtitle={hideProductLabels}
                         onClick={() =>
                           setSelectedCapacity((s) => (s === fi ? null : fi))
                         }
@@ -306,7 +305,6 @@ function CapacityCard({
   active,
   selected,
   dimmed,
-  hideSubtitle,
   onClick,
   refCallback,
 }: {
@@ -317,7 +315,6 @@ function CapacityCard({
   active: boolean;
   selected: boolean;
   dimmed: boolean;
-  hideSubtitle?: boolean;
   onClick: () => void;
   refCallback: (el: HTMLLIElement | null) => void;
 }) {
@@ -385,22 +382,21 @@ function CapacityCard({
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
       <div className="relative flex flex-col gap-1">
-        <div className="flex items-baseline justify-between gap-3">
+        <span
+          className="text-[1.12rem] font-bold leading-tight text-white"
+          style={{ textShadow: `0 0 14px ${ring}55` }}
+        >
+          {item.name}
+        </span>
+        {/* Subtítulo (marcas/produtos) — oculto na grade; dados permanecem no conteúdo/expanded */}
+        {/* {item.subtitle && (
           <span
-            className="text-[1.12rem] font-bold leading-tight text-white"
-            style={{ textShadow: `0 0 14px ${ring}55` }}
+            className="text-[0.88rem] font-medium uppercase tracking-[0.16em]"
+            style={{ color: ring, opacity: 1 }}
           >
-            {item.name}
+            {item.subtitle}
           </span>
-          {!hideSubtitle && item.subtitle && (
-            <span
-              className="text-[0.88rem] font-medium uppercase tracking-[0.16em]"
-              style={{ color: ring, opacity: 1 }}
-            >
-              {item.subtitle}
-            </span>
-          )}
-        </div>
+        )} */}
         {/* {item.description && (
           <p className="text-[1rem] leading-relaxed text-slate-300/100">
             {item.description}

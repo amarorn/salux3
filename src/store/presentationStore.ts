@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { tracksById, type TrackId } from '@/domain/tracks';
+import { trackUsesPremiumStagedPresentation } from '@/domain/trackPresentation';
 import type { StageAspectMode } from '@/domain/stageAspect';
 
 const STAGE_ASPECT_STORAGE_KEY = 'salux-stage-aspect';
@@ -26,7 +27,7 @@ interface PresentationState {
   transitionPhase: TransitionPhase;
   /** Slides governance com `revealPillars`: primeiro clique expande em vez de avançar. */
   governanceRevealExpanded: boolean;
-  /** Trilha Receita (`era-agentica`): revelação por cliques dentro do slide. */
+  /** Trilhas Receita e Assistência (`operacoes`): revelação por cliques dentro do slide. */
   eraStagedRevealStepId: string | null;
   eraStagedRevealPhase: number;
   eraStagedRevealMax: number;
@@ -186,7 +187,7 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
   clearEraStagedReveal: () => set(eraRevealCleared),
   tryAdvanceEraStagedReveal: () => {
     const s = get();
-    if (s.currentTrackId !== 'era-agentica') return false;
+    if (!trackUsesPremiumStagedPresentation(s.currentTrackId)) return false;
     if (!s.eraStagedRevealStepId || s.eraStagedRevealStepId !== s.currentStepId) return false;
     if (s.eraStagedRevealMax <= 1) return false;
     if (s.eraStagedRevealPhase < s.eraStagedRevealMax - 1) {

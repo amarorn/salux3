@@ -1,5 +1,35 @@
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  ArrowRight,
+  Check,
+  Network,
+  Plus,
+  X,
+} from "lucide-react";
+import type { ReactNode } from "react";
+
+export function renderExpandedCardPrefixContent(prefix: string): ReactNode {
+  const p = prefix.trim();
+  if (/^\d{1,2}$/.test(p)) {
+    return (
+      <span className="text-[1.2rem] font-bold tabular-nums">{p}</span>
+    );
+  }
+  if (p === "✓" || p === "✔") {
+    return <Check className="h-5 w-5" strokeWidth={2.2} aria-hidden />;
+  }
+  if (p === "✕" || p === "×" || p === "✗") {
+    return <X className="h-5 w-5" strokeWidth={2.2} aria-hidden />;
+  }
+  if (p === "+") {
+    return <Plus className="h-5 w-5" strokeWidth={2.2} aria-hidden />;
+  }
+  if (p === "→") {
+    return <ArrowRight className="h-5 w-5" strokeWidth={2.2} aria-hidden />;
+  }
+  return <Network className="h-5 w-5" strokeWidth={2} aria-hidden />;
+}
 
 interface ExpandedCardPortalProps {
   text: string;
@@ -141,7 +171,7 @@ export function ExpandedCardPortal({
                 boxShadow: `0 0 22px ${accentColor}44`,
               }}
             >
-              {prefix}
+              {renderExpandedCardPrefixContent(prefix)}
             </span>
           )}
           <div>

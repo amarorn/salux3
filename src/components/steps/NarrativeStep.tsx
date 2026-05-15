@@ -37,6 +37,7 @@ const PAIN_POINT_ICONS: Record<string, LucideIcon> = {
 };
 import { FloatingCard, FloatingCardContext } from "../FloatingCard";
 import type { PresentationStep } from "@/domain/types";
+import { trackUsesPremiumStagedPresentation } from "@/domain/trackPresentation";
 import { theme } from "@/domain/theme";
 import { AnimatedRiskCurve } from "../visuals/AnimatedRiskCurve";
 import { AnimatedNarrativeMetrics } from "../visuals/AnimatedNarrativeMetrics";
@@ -53,7 +54,7 @@ import {
 import { usePresentationStore } from "@/store/presentationStore";
 import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildNarrativeBandKeys } from "@/lib/eraAgenticaRevealBands";
-import { ExpandedCardPortal } from "./ExpandedCardPortal";
+import { ExpandedCardPortal, renderExpandedCardPrefixContent } from "./ExpandedCardPortal";
 
 interface Props {
   step: PresentationStep;
@@ -70,7 +71,7 @@ export function NarrativeStep({ step, active }: Props) {
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
   const trackId = useContext(FloatingCardContext)?.trackId;
-  const eraStaging = trackId === "era-agentica";
+  const eraStaging = trackUsesPremiumStagedPresentation(trackId);
   const { container, item } = getCardTextVariants(
     Boolean(reduceMotion),
     step.index,
@@ -2253,7 +2254,7 @@ function ExpandedChip({
                 boxShadow: `0 0 22px ${accentColor}44`,
               }}
             >
-              {prefix}
+              {renderExpandedCardPrefixContent(prefix)}
             </span>
           ) : Icon ? (
             <span

@@ -2,6 +2,7 @@ import { useContext, useLayoutEffect, useMemo } from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { FloatingCard, FloatingCardContext } from "../FloatingCard";
 import type { ContrastItem, PresentationStep } from "@/domain/types";
+import { trackUsesPremiumStagedPresentation } from "@/domain/trackPresentation";
 import { theme } from "@/domain/theme";
 import { getCardTextVariants } from "./cardTextMotion";
 import { usePresentationStore } from "@/store/presentationStore";
@@ -97,7 +98,7 @@ export function CoverStep({ step, active }: Props) {
   const attention = step.content.attentionPhrase;
   const enriched = Boolean(contrast || attention);
   const trackId = useContext(FloatingCardContext)?.trackId;
-  const eraStaging = trackId === "era-agentica";
+  const eraStaging = trackUsesPremiumStagedPresentation(trackId);
   const bandKeys = useMemo(
     () => buildCoverBandKeys(step.content),
     [step.content],
