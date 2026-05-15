@@ -1188,10 +1188,11 @@ export function NarrativeStep({ step, active }: Props) {
             stepIndex={step.index}
             eraStaging={eraStaging}
             active={active}
+            className="flex w-full justify-center"
           >
             <motion.div
               {...innerMotion}
-              className="relative mt-1 overflow-hidden rounded-2xl border px-5 py-4"
+              className="relative mx-auto mt-1 w-fit max-w-full overflow-hidden rounded-2xl border px-5 py-4 sm:max-w-2xl"
               style={{
                 borderColor: `${accent.base}55`,
                 background: `linear-gradient(135deg, ${accent.base}1f 0%, transparent 65%)`,
@@ -1223,7 +1224,7 @@ export function NarrativeStep({ step, active }: Props) {
                 }}
               />
               <p
-                className="relative pl-3 text-[clamp(1.05rem,2.4vw,1.22rem)] font-medium italic leading-relaxed"
+                className="relative px-3 text-center text-[clamp(1.05rem,2.4vw,1.22rem)] font-medium italic leading-relaxed"
                 style={{
                   color: accent.base,
                   textShadow: `0 0 24px ${accent.base}33`,

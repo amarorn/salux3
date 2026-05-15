@@ -98,6 +98,7 @@ export function CoverStep({ step, active }: Props) {
   const attention = step.content.attentionPhrase;
   const enriched = Boolean(contrast || attention);
   const trackId = useContext(FloatingCardContext)?.trackId;
+  const omitBanner = useContext(FloatingCardContext)?.omitSidePhoto ?? false;
   const eraStaging = trackUsesEraStagedReveal(trackId);
   const bandKeys = useMemo(
     () => buildCoverBandKeys(step.content),
@@ -150,7 +151,11 @@ export function CoverStep({ step, active }: Props) {
       // cardVisual={step.content.cardVisual}
     >
       <motion.div
-        className="flex flex-col items-start gap-5"
+        className={
+          omitBanner
+            ? "flex h-full min-h-0 w-full flex-1 flex-col items-center justify-center gap-5"
+            : "flex w-full flex-col items-center gap-5"
+        }
         variants={outerContainer}
         initial={reduceMotion ? false : "hidden"}
         animate={active ? "visible" : "hidden"}
@@ -162,10 +167,11 @@ export function CoverStep({ step, active }: Props) {
           stepIndex={step.index}
           eraStaging={eraStaging}
           active={active}
+          className="flex w-full justify-center"
         >
           <motion.h1
             {...innerMotion}
-            className="presentation-ppt-title max-w-[22ch] text-[clamp(2.2rem,5.5vw,3.15rem)] text-center whitespace-pre-line"
+            className="presentation-ppt-title mx-auto max-w-[22ch] text-center text-[clamp(2.2rem,5.5vw,3.15rem)] whitespace-pre-line"
           >
             {step.title}
           </motion.h1>
@@ -179,10 +185,15 @@ export function CoverStep({ step, active }: Props) {
             stepIndex={step.index}
             eraStaging={eraStaging}
             active={active}
+            className="flex w-full justify-center"
           >
             <motion.p
               {...innerMotion}
-              className="presentation-ppt-body max-w-prose whitespace-pre-line text-slate-100/95"
+              className={
+                active && !reduceMotion
+                  ? "presentation-ppt-body presentation-ppt-lead-shimmer mx-auto max-w-prose whitespace-pre-line text-center"
+                  : "presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center text-slate-100/95"
+              }
             >
               {step.content.lead}
             </motion.p>
@@ -199,7 +210,10 @@ export function CoverStep({ step, active }: Props) {
             active={active}
             className="w-full"
           >
-            <motion.div {...innerMotion} className="flex w-full gap-3">
+            <motion.div
+              {...innerMotion}
+              className="mx-auto flex w-full max-w-xl justify-center gap-3"
+            >
               <ContrastColumn
                 item={contrast.left}
                 active={active}
@@ -224,10 +238,11 @@ export function CoverStep({ step, active }: Props) {
             stepIndex={step.index}
             eraStaging={eraStaging}
             active={active}
+            className="flex w-full justify-center"
           >
             <motion.p
               {...innerMotion}
-              className="presentation-ppt-body max-w-prose whitespace-pre-line"
+              className="presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center"
             >
               {step.content.body}
             </motion.p>
@@ -242,10 +257,11 @@ export function CoverStep({ step, active }: Props) {
             stepIndex={step.index}
             eraStaging={eraStaging}
             active={active}
+            className="flex w-full justify-center"
           >
             <motion.div
               {...innerMotion}
-              className="relative w-full overflow-hidden px-5 py-4"
+              className="relative mx-auto w-fit max-w-full overflow-hidden px-5 py-4 sm:max-w-xl"
               style={{
                 borderRight: "6px solid",
                 borderLeft: "6px solid",
@@ -268,7 +284,7 @@ export function CoverStep({ step, active }: Props) {
                 }}
               />
               <p
-                className="relative pl-3 text-[clamp(1.22rem,2.6vw,1.44rem)] text-center italic leading-relaxed"
+                className="relative px-3 text-center text-[clamp(1.22rem,2.6vw,1.44rem)] italic leading-relaxed"
                 style={{
                   color: accent.base,
                   fontFamily: "Inter, system-ui, sans-serif",
