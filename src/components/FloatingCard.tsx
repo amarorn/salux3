@@ -176,11 +176,13 @@ export function FloatingCard({
         className={clsx(
           "relative w-full p-12",
           omitSidePhoto
-            ? "min-h-[1100px] rounded-3xl border border-white/10"
-            : "min-h-[420px]",
+            ? "min-h-[1100px] rounded-3xl "
+            : // ? "min-h-[1100px] rounded-3xl border border-white/10"
+              "min-h-[420px]",
           omitSidePhoto &&
             (active
-              ? "border-white/18 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"
+              ? // ? "border-white/18 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"
+                ""
               : "shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)]"),
           className,
         )}

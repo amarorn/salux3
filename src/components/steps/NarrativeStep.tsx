@@ -130,8 +130,11 @@ export function NarrativeStep({ step, active }: Props) {
   const [valueStageSpotlight, setValueStageSpotlight] = useState<number | null>(
     null,
   );
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const stageRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const expandImage = Boolean(step.content.newsUrls?.length);
 
   // Fecha o balão e reseta o tracer quando o slide deixa de estar ativo
   useEffect(() => {
@@ -140,8 +143,18 @@ export function NarrativeStep({ step, active }: Props) {
       setTracerActive(false);
       setImpactActive(false);
       setValueStageSpotlight(null);
+      setExpandedImage(null);
     }
   }, [active]);
+
+  const handleExpandImage = (url: string) => {
+    if (!expandImage) return;
+    setExpandedImage(url);
+  };
+
+  const handleCloseExpandedImage = () => {
+    setExpandedImage(null);
+  };
 
   const handleTriggerClick = () => {
     if (reduceMotion) {
@@ -186,6 +199,18 @@ export function NarrativeStep({ step, active }: Props) {
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
   }, [valueStageSpotlight]);
+
+  useEffect(() => {
+    if (!expandedImage) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        setExpandedImage(null);
+      }
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [expandedImage]);
 
   const hero = step.content.heroImage;
 
@@ -363,7 +388,7 @@ export function NarrativeStep({ step, active }: Props) {
                         background: `linear-gradient(90deg, transparent, ${c.base}, transparent)`,
                       }}
                     />
-                    <div className="mb-1.5 flex items-center gap-2">
+                    <div className="mb-1.5 flex w-full items-center justify-center gap-2">
                       {it.icon && (
                         <span
                           aria-hidden
@@ -380,7 +405,7 @@ export function NarrativeStep({ step, active }: Props) {
                         {it.label}
                       </span>
                     </div>
-                    <p className="text-[1.03rem] leading-relaxed text-white/90 whitespace-pre-line">
+                    <p className="text-center text-[1.03rem] leading-relaxed text-white/90 whitespace-pre-line">
                       {it.text}
                     </p>
                   </motion.div>
@@ -515,7 +540,7 @@ export function NarrativeStep({ step, active }: Props) {
                           background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)`,
                         }}
                       />
-                      <div className="flex items-baseline gap-1.5">
+                      <div className="flex items-baseline justify-center gap-1.5 text-center">
                         <span
                           className="font-display text-[1.03rem] font-bold tabular-nums"
                           style={{
@@ -533,8 +558,9 @@ export function NarrativeStep({ step, active }: Props) {
                         </span>
                       </div>
                       {stage.description && (
-                        <p className="mt-2 flex-1 text-[0.96rem] leading-relaxed text-slate-100/92">
-                          {stage.description}
+                        <p className="mt-2 text-center text-[0.96rem] leading-relaxed text-slate-100/92">
+                          {/* {stage.description}*/}
+                          {stage.mediaUrl && <>(Vídeo)</>}
                         </p>
                       )}
                       <span className="mt-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
@@ -692,10 +718,10 @@ export function NarrativeStep({ step, active }: Props) {
                               background: `linear-gradient(90deg, transparent, ${c.base}, transparent)`,
                             }}
                           />
-                          <div className="flex items-start gap-2">
+                          <div className="flex flex-col items-center gap-2 text-center">
                             <span
                               aria-hidden
-                              className="mt-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded text-[11px] font-bold"
+                              className="inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded text-[11px] font-bold"
                               style={{
                                 background: c.base,
                                 color: "#0b0f1a",
@@ -1077,15 +1103,37 @@ export function NarrativeStep({ step, active }: Props) {
               </p>
             </motion.div>
             {step.content.newsUrls && step.content.newsUrls.length > 0 && (
-              <div className="mt-6 grid w-full grid-cols-1 gap-2 md:grid-cols-2">
+              <div
+                data-no-click-advance
+                className="mt-6 grid w-full grid-cols-1 gap-2 md:grid-cols-2"
+              >
                 {step.content.newsUrls.map((url, index) => (
-                  <div
+                  <button
                     key={`news-url-${index}`}
-                    className="h-[300px] w-full max-w-[400px] rounded-lg border border-white/10 bg-gray-800/50 bg-cover bg-center shadow-inner"
-                    style={{
-                      backgroundImage: `url(${url})`,
-                    }}
-                  />
+                    type="button"
+                    data-no-click-advance
+                    aria-label={expandImage ? "Expandir imagem" : undefined}
+                    className={`relative h-[300px] w-full max-w-[400px] overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none ${
+                      expandImage
+                        ? "cursor-zoom-in transition-transform duration-300 hover:scale-[1.015] focus-visible:ring-2 focus-visible:ring-white/45"
+                        : ""
+                    }`}
+                    onClick={
+                      expandImage
+                        ? (e) => {
+                            e.stopPropagation();
+                            handleExpandImage(url);
+                          }
+                        : undefined
+                    }
+                  >
+                    <img
+                      src={url}
+                      alt=""
+                      draggable={false}
+                      className="pointer-events-none h-full w-full object-cover"
+                    />
+                  </button>
                 ))}
               </div>
             )}
@@ -1198,7 +1246,66 @@ export function NarrativeStep({ step, active }: Props) {
           />
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {expandedImage && (
+          <ExpandedNewsImage
+            imageUrl={expandedImage}
+            reducedMotion={Boolean(reduceMotion)}
+            onClose={handleCloseExpandedImage}
+          />
+        )}
+      </AnimatePresence>
     </FloatingCard>
+  );
+}
+
+interface ExpandedNewsImageProps {
+  imageUrl: string;
+  reducedMotion: boolean;
+  onClose: () => void;
+}
+
+function ExpandedNewsImage({
+  imageUrl,
+  reducedMotion,
+  onClose,
+}: ExpandedNewsImageProps) {
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
+    <motion.div
+      data-no-click-advance
+      className="fixed inset-0 z-[85] flex items-center justify-center p-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClose();
+      }}
+    >
+      <motion.div
+        aria-hidden
+        className="absolute inset-0 cursor-zoom-out bg-black/75 backdrop-blur-md"
+      />
+      <motion.img
+        src={imageUrl}
+        alt=""
+        className="relative max-h-[86vh] max-w-[90vw] cursor-zoom-out rounded-2xl border border-white/15 object-contain shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+        initial={reducedMotion ? false : { opacity: 0, scale: 0.94, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={
+          reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }
+        }
+        transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+      />
+      <p className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-[11px] uppercase tracking-[0.3em] text-white/45">
+        Clique para fechar · ESC
+      </p>
+    </motion.div>,
+    document.body,
   );
 }
 
@@ -1482,7 +1589,7 @@ function TracerParticle({
           className="absolute -left-1 -top-1 block h-2 w-2 rounded-full opacity-60"
           style={{
             background: `radial-gradient(circle, ${accentColor}, transparent 70%)`,
-            filter: "blur(2px)",
+            filter: "",
           }}
         />
       </motion.div>
@@ -1942,7 +2049,7 @@ function PainPointChips({
                     setSelected((s) => (s === i ? null : i));
                   }
                 }}
-                className="group relative flex cursor-pointer items-start gap-3 overflow-hidden rounded-2xl border px-4 py-3 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
+                className="group relative flex cursor-pointer flex-col items-center gap-3 overflow-hidden rounded-2xl border px-4 py-3 text-center outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
                 style={{
                   borderColor: isSelected
                     ? `${accentColor}99`
@@ -1958,7 +2065,7 @@ function PainPointChips({
                 {Icon ? (
                   <span
                     aria-hidden
-                    className="mt-0.5 inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg"
+                    className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg"
                     style={{
                       background: `${accentColor}22`,
                       border: `1px solid ${accentColor}44`,
@@ -1971,7 +2078,7 @@ function PainPointChips({
                 ) : (
                   <motion.span
                     aria-hidden
-                    className="relative mt-2 h-2 w-2 flex-shrink-0 rounded-full"
+                    className="relative h-2 w-2 flex-shrink-0 rounded-full"
                     style={{
                       background: accentColor,
                       boxShadow: `0 0 10px ${accentColor}`,
@@ -1989,7 +2096,7 @@ function PainPointChips({
                     }}
                   />
                 )}
-                <span className="flex-1 text-[1.02rem] font-medium leading-relaxed text-slate-100">
+                <span className="w-full text-[1.02rem] font-medium leading-relaxed text-slate-100">
                   {text}
                 </span>
                 <span
@@ -2137,11 +2244,11 @@ function ExpandedChip({
           animate={reducedMotion ? {} : { opacity: [0.6, 1, 0.6] }}
           transition={{ duration: 2.6, ease: "easeInOut", repeat: Infinity }}
         />
-        <div className="relative flex items-start gap-4">
+        <div className="relative flex flex-col items-center gap-4 text-center">
           {prefix ? (
             <span
               aria-hidden
-              className="mt-0.5 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-[1.2rem] font-bold"
+              className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-[1.2rem] font-bold"
               style={{
                 background: `${accentColor}22`,
                 border: `1px solid ${accentColor}55`,
@@ -2154,7 +2261,7 @@ function ExpandedChip({
           ) : Icon ? (
             <span
               aria-hidden
-              className="mt-0.5 inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl"
+              className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl"
               style={{
                 background: `${accentColor}22`,
                 border: `1px solid ${accentColor}55`,
@@ -2167,7 +2274,7 @@ function ExpandedChip({
           ) : (
             <motion.span
               aria-hidden
-              className="mt-2 h-3 w-3 flex-shrink-0 rounded-full"
+              className="h-3 w-3 flex-shrink-0 rounded-full"
               style={{
                 background: accentColor,
                 boxShadow: `0 0 18px ${accentColor}`,

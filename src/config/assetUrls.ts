@@ -7,6 +7,7 @@ import landingImgReceptionUrl from "@/assets/landing/img-reception.png?url";
 import landingImgCorridorUrl from "@/assets/landing/img-corridor.png?url";
 import zerodoxPainelUrl from "@/assets/presentation/zerodox-painel-produtividade.png?url";
 import analiseGraficosUrl from "@/assets/presentation/analise-graficos.png?url";
+import medicalGroupUrl from "@/assets/presentation/medicalGroup.jpg?url";
 
 /** URL versionada pelo bundler — evita cache agressivo ao substituir ficheiros em `src/assets`. */
 export const INTRO_ASSIST_COVER_URL = assistCoverUrl;
@@ -22,6 +23,7 @@ export const LANDING_SHOWCASE_URLS = [
 export interface SidePhoto {
   src: string;
   alt: string;
+  dimensions?: { width: number; height: number };
 }
 
 const SIDE_PHOTO_BY_STEP_ID: Record<string, SidePhoto> = {
@@ -43,7 +45,7 @@ const SIDE_PHOTO_BY_STEP_ID: Record<string, SidePhoto> = {
     src: analiseGraficosUrl,
     alt: "Análise de gráficos e indicadores em tempo real",
   },
-  closing: { src: landingImgCorridorUrl, alt: "Continuidade do cuidado" },
+  closing: { src: medicalGroupUrl, alt: "Continuidade do cuidado" },
 };
 
 export function presentationSidePhotoForStep(stepId: string): SidePhoto {

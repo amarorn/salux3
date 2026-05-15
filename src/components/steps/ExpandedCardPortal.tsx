@@ -1,5 +1,5 @@
-import { createPortal } from 'react-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface ExpandedCardPortalProps {
   text: string;
@@ -25,15 +25,16 @@ export function ExpandedCardPortal({
   onClose,
 }: ExpandedCardPortalProps) {
   const startOffset = (() => {
-    if (reducedMotion || typeof window === 'undefined' || !origin) return { dx: 0, dy: 0 };
+    if (reducedMotion || typeof window === "undefined" || !origin)
+      return { dx: 0, dy: 0 };
     const rect = origin.getBoundingClientRect();
     return {
-      dx: (rect.left + rect.width / 2) - window.innerWidth / 2,
-      dy: (rect.top + rect.height / 2) - window.innerHeight / 2,
+      dx: rect.left + rect.width / 2 - window.innerWidth / 2,
+      dy: rect.top + rect.height / 2 - window.innerHeight / 2,
     };
   })();
 
-  if (typeof document === 'undefined') return null;
+  if (typeof document === "undefined") return null;
 
   return createPortal(
     <motion.div
@@ -49,9 +50,12 @@ export function ExpandedCardPortal({
         aria-hidden
         className="absolute inset-0 cursor-pointer"
         onClick={onClose}
-        initial={{ backdropFilter: 'blur(0px)', background: 'rgba(4,6,12,0)' }}
-        animate={{ backdropFilter: 'blur(14px)', background: 'rgba(4,6,12,0.68)' }}
-        exit={{ backdropFilter: 'blur(0px)', background: 'rgba(4,6,12,0)' }}
+        initial={{ backdropFilter: "blur(0px)", background: "rgba(4,6,12,0)" }}
+        animate={{
+          backdropFilter: "blur(14px)",
+          background: "rgba(4,6,12,0.68)",
+        }}
+        exit={{ backdropFilter: "blur(0px)", background: "rgba(4,6,12,0)" }}
         transition={{ duration: 0.4 }}
       />
 
@@ -74,30 +78,39 @@ export function ExpandedCardPortal({
         exit={
           reducedMotion
             ? { opacity: 0, scale: 0.9 }
-            : { opacity: 0, scale: 0.88, y: 10, filter: 'blur(8px)' }
+            : { opacity: 0, scale: 0.88, y: 10, filter: "blur(8px)" }
         }
         transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
-        onClick={(e) => { e.stopPropagation(); onClose(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
       >
         {/* Linha de destaque superior */}
         <span
           aria-hidden
           className="pointer-events-none absolute inset-x-8 -top-px h-px"
-          style={{ background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }}
+          style={{
+            background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+          }}
         />
         {/* Halo de fundo */}
         <span
           aria-hidden
           className="pointer-events-none absolute inset-0"
-          style={{ background: `radial-gradient(ellipse at top, ${accentColor}1c, transparent 62%)` }}
+          style={{
+            background: `radial-gradient(ellipse at top, ${accentColor}1c, transparent 62%)`,
+          }}
         />
         {/* Pulso de borda */}
         <motion.span
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-3xl"
-          style={{ boxShadow: `0 0 0 1px ${accentColor}44, 0 0 40px ${accentColor}22` }}
+          style={{
+            boxShadow: `0 0 0 1px ${accentColor}44, 0 0 40px ${accentColor}22`,
+          }}
           animate={reducedMotion ? {} : { opacity: [0.6, 1, 0.6] }}
-          transition={{ duration: 2.6, ease: 'easeInOut', repeat: Infinity }}
+          transition={{ duration: 2.6, ease: "easeInOut", repeat: Infinity }}
         />
 
         {imageSrc && (
@@ -116,9 +129,7 @@ export function ExpandedCardPortal({
           </motion.div>
         )}
 
-        <motion.div
-          className="relative flex items-start gap-4"
-        >
+        <motion.div className="relative flex items-start gap-4">
           {prefix && (
             <span
               aria-hidden
@@ -141,7 +152,9 @@ export function ExpandedCardPortal({
               {text}
             </p>
             {description && (
-              <p className="mt-3 text-[1rem] leading-relaxed text-slate-200/80">{description}</p>
+              <p className="mt-3 text-[1rem] leading-relaxed text-slate-200/80">
+                {description}
+              </p>
             )}
           </div>
         </motion.div>
@@ -160,10 +173,9 @@ interface ExpandedCardTriggerProps {
   children: React.ReactNode;
 }
 
-export function ExpandedCardTriggerWrapper({ open, children }: ExpandedCardTriggerProps) {
-  return (
-    <AnimatePresence>
-      {open && children}
-    </AnimatePresence>
-  );
+export function ExpandedCardTriggerWrapper({
+  open,
+  children,
+}: ExpandedCardTriggerProps) {
+  return <AnimatePresence>{open && children}</AnimatePresence>;
 }
