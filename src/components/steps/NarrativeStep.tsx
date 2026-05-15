@@ -60,10 +60,7 @@ interface Props {
   active: boolean;
 }
 
-function valueStagesGridColumns(
-  count: number,
-  gridCols?: number,
-): string {
+function valueStagesGridColumns(count: number, gridCols?: number): string {
   const cols = gridCols ?? (count === 4 ? 2 : Math.min(count, 4));
   return `repeat(${cols}, minmax(min(100%, 11rem), 1fr))`;
 }
@@ -133,7 +130,7 @@ export function NarrativeStep({ step, active }: Props) {
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const stageRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const expandImage = Boolean(step.content.newsUrls?.length);
 
   // Fecha o balão e reseta o tracer quando o slide deixa de estar ativo
