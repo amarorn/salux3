@@ -236,14 +236,10 @@ export function FloatingCard({
               'relative mx-auto flex min-h-0 w-full flex-1 flex-col',
               'origin-top',
             )}
-            style={
-              cardTextScale !== 1
-                ? {
-                    transform: `scale(${cardTextScale})`,
-                    width: `${(100 / cardTextScale).toFixed(4)}%`,
-                  }
-                : undefined
-            }
+            style={{
+              transform: `scale(${cardTextScale})`,
+              width: `${(100 / cardTextScale).toFixed(4)}%`,
+            }}
           >
             {badge && (
               <div className="mb-6 flex items-center gap-3">
