@@ -25,7 +25,12 @@ export function GovernanceStep({ step, active }: Props) {
   const expanded = usePresentationStore((s) => s.governanceRevealExpanded);
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
-  const { container, item } = getCardTextVariants(Boolean(reduceMotion), step.index, flipPhoto);
+  const { container, item } = getCardTextVariants(
+    Boolean(reduceMotion),
+    step.index,
+    `${step.id}:${step.title}`,
+    flipPhoto,
+  );
 
   const showExpanded = revealMode && active && expanded;
 

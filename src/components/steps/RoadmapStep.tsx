@@ -316,7 +316,12 @@ export function RoadmapStep({ step, active }: Props) {
   const agents = step.content.roadmapAgents;
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
-  const { container, item } = getCardTextVariants(Boolean(reduceMotion), step.index, flipPhoto);
+  const { container, item } = getCardTextVariants(
+    Boolean(reduceMotion),
+    step.index,
+    `${step.id}:${step.title}`,
+    flipPhoto,
+  );
 
   if (agents?.length) {
     const COLS = 3;

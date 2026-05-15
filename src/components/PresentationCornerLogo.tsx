@@ -15,6 +15,7 @@ interface Props {
  */
 export function PresentationCornerLogo({ visible }: Props) {
   const hasEntered = usePresentationStore((s) => s.hasEntered);
+  const returnToTrackSelection = usePresentationStore((s) => s.returnToTrackSelection);
   const stepId = usePresentationStore((s) => s.currentStepId);
   const { meta } = useCurrentPresentation();
   const reduceMotion = useReducedMotion();
@@ -50,14 +51,30 @@ export function PresentationCornerLogo({ visible }: Props) {
               }}
               className="will-change-transform drop-shadow-[0_12px_28px_-8px_rgba(124,58,237,0.35)]"
             >
-              <SaluxSymbol width={60} idle />
+              {hasEntered ? (
+                <button
+                  type="button"
+                  data-no-click-advance
+                  className="pointer-events-auto cursor-pointer rounded-xl border-0 bg-transparent p-0 outline-none transition-opacity hover:opacity-95 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#05070d]"
+                  aria-label="Voltar à escolha de trilhas"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    returnToTrackSelection();
+                  }}
+                >
+                  <SaluxSymbol width={60} idle />
+                </button>
+              ) : (
+                <SaluxSymbol width={60} idle />
+              )}
             </motion.div>
             {hasEntered && (
               <div className="flex flex-col leading-tight">
-                <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">
                   apresentação ativa
                 </span>
-                <span className="text-[12px] font-semibold text-white/80">{meta.title}</span>
+                <span className="text-[14px] font-semibold text-white/85">{meta.title}</span>
               </div>
             )}
           </div>

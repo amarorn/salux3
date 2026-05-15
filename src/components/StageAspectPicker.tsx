@@ -15,9 +15,9 @@ export function StageAspectPicker() {
     <div
       role="radiogroup"
       aria-label="Proporção do palco da apresentação"
-      className="flex flex-col gap-1.5 rounded-xl border border-white/[0.08] bg-black/25 px-2.5 py-2 backdrop-blur-md"
+      className="flex flex-col gap-1.5 rounded-xl border border-white/[0.08] bg-black/25 px-3 py-2.5 backdrop-blur-md"
     >
-      <span className="px-0.5 text-[9px] font-semibold uppercase tracking-[0.22em] text-white/35">
+      <span className="px-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
         Palco
       </span>
       <div className="flex gap-1">
@@ -31,14 +31,14 @@ export function StageAspectPicker() {
               aria-checked={active}
               onClick={() => setMode(opt.id)}
               className={clsx(
-                'flex min-w-[4.5rem] flex-col rounded-lg px-2 py-1.5 text-left transition-colors',
+                'flex min-w-[4.8rem] flex-col rounded-lg px-2.5 py-1.5 text-left transition-colors',
                 active
                   ? 'bg-white/[0.12] ring-1 ring-white/25'
                   : 'bg-white/[0.03] hover:bg-white/[0.07]',
               )}
             >
-              <span className="text-[11px] font-medium leading-tight text-white/90">{opt.label}</span>
-              <span className="text-[9px] tabular-nums text-white/40">{opt.hint}</span>
+              <span className="text-[12px] font-medium leading-tight text-white/90">{opt.label}</span>
+              <span className="text-[10px] tabular-nums text-white/50">{opt.hint}</span>
             </button>
           );
         })}

@@ -18,7 +18,12 @@ export function PathwaysStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const reduce = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
-  const { container, item } = getCardTextVariants(Boolean(reduce), step.index, flipPhoto);
+  const { container, item } = getCardTextVariants(
+    Boolean(reduce),
+    step.index,
+    `${step.id}:${step.title}`,
+    flipPhoto,
+  );
   const items = step.content.pathways ?? [];
   const [focus, setFocus] = useState<number>(0);
   const focused = items[focus];

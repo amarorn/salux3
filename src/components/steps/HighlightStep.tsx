@@ -95,7 +95,12 @@ export function HighlightStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
-  const { container, item } = getCardTextVariants(Boolean(reduceMotion), step.index, flipPhoto);
+  const { container, item } = getCardTextVariants(
+    Boolean(reduceMotion),
+    step.index,
+    `${step.id}:${step.title}`,
+    flipPhoto,
+  );
 
   const intro = step.content.body ?? '';
   const attention = step.content.attentionPhrase;

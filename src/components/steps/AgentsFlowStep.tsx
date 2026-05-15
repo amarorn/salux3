@@ -17,7 +17,12 @@ export function AgentsFlowStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const reduce = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
-  const { container, item } = getCardTextVariants(Boolean(reduce), step.index, flipPhoto);
+  const { container, item } = getCardTextVariants(
+    Boolean(reduce),
+    step.index,
+    `${step.id}:${step.title}`,
+    flipPhoto,
+  );
   const before = step.content.beforeAfter?.before ?? [];
   const after = step.content.beforeAfter?.after ?? [];
   const fns = step.content.agentFunctions ?? [];

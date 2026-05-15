@@ -65,7 +65,12 @@ function ContrastColumn({
 export function CoverStep({ step, active }: Props) {
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
-  const { container, item } = getCardTextVariants(Boolean(reduceMotion), step.index, flipPhoto);
+  const { container, item } = getCardTextVariants(
+    Boolean(reduceMotion),
+    step.index,
+    `${step.id}:${step.title}`,
+    flipPhoto,
+  );
   const hero = step.content.heroImage;
   const accent = theme.accents[step.accent];
   const contrast = step.content.contrastPair;

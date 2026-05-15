@@ -114,7 +114,12 @@ export function ResultsStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const reduce = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
-  const { container, item } = getCardTextVariants(Boolean(reduce), step.index, flipPhoto);
+  const { container, item } = getCardTextVariants(
+    Boolean(reduce),
+    step.index,
+    `${step.id}:${step.title}`,
+    flipPhoto,
+  );
   const cards = step.content.resultsCards ?? [];
 
   return (

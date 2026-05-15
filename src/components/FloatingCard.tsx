@@ -10,8 +10,10 @@ import { INTRO_ASSIST_COVER_URL, presentationSidePhotoForStep } from '@/config/a
 import { CinematicBanner } from '@/components/visuals/CinematicBanner';
 import { CardVisual, type CardVisualVariant } from '@/components/visuals/CardVisualVariants';
 
-/** Trilha 1 (`era-agentica` — Receita): escala aplicada ao texto/conteúdo do painel. */
-const TRACK1_CARD_TEXT_SCALE = 1.04;
+/** Escala base para melhorar leitura sem perder composição do layout. */
+const BASE_CARD_TEXT_SCALE = 1.05;
+/** Trilha 1 (`era-agentica` — Receita): mantém um pequeno ganho adicional. */
+const TRACK1_CARD_TEXT_SCALE = 1.08;
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
@@ -79,7 +81,7 @@ export function FloatingCard({
   const resolvedVideoSrc = bannerVideoSrc ?? ctx?.bannerVideoSrc;
   const resolvedVideoPoster = bannerVideoPoster ?? ctx?.bannerVideoPoster;
   const trackId = ctx?.trackId;
-  const track1TypographyBoost = trackId === 'era-agentica';
+  const cardTextScale = trackId === 'era-agentica' ? TRACK1_CARD_TEXT_SCALE : BASE_CARD_TEXT_SCALE;
   const accentColor = theme.accents[accent];
   const reduceMotion = useReducedMotion();
   const photoMotion = getPhotoColumnVariants(resolvedFlip);
@@ -232,13 +234,13 @@ export function FloatingCard({
           <div
             className={clsx(
               'relative mx-auto flex min-h-0 w-full flex-1 flex-col',
-              track1TypographyBoost && 'origin-top',
+              'origin-top',
             )}
             style={
-              track1TypographyBoost
+              cardTextScale !== 1
                 ? {
-                    transform: `scale(${TRACK1_CARD_TEXT_SCALE})`,
-                    width: `${(100 / TRACK1_CARD_TEXT_SCALE).toFixed(4)}%`,
+                    transform: `scale(${cardTextScale})`,
+                    width: `${(100 / cardTextScale).toFixed(4)}%`,
                   }
                 : undefined
             }

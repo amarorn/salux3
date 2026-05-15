@@ -42,12 +42,18 @@ export function NarrativeStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
-  const { container, item } = getCardTextVariants(Boolean(reduceMotion), step.index, flipPhoto);
+  const { container, item } = getCardTextVariants(
+    Boolean(reduceMotion),
+    step.index,
+    `${step.id}:${step.title}`,
+    flipPhoto,
+  );
   const painPoints = step.content.painPointsLayout;
   const useBalloon = painPoints && step.content.painPointsBalloon;
   const [balloonOpen, setBalloonOpen] = useState(false);
   const [tracerActive, setTracerActive] = useState(false);
   const [impactActive, setImpactActive] = useState(false);
+  const [valueStageSpotlight, setValueStageSpotlight] = useState<number | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   // Fecha o balão e reseta o tracer quando o slide deixa de estar ativo
@@ -56,6 +62,7 @@ export function NarrativeStep({ step, active }: Props) {
       setBalloonOpen(false);
       setTracerActive(false);
       setImpactActive(false);
+      setValueStageSpotlight(null);
     }
   }, [active]);
 
@@ -90,6 +97,18 @@ export function NarrativeStep({ step, active }: Props) {
     window.addEventListener('keydown', onKey, true);
     return () => window.removeEventListener('keydown', onKey, true);
   }, [balloonOpen]);
+
+  useEffect(() => {
+    if (valueStageSpotlight === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setValueStageSpotlight(null);
+      }
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [valueStageSpotlight]);
 
   const hero = step.content.heroImage;
 
@@ -232,22 +251,51 @@ export function NarrativeStep({ step, active }: Props) {
         )}
 
         {step.content.valueStages && step.content.valueStages.length > 0 && (
-          <motion.div variants={item} className="space-y-3">
+          <motion.div variants={item} className="relative space-y-3 overflow-visible py-1">
             {step.content.valueStagesLead && (
               <p
-                className="whitespace-pre-line text-[0.95rem] leading-snug text-slate-200/90"
+                className="whitespace-pre-line text-[1.02rem] leading-relaxed text-slate-200/90"
                 style={{ textShadow: `0 0 18px ${accent.base}1f` }}
               >
                 {step.content.valueStagesLead}
               </p>
             )}
-            <div
-              className="grid gap-2.5"
+            <AnimatePresence>
+              {valueStageSpotlight !== null && (
+                <motion.button
+                  key="value-stages-spotlight-backdrop"
+                  type="button"
+                  aria-label="Fechar destaque"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: reduceMotion ? 0.12 : 0.38, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute -inset-x-6 -inset-y-[min(26vh,240px)] z-[1] cursor-default rounded-[1.35rem] border border-white/[0.06] bg-black/[0.52] backdrop-blur-[6px]"
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
+                  onClick={() => setValueStageSpotlight(null)}
+                />
+              )}
+            </AnimatePresence>
+
+            <motion.div
+              className="relative z-[2] grid gap-2.5"
               style={{
                 gridTemplateColumns: `repeat(${
                   step.content.valueStagesGridCols ?? step.content.valueStages.length
                 }, minmax(0, 1fr))`,
+                ...(valueStageSpotlight !== null
+                  ? {
+                      filter: `drop-shadow(0 0 1px ${accent.base}) drop-shadow(0 18px 40px rgba(0,0,0,0.5))`,
+                    }
+                  : {}),
               }}
+              animate={
+                reduceMotion
+                  ? {}
+                  : valueStageSpotlight !== null
+                    ? { scale: 0.94, y: 3, transition: { duration: 0.72, ease: [0.16, 1, 0.3, 1] } }
+                    : { scale: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }
+              }
             >
               {step.content.valueStages.map((stage, i) => {
                 const intensity = step.content.valueStagesFlat
@@ -257,27 +305,76 @@ export function NarrativeStep({ step, active }: Props) {
                   Math.round(intensity * mult)
                     .toString(16)
                     .padStart(2, '0');
+                const dimmed =
+                  valueStageSpotlight !== null && valueStageSpotlight !== i;
+                const focused = valueStageSpotlight === i;
                 return (
                   <motion.div
                     key={`${stage.number}-${stage.label}`}
-                    className="relative overflow-hidden rounded-xl border px-3.5 py-3"
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={focused}
+                    aria-label={`Destacar: ${stage.label}`}
+                    className="relative cursor-pointer overflow-hidden rounded-xl border px-3.5 py-3 outline-none transition-[border-color,box-shadow] duration-500 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
                     style={{
-                      borderColor: `${accent.base}${hex(95)}`,
+                      borderColor: focused
+                        ? `${accent.base}aa`
+                        : `${accent.base}${hex(95)}`,
                       background: `linear-gradient(160deg, ${accent.base}${hex(30)} 0%, rgba(255,255,255,0.02) 70%)`,
-                      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px -16px ${accent.base}${hex(88)}`,
+                      boxShadow: focused
+                        ? `inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px ${accent.base}55, 0 16px 40px -8px ${accent.base}44`
+                        : `inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px -16px ${accent.base}${hex(88)}`,
+                      zIndex: focused ? 3 : 0,
                     }}
                     initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                     animate={
-                      active
-                        ? { opacity: 1, y: 0 }
-                        : reduceMotion
+                      !active
+                        ? reduceMotion
                           ? undefined
                           : { opacity: 0, y: 12 }
+                        : dimmed
+                          ? {
+                              opacity: 0.42,
+                              y: 0,
+                              scale: 0.96,
+                              transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+                            }
+                          : focused
+                            ? {
+                                opacity: 1,
+                                y: 0,
+                                scale: 1.05,
+                                transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+                              }
+                            : {
+                                opacity: 1,
+                                y: 0,
+                                scale: 1,
+                                transition: {
+                                  duration: 0.55,
+                                  ease: [0.22, 1, 0.36, 1],
+                                  delay: 0.45 + i * 0.12,
+                                },
+                              }
                     }
-                    transition={{
-                      duration: 0.55,
-                      ease: [0.22, 1, 0.36, 1],
-                      delay: 0.45 + i * 0.12,
+                    transition={
+                      active && valueStageSpotlight === null
+                        ? {
+                            duration: 0.55,
+                            ease: [0.22, 1, 0.36, 1],
+                            delay: 0.45 + i * 0.12,
+                          }
+                        : undefined
+                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setValueStageSpotlight((s) => (s === i ? null : i));
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setValueStageSpotlight((s) => (s === i ? null : i));
+                      }
                     }}
                   >
                     <span
@@ -289,25 +386,25 @@ export function NarrativeStep({ step, active }: Props) {
                     />
                     <div className="flex items-baseline gap-1.5">
                       <span
-                        className="font-display text-[0.95rem] font-bold tabular-nums"
+                        className="font-display text-[1.03rem] font-bold tabular-nums"
                         style={{ color: accent.base, textShadow: `0 0 12px ${accent.base}66` }}
                       >
                         {stage.number}
                       </span>
                       <span
-                        className="text-[10px] font-semibold uppercase tracking-[0.26em]"
+                        className="text-[11px] font-semibold uppercase tracking-[0.22em]"
                         style={{ color: accent.base, opacity: 0.9 }}
                       >
                         {stage.label}
                       </span>
                     </div>
-                    <p className="mt-2 text-[0.82rem] leading-snug text-slate-200/85">
+                    <p className="mt-2 text-[0.92rem] leading-relaxed text-slate-200/90">
                       {stage.description}
                     </p>
                   </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           </motion.div>
         )}
 
@@ -362,7 +459,7 @@ export function NarrativeStep({ step, active }: Props) {
               return (
                 <div key={group} className="space-y-2.5">
                   <p
-                    className="text-[0.95rem] font-semibold leading-snug"
+                    className="text-[1.02rem] font-semibold leading-relaxed"
                     style={{ color: c.base, textShadow: `0 0 16px ${c.base}1f` }}
                   >
                     {cfg.lead}
@@ -409,10 +506,10 @@ export function NarrativeStep({ step, active }: Props) {
                           >
                             {icon}
                           </span>
-                          <p className="text-[0.85rem] font-medium leading-snug text-white/95">
+                          <p className="text-[0.94rem] font-medium leading-relaxed text-white/95">
                             {it.label}
                             {it.description && (
-                              <span className="block text-[0.78rem] font-normal text-slate-300/80">
+                              <span className="block text-[0.86rem] font-normal text-slate-300/85">
                                 {it.description}
                               </span>
                             )}
@@ -447,7 +544,7 @@ export function NarrativeStep({ step, active }: Props) {
                   {step.content.bullets.slice(0, step.content.bulletSplitAfter).map((verb) => (
                     <span
                       key={verb}
-                      className="rounded-full border border-cyan-400/25 bg-cyan-500/[0.09] px-3 py-1.5 text-[12px] font-medium text-slate-100 shadow-soft"
+                      className="rounded-full border border-cyan-400/25 bg-cyan-500/[0.09] px-3 py-1.5 text-[13px] font-medium text-slate-100 shadow-soft"
                     >
                       {verb}
                     </span>
@@ -460,7 +557,7 @@ export function NarrativeStep({ step, active }: Props) {
                 </p>
                 <ul className="space-y-2">
                   {step.content.bullets.slice(step.content.bulletSplitAfter).map((bullet) => (
-                    <li key={bullet} className="flex items-start gap-3 text-sm text-slate-200">
+                    <li key={bullet} className="flex items-start gap-3 text-[0.96rem] leading-relaxed text-slate-200">
                       <span
                         className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full"
                         style={{ background: accent.base, boxShadow: `0 0 8px ${accent.base}88` }}
@@ -477,7 +574,7 @@ export function NarrativeStep({ step, active }: Props) {
           <motion.div variants={item} className="relative space-y-3">
             {step.content.painPointsLead && (
               <p
-                className="text-[0.95rem] font-semibold leading-snug text-slate-100/90"
+                className="text-[1.02rem] font-semibold leading-relaxed text-slate-100/90"
                 style={{ textShadow: `0 0 18px ${accent.base}22` }}
               >
                 {step.content.painPointsLead}
@@ -535,7 +632,7 @@ export function NarrativeStep({ step, active }: Props) {
           ) && (
           <motion.ul variants={item} className="mt-1 space-y-2.5">
             {step.content.bullets.map((bullet) => (
-              <li key={bullet} className="flex items-start gap-3 text-sm text-slate-200">
+              <li key={bullet} className="flex items-start gap-3 text-[0.96rem] leading-relaxed text-slate-200">
                 <span
                   className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full"
                   style={{ background: accent.base, boxShadow: `0 0 8px ${accent.base}88` }}
@@ -553,7 +650,7 @@ export function NarrativeStep({ step, active }: Props) {
               className="absolute left-0 top-1 bottom-1 w-px"
               style={{ background: `linear-gradient(180deg, ${accent.base}, transparent)` }}
             />
-            <p className="presentation-ppt-body whitespace-pre-line text-[0.95rem] leading-relaxed text-slate-300/95">
+            <p className="presentation-ppt-body whitespace-pre-line text-[1.02rem] leading-relaxed text-slate-300/95">
               {step.content.body}
             </p>
           </motion.div>
@@ -589,12 +686,12 @@ export function NarrativeStep({ step, active }: Props) {
                       }}
                     >
                       <span
-                        className="block text-[9.5px] font-semibold uppercase tracking-[0.32em]"
+                        className="block text-[11px] font-semibold uppercase tracking-[0.26em]"
                         style={{ color: rose.base, opacity: 0.9 }}
                       >
                         DE →
                       </span>
-                      <p className="mt-0.5 text-[0.88rem] leading-snug text-slate-200/85">{from}</p>
+                      <p className="mt-0.5 text-[0.96rem] leading-relaxed text-slate-200/90">{from}</p>
                     </div>
                     <div
                       className="relative overflow-hidden rounded-lg border px-3.5 py-2.5"
@@ -612,13 +709,13 @@ export function NarrativeStep({ step, active }: Props) {
                         }}
                       />
                       <span
-                        className="block text-[9.5px] font-semibold uppercase tracking-[0.32em]"
+                        className="block text-[11px] font-semibold uppercase tracking-[0.26em]"
                         style={{ color: emerald.base, opacity: 0.95 }}
                       >
                         PARA →
                       </span>
                       <p
-                        className="mt-0.5 text-[0.88rem] font-medium leading-snug text-white/95"
+                        className="mt-0.5 text-[0.96rem] font-medium leading-relaxed text-white/95"
                         style={{ textShadow: `0 0 18px ${emerald.base}22` }}
                       >
                         {to}
@@ -654,7 +751,7 @@ export function NarrativeStep({ step, active }: Props) {
               transition={{ duration: 2.8, ease: 'easeInOut', repeat: Infinity }}
             />
             <p
-              className="relative pl-3 text-[clamp(0.98rem,2.2vw,1.15rem)] font-medium italic leading-snug"
+              className="relative pl-3 text-[clamp(1.05rem,2.4vw,1.22rem)] font-medium italic leading-relaxed"
               style={{ color: accent.base, textShadow: `0 0 24px ${accent.base}33` }}
             >
               “{step.content.attentionPhrase}”
@@ -1150,7 +1247,7 @@ function PainPointsBalloon({
                 >
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <span className="text-[0.98rem] font-medium leading-snug text-slate-50">
+                <span className="text-[1.04rem] font-medium leading-relaxed text-slate-50">
                   {text}
                 </span>
               </div>

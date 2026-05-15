@@ -19,7 +19,12 @@ export function CapacitiesStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const reduce = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
-  const { container, item } = getCardTextVariants(Boolean(reduce), step.index, flipPhoto);
+  const { container, item } = getCardTextVariants(
+    Boolean(reduce),
+    step.index,
+    `${step.id}:${step.title}`,
+    flipPhoto,
+  );
   const groups = step.content.capacityGroups ?? [];
 
   return (

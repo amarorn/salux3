@@ -20,7 +20,12 @@ interface Props {
 export function ClosingStep({ step, active }: Props) {
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
-  const { container, item } = getCardTextVariants(Boolean(reduceMotion), step.index, flipPhoto);
+  const { container, item } = getCardTextVariants(
+    Boolean(reduceMotion),
+    step.index,
+    `${step.id}:${step.title}`,
+    flipPhoto,
+  );
   const metaContact = step.content.meta?.Contato;
   const formUrl = resolveContactFormUrl(typeof metaContact === 'string' ? metaContact : undefined);
 

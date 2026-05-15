@@ -84,7 +84,12 @@ export function JourneyStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
-  const { container, item } = getCardTextVariants(Boolean(reduceMotion), step.index, flipPhoto);
+  const { container, item } = getCardTextVariants(
+    Boolean(reduceMotion),
+    step.index,
+    `${step.id}:${step.title}`,
+    flipPhoto,
+  );
   const stages = step.content.journeyStages;
 
   return (

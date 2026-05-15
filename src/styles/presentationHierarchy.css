@@ -3,12 +3,12 @@
  * Variáveis usadas pelos steps da apresentação (`body.presentation-body`).
  */
 body.presentation-body {
-  --ppt-kicker-size: 11px;
-  --ppt-kicker-tracking: 0.32em;
+  --ppt-kicker-size: 12px;
+  --ppt-kicker-tracking: 0.28em;
   --ppt-title-weight: 700;
-  --ppt-title-tracking: -0.03em;
-  --ppt-body-size: 17px;
-  --ppt-body-leading: 1.65;
+  --ppt-title-tracking: -0.025em;
+  --ppt-body-size: 18px;
+  --ppt-body-leading: 1.72;
 }
 
 .presentation-ppt-kicker {
@@ -34,7 +34,7 @@ body.presentation-body {
 }
 
 .presentation-ppt-caption {
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.55;
   color: rgb(148 163 184);
 }
