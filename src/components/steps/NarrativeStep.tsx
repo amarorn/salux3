@@ -37,7 +37,6 @@ const PAIN_POINT_ICONS: Record<string, LucideIcon> = {
 };
 import { FloatingCard, FloatingCardContext } from "../FloatingCard";
 import type { PresentationStep } from "@/domain/types";
-import { trackUsesPremiumStagedPresentation } from "@/domain/trackPresentation";
 import { theme } from "@/domain/theme";
 import { AnimatedRiskCurve } from "../visuals/AnimatedRiskCurve";
 import { AnimatedNarrativeMetrics } from "../visuals/AnimatedNarrativeMetrics";
@@ -71,7 +70,7 @@ export function NarrativeStep({ step, active }: Props) {
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
   const trackId = useContext(FloatingCardContext)?.trackId;
-  const eraStaging = trackUsesPremiumStagedPresentation(trackId);
+  const eraStaging = trackId === "era-agentica";
   const { container, item } = getCardTextVariants(
     Boolean(reduceMotion),
     step.index,

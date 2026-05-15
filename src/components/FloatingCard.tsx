@@ -21,7 +21,7 @@ import {
 
 /** Escala base para melhorar leitura sem perder composição do layout. */
 const BASE_CARD_TEXT_SCALE = 1.08;
-/** Trilhas com layout premium (Receita + Assistência em `operacoes`). */
+/** Trilha 1 (`era-agentica` — Receita): mantém um pequeno ganho adicional. */
 const TRACK1_CARD_TEXT_SCALE = 1.12;
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
@@ -96,9 +96,7 @@ export function FloatingCard({
   const trackId = ctx?.trackId;
   const omitSidePhoto = Boolean(ctx?.omitSidePhoto);
   const cardTextScale =
-    trackId === "era-agentica" || trackId === "operacoes"
-      ? TRACK1_CARD_TEXT_SCALE
-      : BASE_CARD_TEXT_SCALE;
+    trackId === "era-agentica" ? TRACK1_CARD_TEXT_SCALE : BASE_CARD_TEXT_SCALE;
   const accentColor = theme.accents[accent];
   const reduceMotion = useReducedMotion();
   const photoMotion = getPhotoColumnVariants(resolvedFlip);

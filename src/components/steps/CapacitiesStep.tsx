@@ -18,7 +18,6 @@ import type {
   CapacityItem,
   PresentationStep,
 } from "@/domain/types";
-import { trackUsesPremiumStagedPresentation } from "@/domain/trackPresentation";
 import { theme } from "@/domain/theme";
 import { getCardTextVariants } from "./cardTextMotion";
 import { usePresentationStore } from "@/store/presentationStore";
@@ -54,7 +53,7 @@ export function CapacitiesStep({ step, active }: Props) {
   const groups = step.content.capacityGroups ?? [];
   const productExamples = step.content.productExamples ?? [];
   const trackId = cardCtx?.trackId;
-  const eraStaging = trackUsesPremiumStagedPresentation(trackId);
+  const eraStaging = trackId === "era-agentica";
   const bandKeys = useMemo(
     () => buildCapacitiesBandKeys(step.content),
     [step.content],

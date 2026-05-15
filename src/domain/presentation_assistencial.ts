@@ -1,7 +1,10 @@
 import type { PresentationStep } from "./types";
 import trilha2CoverUrl from "@/assets/presentation/trilha2-cover-paciente.png?url";
-import news1Url from "@/assets/presentation/news-1.png?url";
-import news2Url from "@/assets/presentation/news-2.png?url";
+import trilha2JornadaUrl from "@/assets/presentation/trilha2-jornada-isometrica.png?url";
+import trilha2ComandoUrl from "@/assets/presentation/trilha2-comando-clinico.png?url";
+import trilha2RedeUrl from "@/assets/presentation/trilha2-rede-conectada.png?url";
+import trilha2IntegracaoUrl from "@/assets/presentation/trilha2-integracao-rede.png?url";
+import trilha2EvolucaoUrl from "@/assets/presentation/trilha2-evolucao-decisao.png?url";
 import { steps as baseSteps } from "./presentation";
 
 export const presentationAssistencialMeta = {
@@ -34,8 +37,9 @@ function withStep(
 }
 
 /**
- * Slide extra antes do encerramento — mesmo padrão visual da trilha Receita
- * (`entry-points`): grelha de cartões + pergunta de fechamento.
+ * Card de transição inserido entre `roadmap` e `closing` na trilha assistencial.
+ * Apresenta o título principal, uma frase de leitura escalonada (efeito de
+ * destaque) e uma frase de atenção em destaque com glow pulsante.
  */
 const highlightContextStep: PresentationStep = {
   id: "highlight-context",
@@ -48,46 +52,33 @@ const highlightContextStep: PresentationStep = {
   kind: "narrative",
   accent: "emerald",
   content: {
-    headline: "Pontos de entrada",
-    omitSidePhoto: true,
-    cardVisual: "entry-points",
-    valueStagesFlat: true,
-    valueStagesGridCols: 3,
-    valueStages: [
-      {
-        number: "01",
-        label: "Admissão e triagem",
-        description: "→ Dados críticos estruturados desde o primeiro contato",
+    headline: "INITIA · Agentes",
+    cardVisual: "fan",
+    contrastPair: {
+      left: {
+        label: "Sem INITIA",
+        tone: "warm",
+        text: "O usuário procura.\nInterpreta. Reconstrói contexto.\nDecide com visão parcial. Aciona tarde.",
       },
-      {
-        number: "02",
-        label: "Prontuário vivo",
-        description: "→ Sintese, riscos e restrições sempre visíveis",
+      right: {
+        label: "Com INITIA",
+        tone: "cool",
+        text: "A informação se apresenta. O contexto acompanha.\nO risco é priorizado. O agente orienta.\nA ação parte do dado.",
       },
-      {
-        number: "03",
-        label: "Transições",
-        description: "→ Contexto preservado entre áreas e equipes",
-      },
-      {
-        number: "04",
-        label: "Áreas críticas",
-        description: "→ Priorização de eventos e leitura contínua",
-      },
-      {
-        number: "05",
-        label: "Documentação",
-        description: "→ Consistência entre registro, conduta e evidência",
-      },
-      {
-        number: "06",
-        label: "Alta e pós-alta",
-        description: "→ Continuidade após o encerramento do episódio",
-      },
+    },
+    body: "O que os agentes fazem na jornada assistencial:",
+    bullets: [
+      "Estruturam dados críticos desde a admissão",
+      "Sintetizam o prontuário e destacam riscos, alergias e restrições",
+      "Mantêm contexto entre áreas e equipes ao longo das transições",
+      "Acompanham áreas críticas e priorizam eventos",
+      "Validam consistência entre registro, conduta e documentação",
+      "Apoiam a organização da alta e a continuidade do pós-alta",
     ],
-    closingQuestionLabel: "CTA · Pergunta-gatilho",
-    closingQuestion:
-      "Em qual desses pontos a sua instituição perde mais continuidade hoje?",
+    attentionPhrase:
+      "Os agentes não substituem a equipe. Ampliam a capacidade de leitura, priorização e decisão ao longo da jornada.",
+    closingHighlight:
+      "A tecnologia deixa de apenas registrar o cuidado — e passa a sustentar continuidade, visibilidade e capacidade real de decisão.",
   },
 };
 
@@ -146,20 +137,19 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   )
   .map(
     withStep("governance", {
+      kind: "narrative",
+      accent: "emerald",
+      title: "A pergunta mudou.",
+      subtitle: "Da posse do dado para a continuidade do contexto na decisão",
+    }),
+  )
+  .map(
+    withStep("roadmap", {
       kind: "capacities",
       accent: "cyan",
       title: "Essa arquitetura já existe na prática.",
       subtitle:
         "Ecossistema Salux: capacidades centrais e de sustentação da continuidade",
-    }),
-  )
-  .map(
-    withStep("roadmap", {
-      kind: "narrative",
-      accent: "emerald",
-      title: "A tecnologia deixa de registrar e passa a atuar.",
-      subtitle:
-        "Sem INITIA × Com INITIA — contexto vivo em vez de reconstrução",
     }),
   )
   .map(
@@ -174,18 +164,18 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map(
     withContent("cover", {
       headline: "Abertura",
-      cardVisual: "reveal",
+      cardVisual: "ripple",
       lead: "Na gravidade do caso?\nNa complexidade do paciente?\nOu no momento em que o cuidado perde continuidade?",
       contrastPair: {
         left: {
           label: "Evento visível",
-          icon: "👁",
+          icon: "🔴",
           tone: "warm",
           text: "Complicação.\nErro identificado.\nEvento adverso registrado.",
         },
         right: {
           label: "Risco silencioso",
-          icon: "🌫",
+          icon: "🦊",
           tone: "cool",
           text: "Contexto que se perde.\nDecisão com visão parcial.\nRisco crescendo antes de aparecer.",
         },
@@ -201,218 +191,230 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   )
   .map(
     withContent("limit", {
-      headline: "Diagnóstico",
-      omitSidePhoto: true,
-      cardVisual: "pattern",
-      metrics: [
+      headline: "Acúmulo",
+      cardVisual: "fragment",
+      valueStagesLead:
+        "Na maioria das vezes, o risco se forma em rupturas pequenas — que ninguém percebe isoladamente:",
+      valueStagesFlat: true,
+      valueStagesGridCols: 3,
+      valueStages: [
         {
-          value: 80,
-          decimals: 0,
-          label: "Eventos adversos graves",
-          suffix:
-            "podem estar associados a falhas nas transições de cuidado — onde o contexto se perde.",
-          ring: 80,
-          trend: [52, 58, 61, 65, 69, 72, 76, 80],
-          delta: 4,
-          deltaUnit: "pp",
+          number: "📋",
+          label: "Informação",
+          description: "Que não chega completa.",
         },
         {
-          value: 15,
-          decimals: 0,
-          label: "Áreas críticas",
-          suffix:
-            "dos pacientes podem apresentar complicações não detectadas imediatamente quando a visibilidade chega tarde.",
-          ring: 15,
-          trend: [6, 7, 8, 9, 10, 11, 13, 15],
-          delta: 2.2,
-          deltaUnit: "pp",
+          number: "🔁",
+          label: "Histórico",
+          description: "Que precisa ser reconstruído a cada etapa.",
+        },
+        {
+          number: "🔀",
+          label: "Transição",
+          description: "Entre áreas sem contexto preservado.",
+        },
+        {
+          number: "🧩",
+          label: "Decisão",
+          description: "Tomada com visão parcial do caso.",
+        },
+        {
+          number: "🚪",
+          label: "Alta",
+          description: "Que encerra o vínculo antes de encerrar o cuidado.",
         },
       ],
       body: "Cada ruptura parece administrável. Mas elas se somam ao longo da jornada — e o risco cresce antes de se tornar visível.",
       attentionPhrase:
         "Não falta dado. Falta continuidade entre o dado e a decisão certa, no momento certo.",
-      newsUrls: [news1Url, news2Url],
       bullets: [],
-      valueStages: [],
-      valueStagesLead: undefined,
-      valueStagesFlat: undefined,
-      valueStagesGridCols: undefined,
-      heroImage: undefined,
+      metrics: undefined,
+      heroImage: {
+        src: trilha2JornadaUrl,
+        alt: "Jornada assistencial conectando recepção, consultório, exames e enfermaria",
+      },
     }),
   )
   .map(
     withContent("why-agents", {
-      headline: "Acúmulo",
-      cardVisual: "accumulation",
-      valueStagesLead:
-        "Ao longo da jornada assistencial, o risco de perda de continuidade passa por quatro rupturas típicas:",
-      valueStagesFlat: true,
-      valueStagesGridCols: 4,
-      valueStages: [
-        {
-          number: "01",
-          label: "Informação",
-          description: "Incompleta ou dispersa na origem.",
-        },
-        {
-          number: "02",
-          label: "Transição",
-          description: "Contexto reconstruído a cada mudança de área.",
-        },
-        {
-          number: "03",
-          label: "Decisão",
-          description: "Tomada com leitura parcial do caso.",
-        },
-        {
-          number: "04",
-          label: "Continuidade",
-          description: "Que se rompe antes do cuidado encerrar de fato.",
-        },
-      ],
-      body: "Cada ruptura parece administrável isoladamente. Mas elas se acumulam — e o risco aparece tarde, quando parte do dano já ocorreu.",
-      attentionPhrase:
-        "São pequenas rupturas que se somam e corroem a segurança e a qualidade do cuidado.",
+      headline: "Continuidade decisória",
+      cardVisual: "weave",
       metrics: [],
       bullets: [],
-      dualStages: undefined,
       bulletSplitAfter: undefined,
-      heroImage: undefined,
+      dualStages: {
+        positive: {
+          lead: "O que a operação faz todos os dias:",
+          gridCols: 7,
+          items: [
+            { label: "Registra" },
+            { label: "Documenta" },
+            { label: "Atende" },
+            { label: "Prescreve" },
+            { label: "Executa" },
+            { label: "Encaminha" },
+            { label: "Dá alta" },
+          ],
+        },
+        negative: {
+          lead: "O que acontece entre essas etapas:",
+          gridCols: 3,
+          items: [
+            { label: "Informações não chegam completas" },
+            { label: "Contexto clínico é reconstruído a cada transição" },
+            { label: "Áreas operam com leituras diferentes do mesmo caso" },
+          ],
+        },
+      },
+      attentionPhrase:
+        "A operação sustenta o cuidado todos os dias. Mas ainda não sustenta continuidade de decisão ao longo da jornada.",
+      heroImage: {
+        src: trilha2RedeUrl,
+        alt: "Rede assistencial conectada a um centro de comando clínico",
+      },
     }),
   )
   .map(
     withContent("architecture", {
-      headline: "Modelo reativo",
-      cardVisual: "late-reaction",
-      valueStagesFlat: true,
-      valueStages: [
-        {
-          number: "✕",
-          label: "Correção tardia",
-          description: "Quando o evento já se materializou na jornada.",
-        },
-        {
-          number: "✕",
-          label: "Leitura fragmentada",
-          description: "Quando cada área vê só um pedaço do caso.",
-        },
-        {
-          number: "✕",
-          label: "Registro sem condução",
-          description: "O dado existe — a decisão coordenada não vem.",
-        },
-      ],
-      body: "No curto prazo, a equipe compensa. Mas o esforço custa tempo, custa gente e aumenta exposição assistencial.",
-      attentionPhrase:
-        "Grande parte do esforço acontece tarde demais. O custo de corrigir é maior que o custo de prevenir.",
+      headline: "Evidência",
+      cardVisual: "magnet",
+      lead: "Esse padrão não é percepção. Aparece nos números:",
       metrics: [],
       bullets: [],
-      lead: undefined,
-      architectureMinimal: false,
-      evidenceMetrics: [],
-      heroImage: undefined,
+      architectureMinimal: true,
+      evidenceMetrics: [
+        {
+          badge: "Dado · Evidência",
+          prefix: "até",
+          value: 80,
+          unit: "%",
+          headline:
+            "dos eventos adversos graves podem estar associados a falhas nas transições de cuidado.",
+          context:
+            "A transição entre áreas não é apenas passagem de paciente. É um ponto crítico de segurança — onde o contexto se perde e o risco se forma.",
+        },
+        {
+          badge: "Dado · Evidência",
+          prefix: "até",
+          value: 15,
+          unit: "%",
+          headline:
+            "dos pacientes em áreas críticas podem apresentar complicações não detectadas imediatamente.",
+          context:
+            "Em recuperação pós-anestésica, UTI e leitos monitorados, o risco muda rápido. Quando a visibilidade chega tarde, parte do dano já aconteceu.",
+        },
+      ],
+      body: "Esses dados não falam apenas de eventos. Eles mostram uma fragilidade estrutural.",
+      attentionPhrase:
+        "Quando o contexto se perde, o risco cresce em silêncio. E quando se torna visível, parte dele já se materializou.",
+      heroImage: {
+        src: trilha2ComandoUrl,
+        alt: "Equipe clínica analisando painéis de operação em centro de comando",
+      },
     }),
   )
   .map(
     withContent("journey", {
-      headline: "Virada de lógica",
-      omitSidePhoto: true,
-      cardVisual: "transform",
-      contrastPair: {
-        left: {
-          label: "Antes",
-          tone: "warm",
-          text: "O cuidado é reativo — reconstrói contexto depois que o risco já avançou.",
-        },
-        right: {
-          label: "Depois",
-          tone: "cool",
-          text: "O cuidado é contínuo — contexto e decisão acompanham a jornada enquanto ela acontece.",
-        },
-      },
-      body: "Essa virada exige uma mudança na forma como a operação é estruturada:",
-      beforeAfter: {
-        before: [
-          "Registro disperso",
-          "Etapa isolada",
-          "Leitura tardia",
-          "Reação ao evento",
-          "Esforço individual de compensação",
-        ],
-        after: [
-          "Contexto preservado",
-          "Jornada coordenada",
-          "Visibilidade na execução",
-          "Antecipação coordenada",
-          "Suporte estruturado à decisão",
-        ],
-      },
-      attentionPhrase:
-        "O cuidado precisa ser sustentado enquanto acontece — não recuperado depois que o contexto se perdeu.",
+      headline: "Jornada",
+      cardVisual: "thread",
       journeyStages: [],
-      lead: undefined,
-      valueStages: [],
-      valueStagesFlat: undefined,
-      valueStagesGridCols: undefined,
-      closingQuestion: undefined,
-      closingQuestionLabel: undefined,
+      lead: "Cada etapa parece resolvida isoladamente. Mas o cuidado não acontece em etapas isoladas.",
+      valueStagesFlat: true,
+      valueStagesGridCols: 5,
+      valueStages: [
+        { number: "01", label: "Admissão" },
+        { number: "02", label: "Atendimento" },
+        { number: "03", label: "Transição entre áreas" },
+        { number: "04", label: "Centro cirúrgico" },
+        { number: "05", label: "Recuperação" },
+        { number: "06", label: "Documentação" },
+        { number: "07", label: "Operação assistencial" },
+        { number: "08", label: "Alta" },
+        { number: "09", label: "Pós-alta" },
+      ],
+      body: "Quando a continuidade não é sustentada entre essas etapas, a jornada passa a depender de repasses manuais, memória individual e reconstrução constante de contexto.",
+      attentionPhrase:
+        "O cuidado depende de continuidade entre as etapas. Não apenas de qualidade dentro delas.",
+      closingQuestionLabel: "CTA · Pergunta-gatilho",
+      closingQuestion:
+        "Em qual ponto da jornada o cuidado perde mais continuidade na sua instituição?",
       bullets: [],
     }),
   )
   .map(
     withContent("integration", {
-      headline: "Base coordenada",
-      omitSidePhoto: true,
-      cardVisual: "mesh",
-      valueStagesLead:
-        "A continuidade assistencial depende de como a operação funciona como um todo — da admissão ao pós-alta.\n\nSeis capacidades que precisam operar de forma coordenada:",
-      valueStagesFlat: true,
-      valueStagesGridCols: 3,
-      valueStages: [
-        {
-          number: "01",
-          label: "Base clínica",
-          description: "Origem estruturada da informação e do contexto.",
+      headline: "Continuidade operacional",
+      cardVisual: "crystal",
+      lead: "As equipes sabem cuidar. O problema está na forma como a operação está organizada.",
+      contrastPair: {
+        left: {
+          label: "O que a saúde avançou",
+          tone: "cool",
+          text: "Registrar e armazenar informação.\nDigitalizar processos.\nIntegrar sistemas.",
         },
-        {
-          number: "02",
-          label: "Fluxo assistencial",
-          description: "Acompanhamento contínuo da jornada.",
+        right: {
+          label: "O que ainda falta",
+          tone: "warm",
+          text: "Fazer com que a informação certa acompanhe a jornada no momento em que a decisão precisa ser tomada.",
         },
-        {
-          number: "03",
-          label: "Governança documental",
-          description: "Evidência e rastreabilidade ao longo do cuidado.",
-        },
-        {
-          number: "04",
-          label: "Força de trabalho",
-          description: "Escala, cobertura e disponibilidade alinhadas ao risco.",
-        },
-        {
-          number: "05",
-          label: "Áreas críticas",
-          description: "Alta complexidade com leitura em tempo real.",
-        },
-        {
-          number: "06",
-          label: "Inteligência operacional",
-          description: "A operação acompanhada enquanto acontece.",
-        },
-      ],
-      body: "Registrar informação não substitui preservar contexto.\nIntegrar sistemas não substitui coordenar a decisão na jornada.",
+      },
+      body: "Registrar informação não significa preservar contexto.\nPreservar contexto não significa apenas integrar sistemas.",
       attentionPhrase:
-        "Esses elementos não operam de forma independente. Quando um falha, a continuidade se rompe nos outros.",
-      lead: undefined,
-      contrastPair: undefined,
+        "O limite não está na ausência de tecnologia. Está na ausência de uma base capaz de transformar informação dispersa em clareza clínica e ação coordenada.",
       bullets: [],
-      heroImage: undefined,
+      heroImage: {
+        src: trilha2IntegracaoUrl,
+        alt: "Integração da rede assistencial em torno de um centro de operações clínicas",
+      },
     }),
   )
   .map(
     withContent("governance", {
+      headline: "A pergunta mudou.",
+      cardVisual: "prism",
+      contrastPair: {
+        left: {
+          label: "Antes",
+          tone: "warm",
+          text: "Onde a informação está registrada?",
+        },
+        right: {
+          label: "Agora",
+          tone: "cool",
+          text: "O contexto certo acompanha a decisão no momento em que ela acontece?",
+        },
+      },
+      body: "Isso exige uma mudança de lógica na base da operação:",
+      beforeAfter: {
+        before: [
+          "Registro",
+          "Etapa isolada",
+          "Leitura tardia",
+          "Reação ao risco",
+          "Esforço individual de compensação",
+        ],
+        after: [
+          "Contexto preservado",
+          "Jornada coordenada",
+          "Visibilidade durante a execução",
+          "Antecipação coordenada",
+          "Suporte estruturado à decisão",
+        ],
+      },
+      attentionPhrase:
+        "A mudança não está em digitalizar mais uma etapa. Está em sustentar continuidade ao longo de toda a jornada.",
+      bullets: [],
+      revealPillars: [],
+      heroImage: {
+        src: trilha2EvolucaoUrl,
+        alt: "Evolução do registro para a decisão sustentada ao longo da jornada",
+      },
+    }),
+  )
+  .map(
+    withContent("roadmap", {
       headline: "Essa arquitetura já existe na prática.",
-      cardVisual: "orbit",
+      cardVisual: "branch",
       body: "O Ecossistema Salux estrutura a continuidade em cada ponto da jornada — de forma integrada, não como soluções isoladas.",
       capacityGroups: [
         {
@@ -421,12 +423,14 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
           items: [
             {
               name: "Base clínica",
+              // subtitle: "Plataforma Salux + INITIA",
               description:
                 "Núcleo que organiza dados, fluxos, registros e contexto clínico.",
               tagline: "O caso deixa de ser reconstruído a cada etapa.",
             },
             {
               name: "Diagnóstico integrado",
+              // subtitle: "Med.Place",
               description:
                 "Exame, laudo e contexto conectados à linha do cuidado.",
               tagline:
@@ -434,9 +438,17 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
             },
             {
               name: "Cuidado conectado",
+              // subtitle: "CloudHealth",
               description:
-                "Crônicos, pós-cirúrgicos e recuperação com vínculo e resposta.",
+                "Crônicos, pós-cirúrgicos e pacientes em recuperação acompanhados com vínculo e resposta.",
               tagline: "A continuidade não termina na alta.",
+            },
+            {
+              name: "Áreas críticas",
+              // subtitle: "SkyMed · VisionPilot · AGCOM",
+              description:
+                "Registro anestésico estruturado e rastreabilidade contínua.",
+              tagline: "O risco acompanhado enquanto o cuidado acontece.",
             },
           ],
         },
@@ -445,61 +457,30 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
           tone: "support",
           items: [
             {
-              name: "Áreas críticas",
-              description:
-                "Registro anestésico estruturado, rastreabilidade e leitura em tempo real do ambiente.",
-              tagline: "O risco acompanhado enquanto o cuidado acontece.",
-            },
-            {
               name: "Governança documental",
+              //subtitle: "ZeroDox",
               description:
                 "Documentação que sustenta rastreabilidade, conformidade e continuidade.",
               tagline: "Deixa de ser ponto de fragilidade.",
             },
             {
               name: "Força de trabalho",
+              // subtitle: "StarGrid",
               description:
                 "Escala, cobertura e disponibilidade alinhadas ao risco e ao fluxo assistencial.",
               tagline: "Equipe como capacidade coordenada.",
             },
+            {
+              name: "Inteligência operacional",
+              // subtitle: "VisionPilot",
+              description:
+                "Fluxos físicos, ocupação e sinais do ambiente acompanhados em tempo real.",
+              tagline: "O risco que não aparece no prontuário.",
+            },
           ],
         },
       ],
-      contrastPair: undefined,
-      beforeAfter: undefined,
-      revealPillars: [],
       bullets: [],
-      heroImage: undefined,
-    }),
-  )
-  .map(
-    withContent("roadmap", {
-      headline: "Agentes",
-      omitSidePhoto: true,
-      cardVisual: "radar",
-      contrastPair: {
-        left: {
-          label: "Sem INITIA",
-          tone: "warm",
-          text: "A operação registra. A equipe interpreta. O contexto se perde entre etapas. O retrabalho começa.",
-        },
-        right: {
-          label: "Com INITIA",
-          tone: "cool",
-          text: "O agente sintetiza, prioriza e aciona. O risco aparece antes de se materializar. A decisão parte com contexto.",
-        },
-      },
-      body: "O que os agentes fazem na jornada assistencial:",
-      bullets: [
-        "Estruturam dados críticos desde a admissão",
-        "Sintetizam o prontuário e destacam riscos, alergias e restrições",
-        "Mantêm contexto entre áreas e equipes ao longo das transições",
-        "Acompanham áreas críticas e priorizam eventos",
-        "Validam consistência entre registro, conduta e documentação",
-      ],
-      attentionPhrase:
-        "Os agentes não substituem a equipe. Ampliam leitura, priorização e decisão ao longo da jornada.",
-      capacityGroups: [],
       roadmapTransform: false,
     }),
   )
@@ -507,7 +488,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
     withContent("closing", {
       headline:
         "O cuidado deixa de depender de reconstrução. E passa a ter continuidade real.",
-      cardVisual: "flow",
+      cardVisual: "bloom",
       body: "Com uma base coordenada, a jornada deixa de depender de esforço individual de compensação.",
       valueStagesFlat: true,
       valueStagesGridCols: 3,
@@ -515,32 +496,17 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
         {
           number: "✓",
           label: "Mais previsibilidade sobre a jornada e os riscos",
-          description: "",
         },
-        {
-          number: "✓",
-          label: "Mais clareza clínica no momento da decisão",
-          description: "",
-        },
+        { number: "✓", label: "Mais clareza clínica no momento da decisão" },
         {
           number: "✓",
           label: "Mais continuidade entre áreas, equipes e momentos",
-          description: "",
         },
-        {
-          number: "✓",
-          label: "Menos retrabalho e reconstrução de contexto",
-          description: "",
-        },
-        {
-          number: "✓",
-          label: "Menos variabilidade e exposição assistencial",
-          description: "",
-        },
+        { number: "✓", label: "Menos retrabalho e reconstrução de contexto" },
+        { number: "✓", label: "Menos variabilidade e exposição assistencial" },
         {
           number: "✓",
           label: "Mais capacidade de antecipar risco antes que se materialize",
-          description: "",
         },
       ],
       attentionPhrase:
