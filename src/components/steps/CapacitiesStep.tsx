@@ -8,6 +8,7 @@ import { usePresentationStore } from '@/store/presentationStore';
 import { EraRevealBand } from '@/components/motion/EraAgenticaReveal';
 import { buildCapacitiesBandKeys } from '@/lib/eraAgenticaRevealBands';
 import { ExpandedCardPortal } from './ExpandedCardPortal';
+import { ProductExamplesStrip } from './ProductExamplesStrip';
 
 interface Props {
   step: PresentationStep;
@@ -31,7 +32,9 @@ export function CapacitiesStep({ step, active }: Props) {
     flipPhoto,
   );
   const groups = step.content.capacityGroups ?? [];
+  const productExamples = step.content.productExamples ?? [];
   const trackId = cardCtx?.trackId;
+  const hideProductLabels = trackId === 'assistencial';
   const eraStaging = trackId === 'era-agentica';
   const bandKeys = useMemo(() => buildCapacitiesBandKeys(step.content), [step.content]);
   const b = (id: string) => bandKeys.indexOf(id);
@@ -83,6 +86,8 @@ export function CapacitiesStep({ step, active }: Props) {
       accent={step.accent}
       active={active}
       stepId={step.id}
+      sidePhotoSrc={step.content.heroImage?.src}
+      sidePhotoAlt={step.content.heroImage?.alt}
       width={760}
       badge={step.title}
       cardVisual={step.content.cardVisual}
@@ -183,6 +188,7 @@ export function CapacitiesStep({ step, active }: Props) {
                     active={active}
                     selected={selectedCapacity === fi}
                     dimmed={selectedCapacity !== null && selectedCapacity !== fi}
+                    hideSubtitle={hideProductLabels}
                     onClick={() => setSelectedCapacity((s) => (s === fi ? null : fi))}
                     refCallback={(el) => { capacityRefs.current[fi] = el; }}
                   />
@@ -194,12 +200,33 @@ export function CapacitiesStep({ step, active }: Props) {
           );
         })}
 
+        {productExamples.length > 0 && (
+          <EraRevealBand
+            bandId="productExamples"
+            bandIndex={b('productExamples')}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion}>
+              <ProductExamplesStrip
+                examples={productExamples}
+                active={active}
+                accentColor={accent.base}
+              />
+            </motion.div>
+          </EraRevealBand>
+        )}
+
         <AnimatePresence>
           {selectedCapacity !== null && flatItems[selectedCapacity] !== undefined && (
             <ExpandedCardPortal
               key={`cap-expanded-${selectedCapacity}`}
               text={flatItems[selectedCapacity]!.item.name}
-              description={[flatItems[selectedCapacity]!.item.subtitle, flatItems[selectedCapacity]!.item.description, flatItems[selectedCapacity]!.item.tagline].filter(Boolean).join('\n\n') || undefined}
+              description={[flatItems[selectedCapacity]!.item.description, flatItems[selectedCapacity]!.item.tagline].filter(Boolean).join('\n\n') || undefined}
+              imageSrc={flatItems[selectedCapacity]!.item.productImage}
+              imageAlt={flatItems[selectedCapacity]!.item.name}
               accentColor={flatItems[selectedCapacity]!.ring}
               reducedMotion={Boolean(reduce)}
               origin={capacityRefs.current[selectedCapacity] ?? null}
@@ -220,6 +247,7 @@ function CapacityCard({
   active,
   selected,
   dimmed,
+  hideSubtitle,
   onClick,
   refCallback,
 }: {
@@ -230,6 +258,7 @@ function CapacityCard({
   active: boolean;
   selected: boolean;
   dimmed: boolean;
+  hideSubtitle?: boolean;
   onClick: () => void;
   refCallback: (el: HTMLLIElement | null) => void;
 }) {
@@ -286,12 +315,14 @@ function CapacityCard({
           >
             {item.name}
           </span>
-          <span
-            className="text-[0.78rem] font-medium uppercase tracking-[0.16em]"
-            style={{ color: ring, opacity: 0.85 }}
-          >
-            {item.subtitle}
-          </span>
+          {!hideSubtitle && item.subtitle && (
+            <span
+              className="text-[0.78rem] font-medium uppercase tracking-[0.16em]"
+              style={{ color: ring, opacity: 0.85 }}
+            >
+              {item.subtitle}
+            </span>
+          )}
         </div>
         {item.description && (
           <p className="text-[0.92rem] leading-relaxed text-slate-300/90">{item.description}</p>

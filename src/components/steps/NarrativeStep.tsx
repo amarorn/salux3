@@ -322,7 +322,9 @@ export function NarrativeStep({ step, active }: Props) {
                 const c =
                   it.tone === "cool"
                     ? theme.accents.emerald
-                    : theme.accents.rose;
+                    : trackId === "assistencial"
+                      ? theme.accents.amber
+                      : theme.accents.rose;
                 return (
                   <motion.div
                     key={side}

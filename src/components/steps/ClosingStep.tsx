@@ -18,7 +18,7 @@ import { FloatingCard, FloatingCardContext } from "../FloatingCard";
 import type { PresentationStep } from "@/domain/types";
 import { theme } from "@/domain/theme";
 import { getCardTextVariants } from "./cardTextMotion";
-import { HighlightPhraseList } from "./HighlightBlocks";
+import { ClosingHighlight, HighlightPhraseList } from "./HighlightBlocks";
 import { resolveContactFormUrl } from "@/config/contact";
 import { usePresentationStore } from "@/store/presentationStore";
 import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
@@ -67,7 +67,6 @@ export function ClosingStep({ step, active }: Props) {
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
   }, [selectedBenefit]);
-  const hero = step.content.heroImage;
   const trackId = useContext(FloatingCardContext)?.trackId;
   const eraStaging = trackId === "era-agentica";
   const bandKeys = useMemo(
@@ -112,8 +111,6 @@ export function ClosingStep({ step, active }: Props) {
       accent={step.accent}
       active={active}
       stepId={step.id}
-      sidePhotoSrc={hero?.src}
-      sidePhotoAlt={hero?.alt}
       width={benefits.length >= 4 ? 820 : 580}
       cardVisual={step.content.cardVisual}
     >
@@ -396,12 +393,12 @@ export function ClosingStep({ step, active }: Props) {
             eraStaging={eraStaging}
             active={active}
           >
-            <motion.p
-              {...innerMotion}
-              className="mt-1 text-center text-[1rem] leading-relaxed text-slate-100/90"
-            >
-              {step.content.closingHighlight}
-            </motion.p>
+            <motion.div {...innerMotion}>
+              <ClosingHighlight
+                text={step.content.closingHighlight}
+                active={active}
+              />
+            </motion.div>
           </EraRevealBand>
         )}
       </motion.div>

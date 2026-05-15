@@ -1817,14 +1817,23 @@ function Tide({ accentColor, active, reduce }: V) {
       >
         LIMITE DA REDE
       </Label>
+      <line
+        x1={20}
+        y1={baseY}
+        x2={20 + w}
+        y2={baseY}
+        stroke="#ffffff"
+        strokeOpacity={0.12}
+        strokeWidth={1}
+      />
       <motion.rect
         x={20}
         width={w}
         rx={4}
         fill={accentColor}
-        fillOpacity={0.18}
+        fillOpacity={0.22}
         stroke={accentColor}
-        strokeOpacity={0.5}
+        strokeOpacity={0.55}
         strokeWidth={1}
         initial={reduce ? false : { height: 0, y: baseY }}
         animate={
@@ -1836,6 +1845,20 @@ function Tide({ accentColor, active, reduce }: V) {
         }
         transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
       />
+      <motion.text
+        x={20 + w / 2}
+        y={baseY - 32}
+        textAnchor="middle"
+        fill={accentColor}
+        fontSize="11"
+        fontWeight="600"
+        fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+        initial={reduce ? false : { opacity: 0 }}
+        animate={active ? { opacity: 0.95 } : { opacity: 0 }}
+        transition={{ duration: 0.5, delay: 1.2 }}
+      >
+        pressão em subida
+      </motion.text>
       {points
         .filter((_, i) => i % 5 === 0)
         .map((p, i) => (
@@ -1989,8 +2012,22 @@ function Ladder({ accentColor, active, reduce }: V) {
         const x = 60 + i * 80;
         const y = VIEW.h - 18 - i * 14;
         return (
+          <motion.g key={i}>
+            {i > 0 && (
+              <motion.line
+                x1={x - 10}
+                y1={y + 4}
+                x2={x}
+                y2={y + 4}
+                stroke={accentColor}
+                strokeOpacity={0.45}
+                strokeWidth={1}
+                initial={reduce ? false : { pathLength: 0 }}
+                animate={active ? { pathLength: 1 } : { pathLength: 0 }}
+                transition={{ duration: 0.4, delay: 0.5 + i * 0.12 }}
+              />
+            )}
           <motion.rect
-            key={i}
             x={x}
             y={y}
             width={70}
@@ -2015,6 +2052,7 @@ function Ladder({ accentColor, active, reduce }: V) {
               ease: [0.22, 1, 0.36, 1],
             }}
           />
+          </motion.g>
         );
       })}
     </Shell>

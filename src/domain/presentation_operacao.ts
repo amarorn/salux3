@@ -1,5 +1,14 @@
 import type { PresentationStep } from './types';
-import trilha3PathwaysUrl from '@/assets/presentation/trilha3-central-notificacoes.png?url';
+import trilha3Slide1Url from '@/assets/presentation/trilha3-slide1.jpg?url';
+import trilha3Slide2Url from '@/assets/presentation/trilha3-slide2.jpg?url';
+import trilha3Slide3Url from '@/assets/presentation/trilha3-slide3.jpg?url';
+import trilha3Slide4Url from '@/assets/presentation/trilha3-slide4.jpg?url';
+import trilha3Slide5Url from '@/assets/presentation/trilha3-slide5.jpg?url';
+import trilha3Slide6Url from '@/assets/presentation/trilha3-slide6.jpg?url';
+import trilha3Slide7Url from '@/assets/presentation/trilha3-slide7.jpg?url';
+import trilha3Slide8Url from '@/assets/presentation/trilha3-slide8.png?url';
+import trilha3Slide9Url from '@/assets/presentation/trilha3-slide9.jpg?url';
+import trilha3Slide10Url from '@/assets/presentation/trilha3-slide10.jpg?url';
 import { steps as baseSteps } from './presentation';
 
 export const presentationOperacaoMeta = {
@@ -25,12 +34,12 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
       return {
         ...s,
         kind: 'narrative' as const,
-        accent: 'rose' as const,
+        accent: 'amber' as const,
         title: 'Onde o crescimento da sua instituição começa a pesar?',
         subtitle: 'Pontos de atrito que aparecem com a expansão',
         content: {
           headline: 'Crescimento que pesa',
-          cardVisual: 'ladder',
+          cardVisual: 'converge',
           valueStagesLead: 'Reconhece algum destes pontos de atrito?',
           valueStagesFlat: true,
           valueStagesGridCols: 3,
@@ -42,10 +51,9 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
             { number: '📉', label: 'Perda de previsibilidade econômica com o crescimento' },
             { number: '🏛', label: 'Expansão física que exige mais estrutura e mais custo' },
           ],
-          closingQuestion: 'Sua instituição está crescendo por arquitetura — ou por acúmulo?',
-          closingQuestionLabel: 'CTA · Pergunta-gatilho',
           bullets: [],
           painPointsLayout: false,
+          heroImage: { src: trilha3Slide1Url, alt: 'Trilha 3 — Slide 1' },
         },
       };
     }
@@ -59,7 +67,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
         subtitle: 'A expansão amplia capacidade — e também complexidade',
         content: {
           headline: 'Crescer adicionando esforço',
-          cardVisual: 'tide',
+          cardVisual: 'fragment',
           valueStagesFlat: true,
           valueStagesGridCols: 4,
           valueStages: [
@@ -78,6 +86,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           bullets: [],
           highlightPhrases: [],
           painPointsLayout: false,
+          heroImage: { src: trilha3Slide2Url, alt: 'Trilha 3 — Slide 2' },
         },
       };
     }
@@ -94,7 +103,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           cardVisual: 'gear',
           lead:
             'A maioria das instituições já tem sistemas, módulos, BI, prontuário, integrações e controles.',
-          attentionPhrase:
+          closingHighlight:
             'Um conjunto de sistemas não forma, necessariamente, uma arquitetura.',
           body:
             'Durante anos, a saúde avançou informatizando partes da operação. Isso foi necessário.\nMas informatizar partes não significa coordenar o todo.',
@@ -114,6 +123,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           bullets: [],
           highlightPhrases: [],
           painPointsLayout: false,
+          heroImage: { src: trilha3Slide3Url, alt: 'Trilha 3 — Slide 3' },
         },
       };
     }
@@ -161,6 +171,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           bullets: [],
           highlightPhrases: [],
           painPointsLayout: false,
+          heroImage: { src: trilha3Slide4Url, alt: 'Trilha 3 — Slide 4' },
         },
       };
     }
@@ -191,6 +202,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           ],
           attentionPhrase:
             'Quando esses elementos operam como ecossistema, crescer deixa de exigir sempre mais costura.',
+          heroImage: { src: trilha3Slide5Url, alt: 'Trilha 3 — Slide 5' },
         },
       };
     }
@@ -214,27 +226,27 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
               items: [
                 {
                   name: 'Base digital',
-                  subtitle: 'Plataforma Salux + INITIA',
+                  subtitle: 'Núcleo operacional',
                   description: 'Organiza dados, processos e fluxos críticos.',
                   tagline: 'Coordenação desde a origem.',
                 },
                 {
-                  name: 'Capilaridade',
-                  subtitle: 'CloudHealth',
+                  name: 'Capilaridade assistencial',
+                  subtitle: 'Alcance distribuído',
                   description:
                     'Amplia atendimento, acesso e acompanhamento sem depender de nova unidade física.',
                   tagline: 'Mais alcance sem expansão física linear.',
                 },
                 {
-                  name: 'Diagnóstico',
-                  subtitle: 'Med.Place',
+                  name: 'Diagnóstico em rede',
+                  subtitle: 'Continuidade diagnóstica',
                   description:
-                    'Diagnóstico em rede e disponibilidade contínua. O volume cresce sem criar ruptura.',
+                    'Disponibilidade contínua. O volume cresce sem criar ruptura.',
                   tagline: 'Escala diagnóstica sem gargalo.',
                 },
                 {
                   name: 'Força de trabalho',
-                  subtitle: 'StarGrid',
+                  subtitle: 'Capacidade instalada',
                   description:
                     'Coordena demanda, cobertura, absenteísmo e custo.',
                   tagline: 'Equipe como capacidade instalada.',
@@ -247,21 +259,22 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
               items: [
                 {
                   name: 'Governança documental',
-                  subtitle: 'ZeroDox',
+                  subtitle: 'Rastreabilidade',
                   description:
                     'Rastreabilidade, conformidade e continuidade.',
                   tagline: 'Crescer sem fragilidade documental.',
+                  productImage: trilha3Slide8Url,
                 },
                 {
                   name: 'Controle econômico',
-                  subtitle: 'TI Hospitalar',
+                  subtitle: 'Previsibilidade financeira',
                   description:
                     'Faturamento, glosas e previsibilidade financeira.',
                   tagline: 'Crescimento com controle de resultado.',
                 },
                 {
                   name: 'Áreas críticas',
-                  subtitle: 'SkyMed + VisionPilot · AGCOM',
+                  subtitle: 'Monitoramento em tempo real',
                   description:
                     'Fluxos físicos, ocupação e sinais operacionais acompanhados em tempo real.',
                   tagline: 'A operação acompanhada enquanto acontece.',
@@ -269,6 +282,15 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
               ],
             },
           ],
+          productExamples: [
+            {
+              caption:
+                'Exemplo em operação — notificações, canais e histórico de envios documentais',
+              imageSrc: trilha3Slide8Url,
+              alt: 'Interface de governança documental em operação',
+            },
+          ],
+          heroImage: { src: trilha3Slide6Url, alt: 'Trilha 3 — Slide 6' },
         },
       };
     }
@@ -278,39 +300,58 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
         ...s,
         kind: 'narrative' as const,
         accent: 'emerald' as const,
-        title: 'Com o INITIA, a operação deixa de correr atrás da informação.',
-        subtitle: 'Agentes que ampliam a capacidade de resposta da operação',
+        title: 'A operação deixa de correr atrás da informação.',
+        subtitle: 'Agentes que ampliam a capacidade de resposta',
         content: {
-          headline: 'INITIA · Agentes',
+          headline: 'Agentes na operação',
           cardVisual: 'signal',
           contrastPair: {
             left: {
-              label: 'Sem INITIA',
+              label: 'Sem agentes',
               tone: 'warm',
               text:
                 'O usuário procura dados.\nInterpreta manualmente.\nDecide com visão parcial.\nAciona tarde.',
             },
             right: {
-              label: 'Com INITIA',
+              label: 'Com agentes',
               tone: 'cool',
               text:
                 'A informação se apresenta.\nO contexto acompanha.\nO agente orienta.\nA ação parte do dado.',
             },
           },
-          body: 'O que os Agentes fazem na operação:',
-          bullets: [
-            'Identificam gargalos e interpretam capacidade disponível',
-            'Organizam contexto e priorizam fluxos operacionais',
-            'Apoiam alocação de equipes conforme demanda e criticidade',
-            'Sinalizam riscos antes que virem problema',
-            'Recomendam ações e executam tarefas sob governança',
+          valueStagesLead: 'O que os Agentes fazem na operação:',
+          valueStagesFlat: true,
+          valueStagesGridCols: 2,
+          valueStages: [
+            {
+              number: '01',
+              label: 'Identificam gargalos e interpretam capacidade disponível',
+            },
+            {
+              number: '02',
+              label: 'Organizam contexto e priorizam fluxos operacionais',
+            },
+            {
+              number: '03',
+              label: 'Apoiam alocação de equipes conforme demanda e criticidade',
+            },
+            {
+              number: '04',
+              label: 'Sinalizam riscos antes que virem problema',
+            },
+            {
+              number: '05',
+              label: 'Recomendam ações e executam tarefas sob governança',
+            },
           ],
+          bullets: [],
           attentionPhrase:
             'Os agentes não substituem a equipe. Ampliam a capacidade de resposta da operação.',
           closingHighlight:
             'A tecnologia deixa de apenas registrar a expansão — e passa a ajudar a coordená-la.',
           highlightPhrases: [],
           painPointsLayout: false,
+          heroImage: { src: trilha3Slide7Url, alt: 'Trilha 3 — Slide 7' },
         },
       };
     }
@@ -324,6 +365,11 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
         content: {
           headline: 'Sua instituição está crescendo por arquitetura — ou por acúmulo?',
           cardVisual: 'compass',
+          bannerMedia: {
+            videoSrc: '/intro/tecnologia-loop.mp4',
+            posterSrc: trilha3Slide10Url,
+          },
+          omitSidePhoto: true,
           body: 'Esse movimento pode começar pelo ponto onde a expansão hoje gera mais atrito.',
           valueStagesFlat: true,
           valueStagesGridCols: 3,
@@ -337,11 +383,8 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           ],
           attentionPhrase:
             'O impacto real acontece quando esses pontos deixam de ser tratados isoladamente e passam a funcionar como parte de uma mesma arquitetura de crescimento.',
-          closingQuestionLabel: 'CTA · Pergunta-gatilho',
-          closingQuestion:
-            'Podemos mapear juntos onde o crescimento está gerando mais atrito!',
           closingHighlight:
-            'Ecossistema Salux · A base para uma nova forma de operar a saúde.',
+            'A base para uma nova forma de operar a saúde — com coordenação, não acúmulo.',
           highlightPhrases: [],
         },
       };
@@ -451,10 +494,7 @@ const extraOperacao: PresentationStep[] = [
         { number: '💰', label: 'Faturamento / Glosas', description: '→ TI Hospitalar' },
         { number: '🏥', label: 'Centro cirúrgico / Áreas críticas', description: '→ SkyMed + VisionPilot / AGCOM' },
       ],
-      heroImage: {
-        src: trilha3PathwaysUrl,
-        alt: 'Central de Notificações ZeroDox — histórico e canais de envio',
-      },
+      heroImage: { src: trilha3Slide8Url, alt: 'Trilha 3 — Slide 8' },
     },
   },
   {
@@ -506,6 +546,11 @@ const extraOperacao: PresentationStep[] = [
     content: {
       headline: 'Resultado',
       cardVisual: 'helix',
+      bannerMedia: {
+        videoSrc: '/intro/healthcare-loop.mp4',
+        posterSrc: trilha3Slide9Url,
+      },
+      omitSidePhoto: true,
       valueStagesLead:
         'Com uma base coordenada, o crescimento deixa de depender de esforço contínuo de compensação.',
       valueStagesFlat: true,
@@ -518,22 +563,20 @@ const extraOperacao: PresentationStep[] = [
         { number: '✓', label: 'Menos fricção estrutural e dependências de legado' },
         { number: '✓', label: 'Mais controle sobre a escala sem ampliar complexidade' },
       ],
-      attentionPhrase:
-        'A próxima etapa da saúde não será definida por quem digitalizou mais partes. Será definida por quem fizer suas capacidades operarem como ecossistema.',
+      closingHighlight:
+        'A próxima etapa da saúde não será definida por quem digitalizou mais partes — e sim por quem fizer suas capacidades operarem como ecossistema.',
     },
   },
 ];
 
-/** Sequência final — insere pathways (card 8) e results (card 9) antes do
- *  closing (card 10). Os steps `capacities` e `agents-flow` ficam fora pois
- *  seu conteúdo já está nos cards 6 e 7. */
+/** Sequência final — results antes do closing. Slide de pontos de entrada removido;
+ *  exemplos de produto ficam no card de capacidades (governance). */
 function assemble(): PresentationStep[] {
   const closingIdx = baseOperacao.findIndex((s) => s.id === 'closing');
   const before = baseOperacao.slice(0, closingIdx);
   const closing = baseOperacao[closingIdx];
-  const pathways = extraOperacao.find((s) => s.id === 'pathways')!;
   const results = extraOperacao.find((s) => s.id === 'results')!;
-  return [...before, pathways, results, closing].map((s, i) => ({ ...s, index: i }));
+  return [...before, results, closing].map((s, i) => ({ ...s, index: i }));
 }
 
 export const operacaoSteps: PresentationStep[] = assemble();
