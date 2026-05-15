@@ -16,7 +16,13 @@ export function usePresentationClickAdvance() {
 
       const target = event.target as HTMLElement | null;
       if (!target) return;
-      if (target.closest('[data-no-click-advance]')) return;
+      if (
+        target.closest(
+          'button, a, [role="button"], input, select, textarea, [data-no-click-advance]',
+        )
+      ) {
+        return;
+      }
 
       if (tryRevealGovernanceBeforeAdvance()) return;
 
@@ -25,7 +31,8 @@ export function usePresentationClickAdvance() {
       store.next();
     };
 
-    window.addEventListener('click', handler, true);
-    return () => window.removeEventListener('click', handler, true);
+    // Bubble: botões/cards interativos recebem o clique antes do avanço do slide.
+    window.addEventListener('click', handler, false);
+    return () => window.removeEventListener('click', handler, false);
   }, []);
 }

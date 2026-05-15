@@ -53,10 +53,19 @@ import {
 import { usePresentationStore } from "@/store/presentationStore";
 import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildNarrativeBandKeys } from "@/lib/eraAgenticaRevealBands";
+import { ExpandedCardPortal } from "./ExpandedCardPortal";
 
 interface Props {
   step: PresentationStep;
   active: boolean;
+}
+
+function valueStagesGridColumns(
+  count: number,
+  gridCols?: number,
+): string {
+  const cols = gridCols ?? (count === 4 ? 2 : Math.min(count, 4));
+  return `repeat(${cols}, minmax(min(100%, 11rem), 1fr))`;
 }
 
 export function NarrativeStep({ step, active }: Props) {
@@ -123,6 +132,7 @@ export function NarrativeStep({ step, active }: Props) {
   );
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+
   const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const expandImage = Boolean(step.content.newsUrls?.length);
 
@@ -223,11 +233,10 @@ export function NarrativeStep({ step, active }: Props) {
           : step.content.dualStages
             ? 900
             : step.content.valueStages && step.content.valueStages.length >= 4
-              ? step.content.valueStages.length >= 6 ||
-                step.content.valueStagesGridCols === 4
-                ? 880
-                : 760
-              : undefined
+              ? 920
+              : step.content.valueStages && step.content.valueStages.length > 0
+                ? 760
+                : undefined
       }
       badge={
         painPoints
@@ -427,14 +436,16 @@ export function NarrativeStep({ step, active }: Props) {
                   {step.content.valueStagesLead}
                 </p>
               )}
-              <div
-                className="grid gap-2.5"
+              <motion.div
+                data-no-click-advance
+                className="relative isolate z-10 grid w-full auto-rows-fr gap-2.5"
                 style={{
-                  gridTemplateColumns: `repeat(${
-                    step.content.valueStagesGridCols ??
-                    step.content.valueStages.length
-                  }, minmax(0, 1fr))`,
+                  gridTemplateColumns: valueStagesGridColumns(
+                    step.content.valueStages.length,
+                    step.content.valueStagesGridCols,
+                  ),
                 }}
+                onPointerDown={(e) => e.stopPropagation()}
               >
                 {step.content.valueStages.map((stage, i) => {
                   const intensity = step.content.valueStagesFlat
@@ -450,18 +461,19 @@ export function NarrativeStep({ step, active }: Props) {
                     valueStageSpotlight !== null && valueStageSpotlight !== i;
                   const focused = valueStageSpotlight === i;
                   return (
-                    <motion.div
+                    <motion.button
                       ref={(el) => {
                         stageRefs.current[i] = el;
                       }}
                       key={`${stage.number}-${stage.label}`}
+                      type="button"
                       data-no-click-advance
-                      role="button"
-                      tabIndex={0}
+                      disabled={!active}
                       aria-expanded={focused}
-                      aria-label={`Destacar: ${stage.label}`}
-                      className="relative cursor-pointer overflow-hidden rounded-xl border px-3.5 py-3 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
+                      aria-label={`Ampliar: ${stage.label}`}
+                      className="relative flex h-full min-h-[5.5rem] w-full min-w-0 cursor-pointer flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-left outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45 disabled:cursor-default disabled:opacity-40"
                       style={{
+                        zIndex: focused ? 2 : 1,
                         borderColor: focused
                           ? `${accent.base}aa`
                           : `${accent.base}${hex(95)}`,
@@ -499,16 +511,26 @@ export function NarrativeStep({ step, active }: Props) {
                                 },
                               }
                       }
-                      whileTap={reduceMotion ? undefined : { scale: 0.96 }}
+                      whileHover={
+                        reduceMotion || !active || valueStageSpotlight !== null
+                          ? undefined
+                          : {
+                              y: -2,
+                              scale: 1.02,
+                              transition: {
+                                duration: 0.25,
+                                ease: [0.22, 1, 0.36, 1],
+                              },
+                            }
+                      }
+                      whileTap={
+                        reduceMotion || !active ? undefined : { scale: 0.96 }
+                      }
+                      onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (!active) return;
                         setValueStageSpotlight((s) => (s === i ? null : i));
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          setValueStageSpotlight((s) => (s === i ? null : i));
-                        }
                       }}
                     >
                       <span
@@ -541,16 +563,20 @@ export function NarrativeStep({ step, active }: Props) {
                           {stage.mediaUrl && <>(Vídeo)</>}
                         </p>
                       )}
-                    </motion.div>
+                      <span className="mt-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
+                        Clique para ampliar
+                      </span>
+                    </motion.button>
                   );
                 })}
-              </div>
+              </motion.div>
 
               <AnimatePresence>
-                {valueStageSpotlight !== null &&
+                {active &&
+                  valueStageSpotlight !== null &&
                   step.content.valueStages[valueStageSpotlight] !==
                     undefined && (
-                    <ExpandedChip
+                    <ExpandedCardPortal
                       key={`stage-expanded-${valueStageSpotlight}`}
                       text={
                         step.content.valueStages[valueStageSpotlight]!.label
@@ -565,13 +591,6 @@ export function NarrativeStep({ step, active }: Props) {
                       description={
                         step.content.valueStages[valueStageSpotlight]!
                           .description || undefined
-                      }
-                      mediaUrl={
-                        step.content.valueStages[valueStageSpotlight]!
-                          .mediaUrl || undefined
-                      }
-                      isPlayingMedia={
-                        valueStageSpotlight === valueStageSpotlight
                       }
                     />
                   )}
