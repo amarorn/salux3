@@ -285,7 +285,14 @@ export function FloatingCard({
             }}
           >
             {badge && (
-              <div className="mb-6 flex items-center gap-3">
+              <div className="mb-6 flex w-full items-center justify-center gap-3">
+                <span
+                  aria-hidden
+                  className="h-px min-w-[2rem] flex-1 rounded-full opacity-70"
+                  style={{
+                    background: `linear-gradient(90deg, transparent, ${accentColor.base}66)`,
+                  }}
+                />
                 <span
                   className={clsx(
                     "inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] transition-[box-shadow] duration-500",
@@ -306,7 +313,8 @@ export function FloatingCard({
                   {badge}
                 </span>
                 <span
-                  className="h-px flex-1"
+                  aria-hidden
+                  className="h-px min-w-[2rem] flex-1 rounded-full opacity-70"
                   style={{
                     background: `linear-gradient(90deg, ${accentColor.base}66, transparent)`,
                   }}

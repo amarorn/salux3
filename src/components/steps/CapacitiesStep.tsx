@@ -148,6 +148,7 @@ export function CapacitiesStep({ step, active }: Props) {
           stepIndex={step.index}
           eraStaging={eraStaging}
           active={active}
+          className="flex w-full justify-center"
         >
           <motion.div {...innerMotion}>
             <h2
@@ -167,10 +168,11 @@ export function CapacitiesStep({ step, active }: Props) {
             stepIndex={step.index}
             eraStaging={eraStaging}
             active={active}
+            className="flex w-full justify-center"
           >
             <motion.p
               {...innerMotion}
-              className="presentation-ppt-body text-[1.08rem] leading-relaxed text-slate-100/100 whitespace-pre-line"
+              className="presentation-ppt-body text-center text-[1.08rem] leading-relaxed text-slate-100/100 whitespace-pre-line"
             >
               {step.content.body}
             </motion.p>

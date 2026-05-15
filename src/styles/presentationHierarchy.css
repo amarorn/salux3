@@ -18,6 +18,8 @@ body.presentation-body {
   text-transform: uppercase;
   color: rgb(255 255 255 / 0.52);
   text-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
+  text-align: center;
+  margin-inline: auto;
 }
 
 .presentation-ppt-title {
@@ -27,6 +29,8 @@ body.presentation-body {
   line-height: 1.08;
   font-size: clamp(1.95rem, 4.35vw, 3.05rem);
   color: #fafafa;
+  text-align: center;
+  margin-inline: auto;
   text-shadow:
     0 2px 28px rgb(0 0 0 / 0.55),
     0 1px 0 rgb(0 0 0 / 0.35),

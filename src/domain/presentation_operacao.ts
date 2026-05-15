@@ -43,6 +43,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           valueStagesLead: 'Reconhece algum destes pontos de atrito?',
           valueStagesFlat: true,
           valueStagesGridCols: 3,
+          valueStagesRevealChunkSize: 3,
           valueStages: [
             { number: '🏗', label: 'Abertura de nova unidade' },
             { number: '🔗', label: 'Integrações que precisam ser costuradas a cada nova frente' },
@@ -70,6 +71,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           cardVisual: 'fragment',
           valueStagesFlat: true,
           valueStagesGridCols: 4,
+          valueStagesRevealChunkSize: 3,
           valueStages: [
             { number: '+', label: 'Mais sistemas' },
             { number: '+', label: 'Mais integrações' },
@@ -190,6 +192,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
             'Não se trata de adicionar mais uma solução. Trata-se de fazer todas as capacidades operarem sobre a mesma lógica.\n\nOs 8 elementos de uma operação coordenada:',
           valueStagesFlat: true,
           valueStagesGridCols: 4,
+          valueStagesRevealChunkSize: 4,
           valueStages: [
             { number: '01', label: 'Base digital da operação' },
             { number: '02', label: 'Capilaridade assistencial' },
@@ -322,6 +325,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           valueStagesLead: 'O que os Agentes fazem na operação:',
           valueStagesFlat: true,
           valueStagesGridCols: 2,
+          valueStagesRevealChunkSize: 3,
           valueStages: [
             {
               number: '01',
@@ -373,6 +377,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           body: 'Esse movimento pode começar pelo ponto onde a expansão hoje gera mais atrito.',
           valueStagesFlat: true,
           valueStagesGridCols: 3,
+          valueStagesRevealChunkSize: 3,
           valueStages: [
             { number: '📍', label: 'Uma nova unidade' },
             { number: '📍', label: 'Uma nova especialidade' },
@@ -485,6 +490,7 @@ const extraOperacao: PresentationStep[] = [
       cardVisual: 'spotlight',
       valueStagesFlat: true,
       valueStagesGridCols: 3,
+      valueStagesRevealChunkSize: 3,
       valueStages: [
         { number: '🔧', label: 'Legado / Integração', description: '→ Plataforma Salux + INITIA' },
         { number: '📡', label: 'Capilaridade', description: '→ CloudHealth' },
@@ -555,6 +561,7 @@ const extraOperacao: PresentationStep[] = [
         'Com uma base coordenada, o crescimento deixa de depender de esforço contínuo de compensação.',
       valueStagesFlat: true,
       valueStagesGridCols: 3,
+      valueStagesRevealChunkSize: 3,
       valueStages: [
         { number: '✓', label: 'Mais velocidade na abertura de novas frentes' },
         { number: '✓', label: 'Mais previsibilidade sobre demanda e capacidade' },

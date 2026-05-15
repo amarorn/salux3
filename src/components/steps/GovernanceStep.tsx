@@ -67,19 +67,19 @@ export function GovernanceStep({ step, active }: Props) {
       width={compare ? 720 : 620}
     >
       <motion.div
-        className="flex flex-col gap-6"
+        className="flex flex-col items-center gap-6 text-center"
         variants={container}
         initial={reduceMotion ? false : 'hidden'}
         animate={active ? 'visible' : 'hidden'}
       >
         <motion.div variants={item}>
-          <h2 className="font-display text-[28px] font-bold leading-[1.15] tracking-tight text-white">
+          <h2 className="mx-auto max-w-[26ch] text-center font-display text-[28px] font-bold leading-[1.15] tracking-tight text-white">
             {step.title}
           </h2>
         </motion.div>
 
         {compare && (
-          <motion.div variants={item} className="grid gap-4 md:grid-cols-2">
+          <motion.div variants={item} className="grid w-full max-w-3xl gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-rose-400/30 bg-gradient-to-br from-rose-500/[0.12] to-transparent p-5 shadow-soft">
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-rose-200/85">Pergunta antiga</p>
               <p className="mt-3 text-[1.02rem] leading-relaxed text-slate-100">{compare.before}</p>
@@ -100,7 +100,7 @@ export function GovernanceStep({ step, active }: Props) {
         )}
 
         {step.content.body && (
-          <motion.p variants={item} className="text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line">
+          <motion.p variants={item} className="max-w-prose text-center text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line">
             {step.content.body}
           </motion.p>
         )}
@@ -174,14 +174,14 @@ function RevealFlipCard({ step, active, expanded, pillars, reduceMotion, contain
           {showBack ? (
             <motion.div
               key="back"
-              className="flex flex-col gap-5"
+              className="flex flex-col items-center gap-5 text-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.18 }}
             >
               {/* Indicador de que virou */}
-              <div className="flex items-center gap-2">
-                <h2 className="font-display text-[28px] font-bold leading-[1.15] tracking-tight text-white">
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <h2 className="mx-auto max-w-[22ch] text-center font-display text-[28px] font-bold leading-[1.15] tracking-tight text-white">
                   {step.title}
                 </h2>
                 <motion.span
@@ -196,7 +196,7 @@ function RevealFlipCard({ step, active, expanded, pillars, reduceMotion, contain
               </div>
 
               {/* Grid de pilares com entrada escalonada */}
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className="grid w-full max-w-3xl grid-cols-3 gap-2.5">
                 {pillars.map((label, i) => (
                   <RevealPillarChip key={label} label={label} index={i} />
                 ))}
@@ -207,7 +207,7 @@ function RevealFlipCard({ step, active, expanded, pillars, reduceMotion, contain
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 + pillars.length * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="border-t border-white/10 pt-4 text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line"
+                  className="border-t border-white/10 pt-4 text-center text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line"
                 >
                   {step.content.body}
                 </motion.p>
@@ -216,20 +216,20 @@ function RevealFlipCard({ step, active, expanded, pillars, reduceMotion, contain
           ) : (
             <motion.div
               key="front"
-              className="flex flex-col gap-6"
+              className="flex flex-col items-center gap-6 text-center"
               variants={container}
               initial={reduceMotion ? false : 'hidden'}
               animate={active ? 'visible' : 'hidden'}
             >
               <motion.div variants={item}>
-                <h2 className="font-display text-[28px] font-bold leading-[1.15] tracking-tight text-white">
+                <h2 className="mx-auto max-w-[26ch] text-center font-display text-[28px] font-bold leading-[1.15] tracking-tight text-white">
                   {step.title}
                 </h2>
               </motion.div>
 
               {/* Hint visual de "tem mais" */}
               {active && (
-                <motion.div variants={item} className="flex items-center gap-3">
+                <motion.div variants={item} className="flex items-center justify-center gap-3">
                   <div className="flex gap-1.5">
                     {[0, 1, 2].map((i) => (
                       <motion.span

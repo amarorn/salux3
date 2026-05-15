@@ -67,13 +67,13 @@ export function ArchitectureStep({ step, active }: Props) {
       width={minimal ? 680 : 620}
     >
       <motion.div
-        className="flex flex-col gap-6"
+        className="flex flex-col items-center gap-6 text-center"
         variants={container}
         initial={reduceMotion ? false : "hidden"}
         animate={active ? "visible" : "hidden"}
       >
         <motion.div variants={item}>
-          <h2 className="font-display text-[28px] font-bold leading-[1.15] tracking-tight text-white">
+          <h2 className="mx-auto max-w-[24ch] text-center font-display text-[28px] font-bold leading-[1.15] tracking-tight text-white">
             {step.title}
           </h2>
         </motion.div>

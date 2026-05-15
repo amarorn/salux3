@@ -47,19 +47,19 @@ export function IntegrationStep({ step, active }: Props) {
       width={minimal ? 680 : 620}
     >
       <motion.div
-        className="flex flex-col gap-6"
+        className="flex flex-col items-center gap-6 text-center"
         variants={container}
         initial={reduceMotion ? false : 'hidden'}
         animate={active ? 'visible' : 'hidden'}
       >
         <motion.div variants={item}>
-          <h2 className="font-display text-[33px] font-bold leading-[1.14] tracking-tight text-white">
+          <h2 className="mx-auto max-w-[26ch] text-center font-display text-[33px] font-bold leading-[1.14] tracking-tight text-white">
             {step.title}
           </h2>
         </motion.div>
 
         {step.content.body && (
-          <motion.p variants={item} className="text-[1.02rem] leading-relaxed text-slate-200 whitespace-pre-line">
+          <motion.p variants={item} className="max-w-prose text-center text-[1.02rem] leading-relaxed text-slate-200 whitespace-pre-line">
             {step.content.body}
           </motion.p>
         )}

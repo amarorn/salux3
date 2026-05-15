@@ -101,20 +101,20 @@ export function JourneyStep({ step, active }: Props) {
       width={stages?.length ? 720 : 620}
     >
       <motion.div
-        className="flex flex-col gap-6"
+        className="flex flex-col items-center gap-6 text-center"
         variants={container}
         initial={reduceMotion ? false : 'hidden'}
         animate={active ? 'visible' : 'hidden'}
       >
         <motion.div variants={item}>
-          <h2 className="font-display text-[33px] font-bold leading-[1.14] tracking-tight text-white">
+          <h2 className="mx-auto max-w-[22ch] text-center font-display text-[33px] font-bold leading-[1.14] tracking-tight text-white">
             {step.title}
           </h2>
         </motion.div>
 
         {stages && stages.length > 0 ? (
           <motion.div variants={item}>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
+            <p className="mb-3 w-full text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
               Jornada — rupturas entre etapas
             </p>
             <JourneyStageRail stages={stages} active={active} accentBase={accent.base} />
@@ -122,7 +122,7 @@ export function JourneyStep({ step, active }: Props) {
         ) : null}
 
         {step.content.body && (
-          <motion.p variants={item} className="text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line">
+          <motion.p variants={item} className="max-w-prose text-center text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line">
             {step.content.body}
           </motion.p>
         )}

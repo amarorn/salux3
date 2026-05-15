@@ -615,7 +615,7 @@ export function NarrativeStep({ step, active }: Props) {
       }
     >
       <motion.div
-        className="flex flex-col gap-5"
+        className="flex w-full flex-col gap-5"
         variants={outerContainer}
         initial={reduceMotion ? false : "hidden"}
         animate={active ? "visible" : "hidden"}
@@ -628,8 +628,9 @@ export function NarrativeStep({ step, active }: Props) {
             stepIndex={step.index}
             eraStaging={eraStaging}
             active={active}
+            className="flex w-full justify-center"
           >
-            <motion.div {...innerMotion} className="space-y-3">
+            <motion.div {...innerMotion} className="space-y-3 text-center">
               <span
                 className="block text-[10px] font-semibold uppercase tracking-[0.32em]"
                 style={{ color: accent.base, opacity: 0.85 }}
@@ -652,6 +653,7 @@ export function NarrativeStep({ step, active }: Props) {
             stepIndex={step.index}
             eraStaging={eraStaging}
             active={active}
+            className="flex w-full justify-center"
           >
             <motion.div {...innerMotion}>
               <h2 className="presentation-ppt-title max-w-[24ch] text-[clamp(1.8rem,4vw,2.55rem)]">
@@ -700,10 +702,11 @@ export function NarrativeStep({ step, active }: Props) {
             stepIndex={step.index}
             eraStaging={eraStaging}
             active={active}
+            className="flex w-full justify-center"
           >
             <motion.p
               {...innerMotion}
-              className="presentation-ppt-body max-w-prose whitespace-pre-line text-slate-100/95"
+              className="presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center text-slate-100/95"
             >
               {step.content.lead}
             </motion.p>
