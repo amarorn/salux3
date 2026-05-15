@@ -513,7 +513,7 @@ export function NarrativeStep({ step, active }: Props) {
                       </div>
                       {stage.description && (
                         <p className="mt-2 text-[0.96rem] leading-relaxed text-slate-100/92">
-                          {stage.description}
+                          {stage.description} {stage.mediaUrl && <>(Vídeo)</>}
                         </p>
                       )}
                     </motion.div>
@@ -540,6 +540,13 @@ export function NarrativeStep({ step, active }: Props) {
                       description={
                         step.content.valueStages[valueStageSpotlight]!
                           .description || undefined
+                      }
+                      mediaUrl={
+                        step.content.valueStages[valueStageSpotlight]!
+                          .mediaUrl || undefined
+                      }
+                      isPlayingMedia={
+                        valueStageSpotlight === valueStageSpotlight
                       }
                     />
                   )}
@@ -1051,18 +1058,19 @@ export function NarrativeStep({ step, active }: Props) {
                 “{step.content.attentionPhrase}”
               </p>
             </motion.div>
-            {step.content.newsUrls &&
-              step.content.newsUrls.length > 0 &&
-              step.content.newsUrls.map((url, i) => (
-                <>
-                  <img
-                    src={url}
-                    width={600}
-                    height={200}
-                    alt={`News ${i + 1}`}
+            {step.content.newsUrls && step.content.newsUrls.length > 0 && (
+              <div className="mt-6 grid w-full grid-cols-1 gap-2 md:grid-cols-2">
+                {step.content.newsUrls.map((url, index) => (
+                  <div
+                    key={`news-url-${index}`}
+                    className="h-[300px] w-full max-w-[400px] rounded-lg border border-white/10 bg-gray-800/50 bg-cover bg-center shadow-inner"
+                    style={{
+                      backgroundImage: `url(${url})`,
+                    }}
                   />
-                </>
-              ))}
+                ))}
+              </div>
+            )}
           </EraRevealBand>
         )}
 
@@ -2005,6 +2013,8 @@ interface ExpandedChipProps {
   onClose: () => void;
   prefix?: string;
   description?: string;
+  mediaUrl?: string;
+  isPlayingMedia?: boolean;
 }
 
 function ExpandedChip({
@@ -2016,6 +2026,8 @@ function ExpandedChip({
   onClose,
   prefix,
   description,
+  mediaUrl,
+  isPlayingMedia,
 }: ExpandedChipProps) {
   const Icon = iconKey ? PAIN_POINT_ICONS[iconKey] : undefined;
 
@@ -2058,7 +2070,7 @@ function ExpandedChip({
       <motion.div
         role="dialog"
         aria-modal="true"
-        className="relative w-full max-w-[440px] cursor-pointer overflow-hidden rounded-3xl border px-9 py-9"
+        className={`relative w-full ${mediaUrl ? "max-w-[920px]" : "max-w-[440px]"} cursor-pointer overflow-hidden rounded-3xl border px-9 py-9`}
         style={{
           borderColor: `${accentColor}66`,
           background: `linear-gradient(145deg, ${accentColor}1e 0%, rgba(11,15,24,0.97) 100%)`,
@@ -2107,7 +2119,6 @@ function ExpandedChip({
           animate={reducedMotion ? {} : { opacity: [0.6, 1, 0.6] }}
           transition={{ duration: 2.6, ease: "easeInOut", repeat: Infinity }}
         />
-
         <div className="relative flex items-start gap-4">
           {prefix ? (
             <span
@@ -2164,8 +2175,17 @@ function ExpandedChip({
               </p>
             )}
           </div>
-        </div>
-
+        </div>{" "}
+        {mediaUrl && (
+          <div className=" w-full">
+            <video
+              src={mediaUrl}
+              className="mt-2 w-full rounded-lg"
+              controls
+              autoPlay={isPlayingMedia}
+            />
+          </div>
+        )}
         <p className="relative mt-7 text-center text-[11px] uppercase tracking-[0.3em] text-white/32">
           Clique para fechar · ESC
         </p>
