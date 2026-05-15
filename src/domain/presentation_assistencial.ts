@@ -478,9 +478,6 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       ],
       attentionPhrase:
         'O valor não está em registrar melhor. Está em sustentar o cuidado com contexto vivo ao longo da jornada.',
-      closingQuestionLabel: 'CTA · Pergunta-gatilho',
-      closingQuestion:
-        'Podemos mapear juntos onde o cuidado perde continuidade na sua operação? Marque uma conversa com nosso time.',
       closingHighlight:
         'Ecossistema Salux · A base para uma nova forma de operar a saúde.',
       bullets: [],

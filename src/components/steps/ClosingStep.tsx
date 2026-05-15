@@ -26,12 +26,15 @@ export function ClosingStep({ step, active }: Props) {
 
   const accent = theme.accents[step.accent];
   const benefits = step.content.valueStages ?? [];
+  const hero = step.content.heroImage;
 
   return (
     <FloatingCard
       accent={step.accent}
       active={active}
       stepId={step.id}
+      sidePhotoSrc={hero?.src}
+      sidePhotoAlt={hero?.alt}
       width={benefits.length >= 4 ? 820 : 580}
       cardVisual={step.content.cardVisual}
     >
