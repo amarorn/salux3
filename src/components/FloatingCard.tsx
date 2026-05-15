@@ -51,7 +51,7 @@ interface FloatingCardProps {
   accent: Accent;
   active?: boolean;
   width?: number;
-  height?: 640 | 820 | false;
+  height?: 640 | 820 | 0;
   className?: string;
   badge?: string;
   flipPhoto?: boolean;
@@ -75,7 +75,7 @@ export function FloatingCard({
   accent,
   active = false,
   width = 520,
-  height = 820,
+  height,
   className,
   badge,
   flipPhoto,
@@ -169,7 +169,6 @@ export function FloatingCard({
           )}
         </motion.div>
       )}
-
       <motion.div
         variants={panelMotion}
         initial={layerInitial}
@@ -178,8 +177,7 @@ export function FloatingCard({
           "relative w-full p-12",
           omitSidePhoto
             ? "min-h-[1100px] rounded-3xl border border-white/10"
-            : "min-h-[900px]",
-          height ? `min-h-[${height}px]` : "min-h-[0px]",
+            : "min-h-[420px]",
           omitSidePhoto &&
             (active
               ? "border-white/18 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"

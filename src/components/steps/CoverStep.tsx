@@ -140,7 +140,7 @@ export function CoverStep({ step, active }: Props) {
       accent={step.accent}
       active={active}
       width={enriched ? 640 : 580}
-      height={false}
+      height={0}
       stepId={step.id}
       sidePhotoSrc={hero?.src}
       sidePhotoAlt={hero?.alt}
