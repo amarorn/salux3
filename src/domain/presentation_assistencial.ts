@@ -423,14 +423,14 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
           items: [
             {
               name: "Base clínica",
-              subtitle: "Plataforma Salux + INITIA",
+              // subtitle: "Plataforma Salux + INITIA",
               description:
                 "Núcleo que organiza dados, fluxos, registros e contexto clínico.",
               tagline: "O caso deixa de ser reconstruído a cada etapa.",
             },
             {
               name: "Diagnóstico integrado",
-              subtitle: "Med.Place",
+              // subtitle: "Med.Place",
               description:
                 "Exame, laudo e contexto conectados à linha do cuidado.",
               tagline:
@@ -438,14 +438,14 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
             },
             {
               name: "Cuidado conectado",
-              subtitle: "CloudHealth",
+              // subtitle: "CloudHealth",
               description:
                 "Crônicos, pós-cirúrgicos e pacientes em recuperação acompanhados com vínculo e resposta.",
               tagline: "A continuidade não termina na alta.",
             },
             {
               name: "Áreas críticas",
-              subtitle: "SkyMed · VisionPilot · AGCOM",
+              // subtitle: "SkyMed · VisionPilot · AGCOM",
               description:
                 "Registro anestésico estruturado e rastreabilidade contínua.",
               tagline: "O risco acompanhado enquanto o cuidado acontece.",
@@ -458,21 +458,21 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
           items: [
             {
               name: "Governança documental",
-              subtitle: "ZeroDox",
+              //subtitle: "ZeroDox",
               description:
                 "Documentação que sustenta rastreabilidade, conformidade e continuidade.",
               tagline: "Deixa de ser ponto de fragilidade.",
             },
             {
               name: "Força de trabalho",
-              subtitle: "StarGrid",
+              // subtitle: "StarGrid",
               description:
                 "Escala, cobertura e disponibilidade alinhadas ao risco e ao fluxo assistencial.",
               tagline: "Equipe como capacidade coordenada.",
             },
             {
               name: "Inteligência operacional",
-              subtitle: "VisionPilot",
+              // subtitle: "VisionPilot",
               description:
                 "Fluxos físicos, ocupação e sinais do ambiente acompanhados em tempo real.",
               tagline: "O risco que não aparece no prontuário.",
