@@ -443,7 +443,7 @@ export function RoadmapStep({ step, active }: Props) {
           </motion.div>
 
           {step.content.body && (
-            <motion.p variants={item} className="border-t border-white/[0.06] pt-5 text-sm leading-relaxed text-slate-300 whitespace-pre-line">
+            <motion.p variants={item} className="border-t border-white/[0.06] pt-5 text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line">
               {step.content.body}
             </motion.p>
           )}
@@ -489,13 +489,13 @@ export function RoadmapStep({ step, active }: Props) {
               <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: p.tone }}>
                 {p.phase}
               </p>
-              <p className="mt-1.5 text-sm font-semibold text-white">{p.label}</p>
+              <p className="mt-1.5 text-[1.02rem] font-semibold text-white">{p.label}</p>
               <p className="mt-0.5 text-[11px] leading-snug text-slate-400">{p.desc}</p>
             </motion.div>
           ))}
         </motion.div>
 
-        <motion.p variants={item} className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
+        <motion.p variants={item} className="text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line">
           {step.content.body}
         </motion.p>
       </motion.div>

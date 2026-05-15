@@ -121,7 +121,7 @@ export function HighlightStep({ step, active }: Props) {
         animate={active ? 'visible' : 'hidden'}
       >
         <motion.div variants={item}>
-          <h2 className="presentation-ppt-title max-w-[24ch] text-[clamp(1.35rem,3.2vw,1.85rem)]">
+          <h2 className="presentation-ppt-title max-w-[24ch] text-[clamp(1.62rem,3.8vw,2.25rem)]">
             {step.title}
           </h2>
         </motion.div>
@@ -211,7 +211,7 @@ export function HighlightStep({ step, active }: Props) {
               transition={{ duration: 2.6, ease: 'easeInOut', repeat: Infinity }}
             />
             <p
-              className="presentation-ppt-body relative text-[clamp(1.05rem,2.6vw,1.35rem)] font-semibold"
+              className="presentation-ppt-body relative text-[clamp(1.2rem,2.9vw,1.56rem)] font-semibold"
               style={{ color: accent.base }}
             >
               {attention}

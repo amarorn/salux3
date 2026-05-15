@@ -43,7 +43,7 @@ export function AgentsFlowStep({ step, active }: Props) {
       >
         <motion.div variants={item}>
           <h2
-            className="presentation-ppt-title max-w-[28ch] text-[clamp(1.35rem,3vw,1.85rem)] leading-[1.12]"
+            className="presentation-ppt-title max-w-[28ch] text-[clamp(1.62rem,3.5vw,2.25rem)] leading-[1.12]"
             style={{ textShadow: `0 0 28px ${accent.base}22` }}
           >
             {step.content.headline}

@@ -51,7 +51,7 @@ export function ClosingStep({ step, active }: Props) {
       >
         <motion.h2
           variants={item}
-          className="presentation-ppt-title max-w-[22ch] text-[clamp(1.7rem,4.2vw,2.6rem)] whitespace-pre-line"
+          className="presentation-ppt-title max-w-[22ch] text-[clamp(1.95rem,4.8vw,3.05rem)] whitespace-pre-line"
         >
           {step.content.headline}
         </motion.h2>
@@ -102,10 +102,10 @@ export function ClosingStep({ step, active }: Props) {
                   >
                     {b.number || '✓'}
                   </span>
-                  <p className="text-[0.88rem] font-medium leading-snug text-white/95">
+                  <p className="text-[1rem] font-medium leading-relaxed text-white/95">
                     {b.label}
                     {b.description && (
-                      <span className="block text-[0.82rem] font-normal text-slate-300/85">
+                      <span className="block text-[0.92rem] font-normal text-slate-300/90">
                         {b.description}
                       </span>
                     )}
@@ -131,7 +131,7 @@ export function ClosingStep({ step, active }: Props) {
               style={{ background: accent.base, boxShadow: `0 0 14px ${accent.base}` }}
             />
             <p
-              className="relative pl-3 text-[clamp(0.98rem,2.2vw,1.15rem)] font-medium italic leading-snug"
+              className="relative pl-3 text-[clamp(1.12rem,2.5vw,1.35rem)] font-medium italic leading-relaxed"
               style={{ color: accent.base, textShadow: `0 0 24px ${accent.base}33` }}
             >
               “{step.content.attentionPhrase}”
@@ -178,7 +178,7 @@ export function ClosingStep({ step, active }: Props) {
         {step.content.closingHighlight && (
           <motion.p
             variants={item}
-            className="mt-1 text-center text-[0.85rem] leading-snug text-slate-300/80"
+            className="mt-1 text-center text-[0.96rem] leading-relaxed text-slate-300/85"
           >
             {step.content.closingHighlight}
           </motion.p>

@@ -4,11 +4,11 @@
  */
 body.presentation-body {
   --ppt-kicker-size: 12px;
-  --ppt-kicker-tracking: 0.28em;
+  --ppt-kicker-tracking: 0.24em;
   --ppt-title-weight: 700;
-  --ppt-title-tracking: -0.025em;
-  --ppt-body-size: 18px;
-  --ppt-body-leading: 1.72;
+  --ppt-title-tracking: -0.02em;
+  --ppt-body-size: 19px;
+  --ppt-body-leading: 1.78;
 }
 
 .presentation-ppt-kicker {
@@ -24,13 +24,14 @@ body.presentation-body {
   font-weight: var(--ppt-title-weight);
   letter-spacing: var(--ppt-title-tracking);
   line-height: 1.08;
+  font-size: clamp(1.85rem, 4.1vw, 2.85rem);
   color: #fff;
 }
 
 .presentation-ppt-body {
   font-size: var(--ppt-body-size);
   line-height: var(--ppt-body-leading);
-  color: rgb(203 213 225);
+  color: rgb(226 232 240 / 0.96);
 }
 
 .presentation-ppt-caption {

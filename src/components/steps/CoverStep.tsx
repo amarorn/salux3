@@ -95,7 +95,7 @@ export function CoverStep({ step, active }: Props) {
       >
         <motion.h1
           variants={item}
-          className="presentation-ppt-title max-w-[22ch] text-[clamp(1.95rem,4.9vw,2.75rem)] whitespace-pre-line"
+          className="presentation-ppt-title max-w-[22ch] text-[clamp(2.2rem,5.5vw,3.15rem)] whitespace-pre-line"
         >
           {step.title}
         </motion.h1>
@@ -146,7 +146,7 @@ export function CoverStep({ step, active }: Props) {
               transition={{ duration: 2.8, ease: 'easeInOut', repeat: Infinity }}
             />
             <p
-              className="relative pl-3 text-[clamp(0.98rem,2.2vw,1.15rem)] font-medium italic leading-snug"
+              className="relative pl-3 text-[clamp(1.12rem,2.5vw,1.34rem)] font-medium italic leading-relaxed"
               style={{ color: accent.base, textShadow: `0 0 24px ${accent.base}33` }}
             >
               “{attention}”

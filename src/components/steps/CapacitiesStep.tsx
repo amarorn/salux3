@@ -44,7 +44,7 @@ export function CapacitiesStep({ step, active }: Props) {
       >
         <motion.div variants={item}>
           <h2
-            className="presentation-ppt-title max-w-[26ch] text-[clamp(1.65rem,3.6vw,2.3rem)] leading-[1.1]"
+            className="presentation-ppt-title max-w-[26ch] text-[clamp(1.9rem,4.2vw,2.75rem)] leading-[1.1]"
             style={{ textShadow: `0 0 28px ${accent.base}22` }}
           >
             {step.content.headline ?? 'Capacidades coordenadas'}
@@ -52,7 +52,7 @@ export function CapacitiesStep({ step, active }: Props) {
         </motion.div>
 
         {step.content.body && (
-          <motion.p variants={item} className="presentation-ppt-body text-[0.95rem] leading-snug text-slate-200/90 whitespace-pre-line">
+          <motion.p variants={item} className="presentation-ppt-body text-[1.05rem] leading-relaxed text-slate-200/95 whitespace-pre-line">
             {step.content.body}
           </motion.p>
         )}
@@ -77,7 +77,7 @@ export function CapacitiesStep({ step, active }: Props) {
                 />
                 {TONE_COLORS[group.tone].chip}
               </span>
-              <h3 className="text-[0.92rem] font-semibold text-white/85">{group.title}</h3>
+              <h3 className="text-[1.04rem] font-semibold text-white/90">{group.title}</h3>
               <span
                 className="ml-1 h-px flex-1"
                 style={{
@@ -151,23 +151,23 @@ function CapacityCard({
       <div className="relative flex flex-col gap-1">
         <div className="flex items-baseline justify-between gap-3">
           <span
-            className="text-[0.92rem] font-bold leading-tight text-white"
+            className="text-[1.02rem] font-bold leading-tight text-white"
             style={{ textShadow: `0 0 14px ${ring}55` }}
           >
             {item.name}
           </span>
           <span
-            className="text-[0.7rem] font-medium uppercase tracking-[0.18em]"
+            className="text-[0.78rem] font-medium uppercase tracking-[0.16em]"
             style={{ color: ring, opacity: 0.85 }}
           >
             {item.subtitle}
           </span>
         </div>
         {item.description && (
-          <p className="text-[0.82rem] leading-snug text-slate-300/85">{item.description}</p>
+          <p className="text-[0.92rem] leading-relaxed text-slate-300/90">{item.description}</p>
         )}
         <p
-          className="mt-1 text-[0.82rem] font-semibold italic leading-snug"
+          className="mt-1 text-[0.92rem] font-semibold italic leading-relaxed"
           style={{ color: ring }}
         >
           {item.tagline}

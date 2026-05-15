@@ -156,7 +156,7 @@ export function NarrativeStep({ step, active }: Props) {
               {step.title}
             </span>
             <h2
-              className="presentation-ppt-title max-w-[20ch] text-[clamp(1.65rem,3.6vw,2.45rem)] leading-[1.08]"
+              className="presentation-ppt-title max-w-[20ch] text-[clamp(1.9rem,4.2vw,2.9rem)] leading-[1.08]"
               style={{ textShadow: `0 0 28px ${accent.base}22` }}
             >
               {step.content.headline}
@@ -164,7 +164,7 @@ export function NarrativeStep({ step, active }: Props) {
           </motion.div>
         ) : (
           <motion.div variants={item}>
-            <h2 className="presentation-ppt-title max-w-[24ch] text-[clamp(1.55rem,3.6vw,2.1rem)]">
+            <h2 className="presentation-ppt-title max-w-[24ch] text-[clamp(1.8rem,4vw,2.55rem)]">
               {step.title}
             </h2>
           </motion.div>
@@ -243,7 +243,7 @@ export function NarrativeStep({ step, active }: Props) {
                       {it.label}
                     </span>
                   </div>
-                  <p className="text-[0.92rem] leading-snug text-white/85 whitespace-pre-line">{it.text}</p>
+                  <p className="text-[1.03rem] leading-relaxed text-white/90 whitespace-pre-line">{it.text}</p>
                 </motion.div>
               );
             })}
@@ -1255,7 +1255,7 @@ function PainPointsBalloon({
           ))}
         </motion.ul>
 
-        <p className="relative mt-7 text-center text-[11px] uppercase tracking-[0.32em] text-white/35">
+            <p className="relative mt-7 text-center text-[12px] uppercase tracking-[0.28em] text-white/40">
           Toque fora ou pressione ESC para fechar
         </p>
       </motion.div>
@@ -1478,7 +1478,7 @@ function PainPointChips({
                 }}
               />
             )}
-            <span className="flex-1 text-[0.92rem] font-medium leading-snug text-slate-100">
+            <span className="flex-1 text-[1.02rem] font-medium leading-relaxed text-slate-100">
               {text}
             </span>
             <span

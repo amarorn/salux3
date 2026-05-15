@@ -53,13 +53,13 @@ export function IntegrationStep({ step, active }: Props) {
         animate={active ? 'visible' : 'hidden'}
       >
         <motion.div variants={item}>
-          <h2 className="font-display text-[28px] font-bold leading-[1.15] tracking-tight text-white">
+          <h2 className="font-display text-[33px] font-bold leading-[1.14] tracking-tight text-white">
             {step.title}
           </h2>
         </motion.div>
 
         {step.content.body && (
-          <motion.p variants={item} className="text-sm leading-relaxed text-slate-200 whitespace-pre-line">
+          <motion.p variants={item} className="text-[1.02rem] leading-relaxed text-slate-200 whitespace-pre-line">
             {step.content.body}
           </motion.p>
         )}
@@ -78,7 +78,7 @@ export function IntegrationStep({ step, active }: Props) {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 + i * 0.04, ease: [0.22, 1, 0.36, 1] }}
-                className="rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-center text-[11px] font-medium text-slate-200 shadow-soft"
+                className="rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-center text-[12px] font-medium text-slate-200 shadow-soft"
               >
                 {sys}
               </motion.div>
@@ -97,15 +97,15 @@ export function IntegrationStep({ step, active }: Props) {
                 key={bullet}
                 className={
                   minimal
-                    ? 'flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-slate-200'
-                    : 'flex items-start gap-3 text-sm text-slate-200'
+                    ? 'flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-[1.02rem] text-slate-200'
+                    : 'flex items-start gap-3 text-[1.02rem] text-slate-200'
                 }
               >
                 <span
                   className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full"
                   style={{ background: accent.base, boxShadow: `0 0 8px ${accent.base}88` }}
                 />
-                <span className="whitespace-pre-line leading-snug">{bullet}</span>
+                <span className="whitespace-pre-line leading-relaxed">{bullet}</span>
               </li>
             ))}
           </motion.ul>

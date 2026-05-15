@@ -11,9 +11,9 @@ import { CinematicBanner } from '@/components/visuals/CinematicBanner';
 import { CardVisual, type CardVisualVariant } from '@/components/visuals/CardVisualVariants';
 
 /** Escala base para melhorar leitura sem perder composição do layout. */
-const BASE_CARD_TEXT_SCALE = 1.05;
+const BASE_CARD_TEXT_SCALE = 1.08;
 /** Trilha 1 (`era-agentica` — Receita): mantém um pequeno ganho adicional. */
-const TRACK1_CARD_TEXT_SCALE = 1.08;
+const TRACK1_CARD_TEXT_SCALE = 1.12;
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 

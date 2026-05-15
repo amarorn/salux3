@@ -73,7 +73,7 @@ export function ArchitectureStep({ step, active }: Props) {
                 <layer.icon className="h-5 w-5" style={{ color: layer.accent }} strokeWidth={1.8} />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-white">{layer.label}</p>
+                <p className="text-[1.02rem] font-semibold text-white">{layer.label}</p>
                 <p className="text-xs text-slate-400">{layer.desc}</p>
               </div>
               <div
@@ -94,7 +94,7 @@ export function ArchitectureStep({ step, active }: Props) {
         )}
 
         {step.content.body && (
-          <motion.p variants={item} className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
+          <motion.p variants={item} className="text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line">
             {step.content.body}
           </motion.p>
         )}

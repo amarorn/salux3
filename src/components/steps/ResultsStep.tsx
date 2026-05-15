@@ -138,7 +138,7 @@ export function ResultsStep({ step, active }: Props) {
       >
         <motion.div variants={item} className="flex flex-col gap-3">
           <h2
-            className="presentation-ppt-title max-w-[28ch] text-[clamp(1.35rem,3vw,1.95rem)] leading-[1.12]"
+            className="presentation-ppt-title max-w-[28ch] text-[clamp(1.62rem,3.5vw,2.35rem)] leading-[1.12]"
             style={{ textShadow: `0 0 28px ${accent.base}22` }}
           >
             {step.content.headline}
@@ -190,13 +190,13 @@ export function ResultsStep({ step, active }: Props) {
                 }}
               />
               <span
-                className="relative block text-[10px] font-semibold uppercase tracking-[0.3em]"
+                className="relative block text-[11px] font-semibold uppercase tracking-[0.26em]"
                 style={{ color: accent.base, opacity: 0.85 }}
               >
                 {String(i + 1).padStart(2, '0')}
               </span>
               <p
-                className="relative mt-1 text-[1.02rem] font-bold leading-snug text-white"
+                className="relative mt-1 text-[1.14rem] font-bold leading-relaxed text-white"
                 style={{ textShadow: `0 0 18px ${accent.base}55` }}
               >
                 {c}

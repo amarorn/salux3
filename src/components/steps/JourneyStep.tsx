@@ -107,7 +107,7 @@ export function JourneyStep({ step, active }: Props) {
         animate={active ? 'visible' : 'hidden'}
       >
         <motion.div variants={item}>
-          <h2 className="font-display text-[28px] font-bold leading-[1.15] tracking-tight text-white">
+          <h2 className="font-display text-[33px] font-bold leading-[1.14] tracking-tight text-white">
             {step.title}
           </h2>
         </motion.div>
@@ -122,7 +122,7 @@ export function JourneyStep({ step, active }: Props) {
         ) : null}
 
         {step.content.body && (
-          <motion.p variants={item} className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
+          <motion.p variants={item} className="text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line">
             {step.content.body}
           </motion.p>
         )}
@@ -156,7 +156,7 @@ export function JourneyStep({ step, active }: Props) {
         {step.content.bullets && step.content.bullets.length > 0 && (
           <motion.ul variants={item} className="mt-1 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {step.content.bullets.map((bullet) => (
-              <li key={bullet} className="flex items-start gap-2 text-xs leading-snug text-slate-200">
+              <li key={bullet} className="flex items-start gap-2 text-[0.95rem] leading-relaxed text-slate-200">
                 <span
                   className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full"
                   style={{ background: accent.base }}

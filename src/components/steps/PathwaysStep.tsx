@@ -50,7 +50,7 @@ export function PathwaysStep({ step, active }: Props) {
             Painel consultivo · diagnóstico → resposta
           </span>
           <h2
-            className="presentation-ppt-title max-w-[22ch] text-[clamp(1.45rem,3.2vw,2.05rem)] leading-[1.1]"
+            className="presentation-ppt-title max-w-[22ch] text-[clamp(1.72rem,3.8vw,2.45rem)] leading-[1.1]"
             style={{ textShadow: `0 0 28px ${accent.base}22` }}
           >
             {step.content.headline ?? 'Por onde o crescimento está travando hoje?'}
@@ -104,14 +104,14 @@ export function PathwaysStep({ step, active }: Props) {
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <span
-                      className="text-[0.82rem] font-medium leading-snug"
+                      className="text-[0.94rem] font-medium leading-relaxed"
                       style={{ color: isFocused ? '#ffffff' : 'rgba(226,232,240,0.78)' }}
                     >
                       {p.pain}
                     </span>
                     <motion.span
                       aria-hidden
-                      className="text-[0.95rem] leading-none"
+                      className="text-[1.05rem] leading-none"
                       style={{
                         color: accent.base,
                         textShadow: isFocused ? `0 0 10px ${accent.base}` : undefined,
@@ -149,7 +149,7 @@ export function PathwaysStep({ step, active }: Props) {
           />
           <div className="flex items-center justify-between gap-3">
             <span
-              className="text-[9px] font-semibold uppercase tracking-[0.28em]"
+              className="text-[10px] font-semibold uppercase tracking-[0.24em]"
               style={{ color: accent.base, opacity: 0.85 }}
             >
               Resposta coordenada
@@ -163,7 +163,7 @@ export function PathwaysStep({ step, active }: Props) {
             initial={reduce ? false : { opacity: 0, y: 6, filter: 'blur(6px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-1 font-display text-[1.25rem] font-extrabold leading-tight"
+            className="mt-1 font-display text-[1.4rem] font-extrabold leading-tight"
             style={{ color: '#fff', textShadow: `0 0 16px ${accent.base}66` }}
           >
             {focused?.product}

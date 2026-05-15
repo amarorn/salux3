@@ -82,11 +82,11 @@ export function GovernanceStep({ step, active }: Props) {
           <motion.div variants={item} className="grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-rose-400/30 bg-gradient-to-br from-rose-500/[0.12] to-transparent p-5 shadow-soft">
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-rose-200/85">Pergunta antiga</p>
-              <p className="mt-3 text-sm leading-relaxed text-slate-100">{compare.before}</p>
+              <p className="mt-3 text-[1.02rem] leading-relaxed text-slate-100">{compare.before}</p>
             </div>
             <div className="rounded-2xl border border-emerald-400/30 bg-gradient-to-br from-emerald-500/[0.12] to-transparent p-5 shadow-soft">
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-200/85">Pergunta nova</p>
-              <p className="mt-3 text-sm leading-relaxed text-slate-100">{compare.after}</p>
+              <p className="mt-3 text-[1.02rem] leading-relaxed text-slate-100">{compare.after}</p>
             </div>
           </motion.div>
         )}
@@ -100,7 +100,7 @@ export function GovernanceStep({ step, active }: Props) {
         )}
 
         {step.content.body && (
-          <motion.p variants={item} className="text-sm leading-relaxed text-slate-300 whitespace-pre-line">
+          <motion.p variants={item} className="text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line">
             {step.content.body}
           </motion.p>
         )}
@@ -207,7 +207,7 @@ function RevealFlipCard({ step, active, expanded, pillars, reduceMotion, contain
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 + pillars.length * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="border-t border-white/10 pt-4 text-sm leading-relaxed text-slate-300 whitespace-pre-line"
+                  className="border-t border-white/10 pt-4 text-[1.02rem] leading-relaxed text-slate-300 whitespace-pre-line"
                 >
                   {step.content.body}
                 </motion.p>
@@ -283,7 +283,7 @@ function RevealPillarChip({ label, index }: { label: string; index: number }) {
         transition: 'background 300ms, border 300ms, box-shadow 300ms, transform 250ms',
       }}
     >
-      <p className="text-sm font-semibold leading-snug text-white">{label}</p>
+      <p className="text-[1.02rem] font-semibold leading-relaxed text-white">{label}</p>
       {/* Glow de canto */}
       <span
         aria-hidden
@@ -343,7 +343,7 @@ function PillarCard({ pillar, index, active }: PillarCardProps) {
       </div>
 
       <div className="min-w-0">
-        <p className="text-sm font-semibold leading-tight text-white">{pillar.label}</p>
+        <p className="text-[1.02rem] font-semibold leading-tight text-white">{pillar.label}</p>
         <p
           className="text-[11px] transition-colors duration-300"
           style={{ color: hovered ? 'rgba(255,255,255,0.55)' : 'rgba(148,163,184,1)' }}
