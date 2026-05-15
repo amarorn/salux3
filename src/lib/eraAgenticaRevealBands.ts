@@ -10,9 +10,20 @@ export function buildNarrativeBandKeys(
   if (content.metrics && content.metrics.length > 0) keys.push('metrics');
   if (content.lead) keys.push('lead');
   if (content.contrastPair) keys.push('contrastPair');
-  if (content.valueStages && content.valueStages.length > 0) keys.push('valueStages');
+  if (content.valueStages && content.valueStages.length > 0) {
+    const chunk = content.valueStagesRevealChunkSize;
+    if (typeof chunk === 'number' && chunk > 0) {
+      const n = Math.ceil(content.valueStages.length / chunk);
+      for (let i = 0; i < n; i++) keys.push(`valueStagesChunk${i}`);
+    } else {
+      keys.push('valueStages');
+    }
+  }
   if (content.evidenceMetrics && content.evidenceMetrics.length > 0) keys.push('evidenceMetrics');
-  if (content.dualStages) keys.push('dualStages');
+  if (content.dualStages) {
+    keys.push('dualStagesPositive');
+    keys.push('dualStagesNegative');
+  }
   if (content.body && !painPoints) keys.push('body');
   if (
     content.bullets &&

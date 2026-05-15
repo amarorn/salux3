@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   type RefObject,
+  type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -61,6 +62,115 @@ interface Props {
   active: boolean;
 }
 
+type DualStageSide = NonNullable<PresentationStep["content"]["dualStages"]>;
+
+function DualStageGroupBlock({
+  group,
+  cfg,
+  reduceMotion,
+  active,
+  innerMotion,
+}: {
+  group: "positive" | "negative";
+  cfg: DualStageSide["positive"];
+  reduceMotion: boolean | null;
+  active: boolean;
+  innerMotion: Record<string, unknown>;
+}) {
+  const c =
+    group === "positive" ? theme.accents.emerald : theme.accents.rose;
+  const icon = group === "positive" ? "✓" : "⚠";
+  const cardDelayBase = group === "positive" ? 0.35 : 0.52;
+  const cardDelayStep = group === "positive" ? 0.07 : 0.22;
+
+  return (
+    <motion.div {...innerMotion} className="space-y-2.5">
+      <motion.p
+        className="text-[1.02rem] font-semibold leading-relaxed"
+        style={{
+          color: c.base,
+          textShadow: `0 0 16px ${c.base}1f`,
+        }}
+        initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+        animate={
+          active
+            ? { opacity: 1, y: 0 }
+            : reduceMotion
+              ? undefined
+              : { opacity: 0, y: 6 }
+        }
+        transition={{
+          duration: 0.4,
+          ease: [0.22, 1, 0.36, 1],
+          delay: group === "negative" ? 0.12 : 0,
+        }}
+      >
+        {cfg.lead}
+      </motion.p>
+      <div
+        className="grid gap-2"
+        style={{
+          gridTemplateColumns: `repeat(${cfg.gridCols ?? cfg.items.length}, minmax(0, 1fr))`,
+        }}
+      >
+        {cfg.items.map((it, i) => (
+          <motion.div
+            key={`${it.label}-${i}`}
+            className="relative overflow-hidden rounded-lg border px-3 py-2.5"
+            style={{
+              borderColor: `${c.base}55`,
+              background: `linear-gradient(135deg, ${c.base}18 0%, rgba(255,255,255,0.02) 70%)`,
+              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05)`,
+            }}
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+            animate={
+              active
+                ? { opacity: 1, y: 0 }
+                : reduceMotion
+                  ? undefined
+                  : { opacity: 0, y: 8 }
+            }
+            transition={{
+              duration: 0.45,
+              ease: [0.22, 1, 0.36, 1],
+              delay: cardDelayBase + i * cardDelayStep,
+            }}
+          >
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-3 -top-px h-px"
+              style={{
+                background: `linear-gradient(90deg, transparent, ${c.base}, transparent)`,
+              }}
+            />
+            <div className="flex flex-col items-center gap-2 text-center">
+              <span
+                aria-hidden
+                className="inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded text-[11px] font-bold"
+                style={{
+                  background: c.base,
+                  color: "#0b0f1a",
+                  boxShadow: `0 0 10px ${c.base}66`,
+                }}
+              >
+                {icon}
+              </span>
+              <p className="text-[0.94rem] font-medium leading-relaxed text-white/95">
+                {it.label}
+                {it.description && (
+                  <span className="block text-[0.86rem] font-normal text-slate-300/85">
+                    {it.description}
+                  </span>
+                )}
+              </p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 function valueStagesGridColumns(count: number, gridCols?: number): string {
   const cols = gridCols ?? (count === 4 ? 2 : Math.min(count, 4));
   return `repeat(${cols}, minmax(min(100%, 11rem), 1fr))`;
@@ -71,7 +181,15 @@ export function NarrativeStep({ step, active }: Props) {
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
   const trackId = useContext(FloatingCardContext)?.trackId;
-  const eraStaging = trackUsesEraStagedReveal(trackId);
+  const hasChunkedValueStages = Boolean(
+    (step.content.valueStagesRevealChunkSize ?? 0) > 0 &&
+      step.content.valueStages &&
+      step.content.valueStages.length > 0,
+  );
+  const eraStaging =
+    trackUsesEraStagedReveal(trackId) ||
+    Boolean(step.content.forceEraStagedReveal) ||
+    hasChunkedValueStages;
   const { container, item } = getCardTextVariants(
     Boolean(reduceMotion),
     step.index,
@@ -89,6 +207,16 @@ export function NarrativeStep({ step, active }: Props) {
       ),
     [step.content, painPoints, useBalloon],
   );
+  const valueStagesChunks = useMemo(() => {
+    const vs = step.content.valueStages;
+    const chunk = step.content.valueStagesRevealChunkSize;
+    if (!vs?.length || typeof chunk !== "number" || chunk < 1) return null;
+    const rows: (typeof vs)[] = [];
+    for (let i = 0; i < vs.length; i += chunk) {
+      rows.push(vs.slice(i, i + chunk));
+    }
+    return rows;
+  }, [step.content.valueStages, step.content.valueStagesRevealChunkSize]);
   const b = (id: string) => bandKeys.indexOf(id);
   const setEraCfg = usePresentationStore((s) => s.setEraStagedRevealConfig);
   const clearEra = usePresentationStore((s) => s.clearEraStagedReveal);
@@ -210,6 +338,247 @@ export function NarrativeStep({ step, active }: Props) {
     return () => window.removeEventListener("keydown", onKey, true);
   }, [expandedImage]);
 
+  const renderValueStagesSection = (): ReactNode => {
+    const vs = step.content.valueStages;
+    if (!vs?.length) return null;
+    const chunks = valueStagesChunks;
+    const revealChunk = step.content.valueStagesRevealChunkSize ?? 1;
+
+    const valueStagesLeadBlock =
+      step.content.valueStagesLead ? (
+        <p
+          className="whitespace-pre-line text-[1.05rem] leading-relaxed text-slate-100/95"
+          style={{ textShadow: `0 0 18px ${accent.base}1f` }}
+        >
+          {step.content.valueStagesLead}
+        </p>
+      ) : null;
+
+    const expandedPortal = (
+      <AnimatePresence>
+        {active &&
+          valueStageSpotlight !== null &&
+          vs[valueStageSpotlight] !== undefined && (
+            <ExpandedCardPortal
+              key={`stage-expanded-${valueStageSpotlight}`}
+              text={vs[valueStageSpotlight]!.label}
+              accentColor={accent.base}
+              reducedMotion={Boolean(reduceMotion)}
+              origin={stageRefs.current[valueStageSpotlight] ?? null}
+              onClose={() => setValueStageSpotlight(null)}
+              prefix={vs[valueStageSpotlight]!.number}
+              description={
+                vs[valueStageSpotlight]!.description || undefined
+              }
+            />
+          )}
+      </AnimatePresence>
+    );
+
+    const renderStageButton = (
+      stage: (typeof vs)[number],
+      i: number,
+      ji: number,
+      chunked: boolean,
+    ) => {
+      const intensity = step.content.valueStagesFlat
+        ? 0.85
+        : 0.55 + (i / Math.max(vs.length - 1, 1)) * 0.45;
+      const hex = (mult: number) =>
+        Math.round(intensity * mult)
+          .toString(16)
+          .padStart(2, "0");
+      const dimmed = valueStageSpotlight !== null && valueStageSpotlight !== i;
+      const focused = valueStageSpotlight === i;
+      const enterDelay =
+        active && valueStageSpotlight === null
+          ? chunked
+            ? 0.34 + ji * 0.11
+            : 0.45 + ji * 0.12
+          : 0;
+      return (
+        <motion.button
+          ref={(el) => {
+            stageRefs.current[i] = el;
+          }}
+          key={`${stage.number}-${stage.label}-${i}`}
+          type="button"
+          data-no-click-advance
+          disabled={!active}
+          aria-expanded={focused}
+          aria-label={`Ampliar: ${stage.label}`}
+          className="relative flex h-full min-h-[5.5rem] w-full min-w-0 cursor-pointer flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-left outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45 disabled:cursor-default disabled:opacity-40"
+          style={{
+            zIndex: focused ? 2 : 1,
+            borderColor: focused
+              ? `${accent.base}aa`
+              : `${accent.base}${hex(95)}`,
+            background: `linear-gradient(160deg, ${accent.base}${hex(30)} 0%, rgba(255,255,255,0.02) 70%)`,
+            boxShadow: focused
+              ? `inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px ${accent.base}55, 0 16px 40px -8px ${accent.base}44`
+              : `inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px -16px ${accent.base}${hex(88)}`,
+          }}
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={
+            !active
+              ? reduceMotion
+                ? undefined
+                : { opacity: 0, y: 12 }
+              : dimmed
+                ? {
+                    opacity: 0.35,
+                    scale: 0.97,
+                    transition: {
+                      duration: 0.32,
+                      ease: [0.22, 1, 0.36, 1],
+                    },
+                  }
+                : {
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                    transition: {
+                      duration: 0.55,
+                      ease: [0.22, 1, 0.36, 1],
+                      delay: enterDelay,
+                    },
+                  }
+          }
+          whileHover={
+            reduceMotion || !active || valueStageSpotlight !== null
+              ? undefined
+              : {
+                  y: -2,
+                  scale: 1.02,
+                  transition: {
+                    duration: 0.25,
+                    ease: [0.22, 1, 0.36, 1],
+                  },
+                }
+          }
+          whileTap={reduceMotion || !active ? undefined : { scale: 0.96 }}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!active) return;
+            setValueStageSpotlight((s) => (s === i ? null : i));
+          }}
+        >
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-x-3 -top-px h-px"
+            style={{
+              background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)`,
+            }}
+          />
+          <div className="flex items-baseline justify-center gap-1.5 text-center">
+            <span
+              className="font-display text-[1.03rem] font-bold tabular-nums"
+              style={{
+                color: accent.base,
+                textShadow: `0 0 12px ${accent.base}66`,
+              }}
+            >
+              {stage.number}
+            </span>
+            <span
+              className="text-[11px] font-semibold uppercase tracking-[0.22em]"
+              style={{ color: accent.base, opacity: 0.9 }}
+            >
+              {stage.label}
+            </span>
+          </div>
+          {stage.description && (
+            <p className="mt-2 text-center text-[0.96rem] leading-relaxed text-slate-100/92">
+              {stage.mediaUrl && <>(Vídeo)</>}
+            </p>
+          )}
+          <span className="mt-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
+            Clique para ampliar
+          </span>
+        </motion.button>
+      );
+    };
+
+    if (chunks) {
+      return (
+        <>
+          {chunks.map((slice, gi) => (
+            <EraRevealBand
+              key={`valueStagesChunk-${gi}`}
+              bandId={`valueStagesChunk${gi}`}
+              bandIndex={b(`valueStagesChunk${gi}`)}
+              stepId={step.id}
+              stepIndex={step.index}
+              eraStaging={eraStaging}
+              active={active}
+            >
+              <motion.div
+                {...innerMotion}
+                className="relative space-y-3 overflow-visible py-1"
+              >
+                {gi === 0 ? valueStagesLeadBlock : null}
+                <motion.div
+                  data-no-click-advance
+                  className="relative isolate z-10 grid w-full auto-rows-fr gap-2.5"
+                  style={{
+                    gridTemplateColumns: valueStagesGridColumns(
+                      slice.length,
+                      step.content.valueStagesGridCols,
+                    ),
+                  }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                >
+                  {slice.map((stage, ji) =>
+                    renderStageButton(
+                      stage,
+                      gi * revealChunk + ji,
+                      ji,
+                      true,
+                    ),
+                  )}
+                </motion.div>
+              </motion.div>
+            </EraRevealBand>
+          ))}
+          {expandedPortal}
+        </>
+      );
+    }
+
+    return (
+      <EraRevealBand
+        bandId="valueStages"
+        bandIndex={b("valueStages")}
+        stepId={step.id}
+        stepIndex={step.index}
+        eraStaging={eraStaging}
+        active={active}
+      >
+        <motion.div
+          {...innerMotion}
+          className="relative space-y-3 overflow-visible py-1"
+        >
+          {valueStagesLeadBlock}
+          <motion.div
+            data-no-click-advance
+            className="relative isolate z-10 grid w-full auto-rows-fr gap-2.5"
+            style={{
+              gridTemplateColumns: valueStagesGridColumns(
+                vs.length,
+                step.content.valueStagesGridCols,
+              ),
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            {vs.map((stage, i) => renderStageButton(stage, i, i, false))}
+          </motion.div>
+          {expandedPortal}
+        </motion.div>
+      </EraRevealBand>
+    );
+  };
+
   const hero = step.content.heroImage;
 
   return (
@@ -231,6 +600,8 @@ export function NarrativeStep({ step, active }: Props) {
               : 640
           : step.content.dualStages
             ? 900
+            : step.content.valueStagesRevealChunkSize
+            ? 920
             : step.content.valueStages && step.content.valueStages.length >= 4
               ? 920
               : step.content.valueStages && step.content.valueStages.length > 0
@@ -414,189 +785,7 @@ export function NarrativeStep({ step, active }: Props) {
           </EraRevealBand>
         )}
 
-        {step.content.valueStages && step.content.valueStages.length > 0 && (
-          <EraRevealBand
-            bandId="valueStages"
-            bandIndex={b("valueStages")}
-            stepId={step.id}
-            stepIndex={step.index}
-            eraStaging={eraStaging}
-            active={active}
-          >
-            <motion.div
-              {...innerMotion}
-              className="relative space-y-3 overflow-visible py-1"
-            >
-              {step.content.valueStagesLead && (
-                <p
-                  className="whitespace-pre-line text-[1.05rem] leading-relaxed text-slate-100/95"
-                  style={{ textShadow: `0 0 18px ${accent.base}1f` }}
-                >
-                  {step.content.valueStagesLead}
-                </p>
-              )}
-              <motion.div
-                data-no-click-advance
-                className="relative isolate z-10 grid w-full auto-rows-fr gap-2.5"
-                style={{
-                  gridTemplateColumns: valueStagesGridColumns(
-                    step.content.valueStages.length,
-                    step.content.valueStagesGridCols,
-                  ),
-                }}
-                onPointerDown={(e) => e.stopPropagation()}
-              >
-                {step.content.valueStages.map((stage, i) => {
-                  const intensity = step.content.valueStagesFlat
-                    ? 0.85
-                    : 0.55 +
-                      (i / Math.max(step.content.valueStages!.length - 1, 1)) *
-                        0.45;
-                  const hex = (mult: number) =>
-                    Math.round(intensity * mult)
-                      .toString(16)
-                      .padStart(2, "0");
-                  const dimmed =
-                    valueStageSpotlight !== null && valueStageSpotlight !== i;
-                  const focused = valueStageSpotlight === i;
-                  return (
-                    <motion.button
-                      ref={(el) => {
-                        stageRefs.current[i] = el;
-                      }}
-                      key={`${stage.number}-${stage.label}`}
-                      type="button"
-                      data-no-click-advance
-                      disabled={!active}
-                      aria-expanded={focused}
-                      aria-label={`Ampliar: ${stage.label}`}
-                      className="relative flex h-full min-h-[5.5rem] w-full min-w-0 cursor-pointer flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-left outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45 disabled:cursor-default disabled:opacity-40"
-                      style={{
-                        zIndex: focused ? 2 : 1,
-                        borderColor: focused
-                          ? `${accent.base}aa`
-                          : `${accent.base}${hex(95)}`,
-                        background: `linear-gradient(160deg, ${accent.base}${hex(30)} 0%, rgba(255,255,255,0.02) 70%)`,
-                        boxShadow: focused
-                          ? `inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px ${accent.base}55, 0 16px 40px -8px ${accent.base}44`
-                          : `inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px -16px ${accent.base}${hex(88)}`,
-                      }}
-                      initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-                      animate={
-                        !active
-                          ? reduceMotion
-                            ? undefined
-                            : { opacity: 0, y: 12 }
-                          : dimmed
-                            ? {
-                                opacity: 0.35,
-                                scale: 0.97,
-                                transition: {
-                                  duration: 0.32,
-                                  ease: [0.22, 1, 0.36, 1],
-                                },
-                              }
-                            : {
-                                opacity: 1,
-                                scale: 1,
-                                y: 0,
-                                transition: {
-                                  duration: 0.55,
-                                  ease: [0.22, 1, 0.36, 1],
-                                  delay:
-                                    active && valueStageSpotlight === null
-                                      ? 0.45 + i * 0.12
-                                      : 0,
-                                },
-                              }
-                      }
-                      whileHover={
-                        reduceMotion || !active || valueStageSpotlight !== null
-                          ? undefined
-                          : {
-                              y: -2,
-                              scale: 1.02,
-                              transition: {
-                                duration: 0.25,
-                                ease: [0.22, 1, 0.36, 1],
-                              },
-                            }
-                      }
-                      whileTap={
-                        reduceMotion || !active ? undefined : { scale: 0.96 }
-                      }
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!active) return;
-                        setValueStageSpotlight((s) => (s === i ? null : i));
-                      }}
-                    >
-                      <span
-                        aria-hidden
-                        className="pointer-events-none absolute inset-x-3 -top-px h-px"
-                        style={{
-                          background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)`,
-                        }}
-                      />
-                      <div className="flex items-baseline justify-center gap-1.5 text-center">
-                        <span
-                          className="font-display text-[1.03rem] font-bold tabular-nums"
-                          style={{
-                            color: accent.base,
-                            textShadow: `0 0 12px ${accent.base}66`,
-                          }}
-                        >
-                          {stage.number}
-                        </span>
-                        <span
-                          className="text-[11px] font-semibold uppercase tracking-[0.22em]"
-                          style={{ color: accent.base, opacity: 0.9 }}
-                        >
-                          {stage.label}
-                        </span>
-                      </div>
-                      {stage.description && (
-                        <p className="mt-2 text-center text-[0.96rem] leading-relaxed text-slate-100/92">
-                          {/* {stage.description}*/}
-                          {stage.mediaUrl && <>(Vídeo)</>}
-                        </p>
-                      )}
-                      <span className="mt-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
-                        Clique para ampliar
-                      </span>
-                    </motion.button>
-                  );
-                })}
-              </motion.div>
-
-              <AnimatePresence>
-                {active &&
-                  valueStageSpotlight !== null &&
-                  step.content.valueStages[valueStageSpotlight] !==
-                    undefined && (
-                    <ExpandedCardPortal
-                      key={`stage-expanded-${valueStageSpotlight}`}
-                      text={
-                        step.content.valueStages[valueStageSpotlight]!.label
-                      }
-                      accentColor={accent.base}
-                      reducedMotion={Boolean(reduceMotion)}
-                      origin={stageRefs.current[valueStageSpotlight] ?? null}
-                      onClose={() => setValueStageSpotlight(null)}
-                      prefix={
-                        step.content.valueStages[valueStageSpotlight]!.number
-                      }
-                      description={
-                        step.content.valueStages[valueStageSpotlight]!
-                          .description || undefined
-                      }
-                    />
-                  )}
-              </AnimatePresence>
-            </motion.div>
-          </EraRevealBand>
-        )}
+        {renderValueStagesSection()}
 
         {step.content.evidenceMetrics &&
           step.content.evidenceMetrics.length > 0 && (
@@ -654,98 +843,40 @@ export function NarrativeStep({ step, active }: Props) {
           )}
 
         {step.content.dualStages && (
-          <EraRevealBand
-            bandId="dualStages"
-            bandIndex={b("dualStages")}
-            stepId={step.id}
-            stepIndex={step.index}
-            eraStaging={eraStaging}
-            active={active}
-          >
-            <motion.div {...innerMotion} className="space-y-5">
-              {(["positive", "negative"] as const).map((group, gi) => {
-                const cfg = step.content.dualStages![group];
-                const c =
-                  group === "positive"
-                    ? theme.accents.emerald
-                    : theme.accents.rose;
-                const icon = group === "positive" ? "✓" : "⚠";
-                return (
-                  <div key={group} className="space-y-2.5">
-                    <p
-                      className="text-[1.02rem] font-semibold leading-relaxed"
-                      style={{
-                        color: c.base,
-                        textShadow: `0 0 16px ${c.base}1f`,
-                      }}
-                    >
-                      {cfg.lead}
-                    </p>
-                    <div
-                      className="grid gap-2"
-                      style={{
-                        gridTemplateColumns: `repeat(${cfg.gridCols ?? cfg.items.length}, minmax(0, 1fr))`,
-                      }}
-                    >
-                      {cfg.items.map((it, i) => (
-                        <motion.div
-                          key={`${it.label}-${i}`}
-                          className="relative overflow-hidden rounded-lg border px-3 py-2.5"
-                          style={{
-                            borderColor: `${c.base}55`,
-                            background: `linear-gradient(135deg, ${c.base}18 0%, rgba(255,255,255,0.02) 70%)`,
-                            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05)`,
-                          }}
-                          initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-                          animate={
-                            active
-                              ? { opacity: 1, y: 0 }
-                              : reduceMotion
-                                ? undefined
-                                : { opacity: 0, y: 8 }
-                          }
-                          transition={{
-                            duration: 0.45,
-                            ease: [0.22, 1, 0.36, 1],
-                            delay: 0.4 + gi * 0.15 + i * 0.06,
-                          }}
-                        >
-                          <span
-                            aria-hidden
-                            className="pointer-events-none absolute inset-x-3 -top-px h-px"
-                            style={{
-                              background: `linear-gradient(90deg, transparent, ${c.base}, transparent)`,
-                            }}
-                          />
-                          <div className="flex flex-col items-center gap-2 text-center">
-                            <span
-                              aria-hidden
-                              className="inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded text-[11px] font-bold"
-                              style={{
-                                background: c.base,
-                                color: "#0b0f1a",
-                                boxShadow: `0 0 10px ${c.base}66`,
-                              }}
-                            >
-                              {icon}
-                            </span>
-                            <p className="text-[0.94rem] font-medium leading-relaxed text-white/95">
-                              {it.label}
-                              {it.description && (
-                                <span className="block text-[0.86rem] font-normal text-slate-300/85">
-                                  {it.description}
-                                </span>
-                              )}
-                            </p>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </motion.div>
-          </EraRevealBand>
+          <div className="space-y-5">
+            <EraRevealBand
+              bandId="dualStagesPositive"
+              bandIndex={b("dualStagesPositive")}
+              stepId={step.id}
+              stepIndex={step.index}
+              eraStaging={eraStaging}
+              active={active}
+            >
+              <DualStageGroupBlock
+                group="positive"
+                cfg={step.content.dualStages.positive}
+                reduceMotion={reduceMotion}
+                active={active}
+                innerMotion={innerMotion}
+              />
+            </EraRevealBand>
+            <EraRevealBand
+              bandId="dualStagesNegative"
+              bandIndex={b("dualStagesNegative")}
+              stepId={step.id}
+              stepIndex={step.index}
+              eraStaging={eraStaging}
+              active={active}
+            >
+              <DualStageGroupBlock
+                group="negative"
+                cfg={step.content.dualStages.negative}
+                reduceMotion={reduceMotion}
+                active={active}
+                innerMotion={innerMotion}
+              />
+            </EraRevealBand>
+          </div>
         )}
 
         {step.content.body && !painPoints && (

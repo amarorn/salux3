@@ -237,6 +237,10 @@ export interface StepContent {
   valueStagesFlat?: boolean;
   /** Número de colunas da grid de etapas (default = quantidade de etapas, em uma linha). */
   valueStagesGridCols?: 2 | 3 | 4 | 5;
+  /** Quantas etapas revelar por clique (requer `forceEraStagedReveal` nas faixas do slide). */
+  valueStagesRevealChunkSize?: number;
+  /** Revelação por clique neste slide mesmo fora das trilhas era-agentica/operacoes. */
+  forceEraStagedReveal?: boolean;
   /** Variante do visual decorativo no rodapé do card (default: 'flow'). */
   cardVisual?:
     | "flow"

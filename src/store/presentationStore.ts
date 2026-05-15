@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { tracksById, type TrackId } from '@/domain/tracks';
 import type { StageAspectMode } from '@/domain/stageAspect';
-import { trackUsesEraStagedReveal } from '@/lib/trackEraStaging';
 
 const STAGE_ASPECT_STORAGE_KEY = 'salux-stage-aspect';
 
@@ -187,7 +186,6 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
   clearEraStagedReveal: () => set(eraRevealCleared),
   tryAdvanceEraStagedReveal: () => {
     const s = get();
-    if (!trackUsesEraStagedReveal(s.currentTrackId)) return false;
     if (!s.eraStagedRevealStepId || s.eraStagedRevealStepId !== s.currentStepId) return false;
     if (s.eraStagedRevealMax <= 1) return false;
     if (s.eraStagedRevealPhase < s.eraStagedRevealMax - 1) {

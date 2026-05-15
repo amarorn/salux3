@@ -1,5 +1,4 @@
 import type { PresentationStep } from "./types";
-import trilha2CoverUrl from "@/assets/presentation/trilha2-cover-paciente.png?url";
 import trilha2JornadaUrl from "@/assets/presentation/trilha2-jornada-isometrica-sf.png?url";
 import trilha2ComandoUrl from "@/assets/presentation/trilha2-comando-clinico.png?url";
 import trilha2RedeUrl from "@/assets/presentation/trilha2-rede-conectada.png?url";
@@ -183,10 +182,6 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       body: "Em saúde, o risco nem sempre nasce de um evento isolado. Muitas vezes, ele se forma aos poucos — e em silêncio.",
       attentionPhrase:
         "O problema não é falta de dado. É falta de continuidade.",
-      heroImage: {
-        src: trilha2CoverUrl,
-        alt: "Médica acompanhando paciente em leito hospitalar",
-      },
     }),
   )
   .map(
@@ -321,7 +316,8 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       journeyStages: [],
       lead: "Cada etapa parece resolvida isoladamente. Mas o cuidado não acontece em etapas isoladas.",
       valueStagesFlat: true,
-      valueStagesGridCols: 5,
+      valueStagesGridCols: 3,
+      valueStagesRevealChunkSize: 3,
       valueStages: [
         { number: "01", label: "Admissão" },
         { number: "02", label: "Atendimento" },
