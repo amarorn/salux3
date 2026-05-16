@@ -134,6 +134,7 @@ export function CapacitiesStep({ step, active }: Props) {
       width={760}
       badge={step.title}
       cardVisual={step.content.cardVisual}
+      hideValueFlow={Boolean(step.content.hideValueFlow)}
     >
       <motion.div
         className="flex flex-col gap-6"

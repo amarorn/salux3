@@ -412,7 +412,8 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map(
     withContent("roadmap", {
       headline: "Essa arquitetura já existe na prática.",
-      cardVisual: "branch",
+      omitSidePhoto: true,
+      hideValueFlow: true,
       body: "O Ecossistema Salux estrutura a continuidade em cada ponto da jornada — de forma integrada, não como soluções isoladas.",
       capacityGroups: [
         {

@@ -89,6 +89,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           highlightPhrases: [],
           painPointsLayout: false,
           heroImage: { src: trilha3Slide2Url, alt: 'Trilha 3 — Slide 2' },
+          centerTitleAndValueStagesInPanel: true,
         },
       };
     }

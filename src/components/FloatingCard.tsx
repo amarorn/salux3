@@ -273,7 +273,12 @@ export function FloatingCard({
             vectorEffect="non-scaling-stroke"
           />
         </svg>
-        <div className={`relative flex h-full min-h-[${height}px] flex-col`}>
+        <div
+          className={clsx(
+            "relative flex h-full flex-col",
+            typeof height === "number" && height > 0 && `min-h-[${height}px]`,
+          )}
+        >
           <div
             className={clsx(
               "relative mx-auto flex min-h-0 w-full flex-1 flex-col",

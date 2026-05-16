@@ -185,6 +185,8 @@ export interface StepContent {
   resultsCards?: string[];
   /** Sem coluna de foto/banner no topo — só o painel de texto (layout vertical do card). */
   omitSidePhoto?: boolean;
+  /** Esconde o visual decorativo do rodapé do cartão (`CardVisual` / “value flow”). */
+  hideValueFlow?: boolean;
   /** Vídeo no banner do card (substitui a foto lateral). */
   bannerMedia?: BannerMedia;
   /** Par de contraste (ex.: visível × despercebido) usado na capa. */
@@ -239,6 +241,8 @@ export interface StepContent {
   valueStagesGridCols?: 2 | 3 | 4 | 5;
   /** Quantas etapas revelar por clique (requer `forceEraStagedReveal` nas faixas do slide). */
   valueStagesRevealChunkSize?: number;
+  /** Agrupa título do slide + grelha `valueStages` e centra o bloco no espaço vertical do painel (abaixo do banner). */
+  centerTitleAndValueStagesInPanel?: boolean;
   /** Revelação por clique neste slide mesmo fora das trilhas era-agentica/operacoes. */
   forceEraStagedReveal?: boolean;
   /** Variante do visual decorativo no rodapé do card (default: 'flow'). */

@@ -8,6 +8,7 @@ import {
   useState,
   type RefObject,
   type ReactNode,
+  type CSSProperties,
 } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -171,9 +172,25 @@ function DualStageGroupBlock({
   );
 }
 
+function valueStagesColCount(count: number, gridCols?: number): number {
+  return gridCols ?? (count === 4 ? 2 : Math.min(count, 4));
+}
+
 function valueStagesGridColumns(count: number, gridCols?: number): string {
-  const cols = gridCols ?? (count === 4 ? 2 : Math.min(count, 4));
-  return `repeat(${cols}, minmax(min(100%, 11rem), 1fr))`;
+  const cols = valueStagesColCount(count, gridCols);
+  return `repeat(${cols}, minmax(0, 11rem))`;
+}
+
+function valueStageOrphanGridPlacement(
+  cols: number,
+  bandSize: number,
+  indexInBand: number,
+): CSSProperties | undefined {
+  if (cols < 2 || bandSize < 1) return undefined;
+  const r = bandSize % cols;
+  if (r !== 1 || indexInBand !== bandSize - 1) return undefined;
+  const col = Math.floor((cols - 1) / 2) + 1;
+  return { gridColumn: `${col} / ${col + 1}` };
 }
 
 export function NarrativeStep({ step, active }: Props) {
@@ -347,7 +364,7 @@ export function NarrativeStep({ step, active }: Props) {
     const valueStagesLeadBlock =
       step.content.valueStagesLead ? (
         <p
-          className="whitespace-pre-line text-[1.05rem] leading-relaxed text-slate-100/95"
+          className="mx-auto w-full max-w-prose whitespace-pre-line text-center text-[1.05rem] leading-relaxed text-slate-100/95"
           style={{ textShadow: `0 0 18px ${accent.base}1f` }}
         >
           {step.content.valueStagesLead}
@@ -380,6 +397,9 @@ export function NarrativeStep({ step, active }: Props) {
       i: number,
       ji: number,
       chunked: boolean,
+      gridCols: number,
+      bandSize: number,
+      indexInBand: number,
     ) => {
       const intensity = step.content.valueStagesFlat
         ? 0.85
@@ -396,6 +416,11 @@ export function NarrativeStep({ step, active }: Props) {
             ? 0.34 + ji * 0.11
             : 0.45 + ji * 0.12
           : 0;
+      const orphanPlacement = valueStageOrphanGridPlacement(
+        gridCols,
+        bandSize,
+        indexInBand,
+      );
       return (
         <motion.button
           ref={(el) => {
@@ -407,7 +432,7 @@ export function NarrativeStep({ step, active }: Props) {
           disabled={!active}
           aria-expanded={focused}
           aria-label={`Ampliar: ${stage.label}`}
-          className="relative flex h-full min-h-[5.5rem] w-full min-w-0 cursor-pointer flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-left outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45 disabled:cursor-default disabled:opacity-40"
+          className="relative flex h-full min-h-[5.5rem] w-full min-w-0 cursor-pointer flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-center outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45 disabled:cursor-default disabled:opacity-40"
           style={{
             zIndex: focused ? 2 : 1,
             borderColor: focused
@@ -417,6 +442,7 @@ export function NarrativeStep({ step, active }: Props) {
             boxShadow: focused
               ? `inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px ${accent.base}55, 0 16px 40px -8px ${accent.base}44`
               : `inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px -16px ${accent.base}${hex(88)}`,
+            ...orphanPlacement,
           }}
           initial={reduceMotion ? false : { opacity: 0, y: 12 }}
           animate={
@@ -512,15 +538,16 @@ export function NarrativeStep({ step, active }: Props) {
               stepIndex={step.index}
               eraStaging={eraStaging}
               active={active}
+              className="flex w-full justify-center"
             >
               <motion.div
                 {...innerMotion}
-                className="relative space-y-3 overflow-visible py-1"
+                className="relative flex w-full flex-col items-stretch space-y-3 overflow-visible py-1"
               >
                 {gi === 0 ? valueStagesLeadBlock : null}
                 <motion.div
                   data-no-click-advance
-                  className="relative isolate z-10 grid w-full auto-rows-fr gap-2.5"
+                  className="relative isolate z-10 mx-auto grid w-full max-w-[min(100%,56rem)] auto-rows-fr justify-center justify-items-stretch gap-2.5"
                   style={{
                     gridTemplateColumns: valueStagesGridColumns(
                       slice.length,
@@ -529,14 +556,21 @@ export function NarrativeStep({ step, active }: Props) {
                   }}
                   onPointerDown={(e) => e.stopPropagation()}
                 >
-                  {slice.map((stage, ji) =>
-                    renderStageButton(
+                  {slice.map((stage, ji) => {
+                    const cols = valueStagesColCount(
+                      slice.length,
+                      step.content.valueStagesGridCols,
+                    );
+                    return renderStageButton(
                       stage,
                       gi * revealChunk + ji,
                       ji,
                       true,
-                    ),
-                  )}
+                      cols,
+                      slice.length,
+                      ji,
+                    );
+                  })}
                 </motion.div>
               </motion.div>
             </EraRevealBand>
@@ -554,15 +588,16 @@ export function NarrativeStep({ step, active }: Props) {
         stepIndex={step.index}
         eraStaging={eraStaging}
         active={active}
+        className="flex w-full justify-center"
       >
         <motion.div
           {...innerMotion}
-          className="relative space-y-3 overflow-visible py-1"
+          className="relative flex w-full flex-col items-stretch space-y-3 overflow-visible py-1"
         >
           {valueStagesLeadBlock}
           <motion.div
             data-no-click-advance
-            className="relative isolate z-10 grid w-full auto-rows-fr gap-2.5"
+            className="relative isolate z-10 mx-auto grid w-full max-w-[min(100%,56rem)] auto-rows-fr justify-center justify-items-stretch gap-2.5"
             style={{
               gridTemplateColumns: valueStagesGridColumns(
                 vs.length,
@@ -571,7 +606,13 @@ export function NarrativeStep({ step, active }: Props) {
             }}
             onPointerDown={(e) => e.stopPropagation()}
           >
-            {vs.map((stage, i) => renderStageButton(stage, i, i, false))}
+            {vs.map((stage, i) => {
+              const cols = valueStagesColCount(
+                vs.length,
+                step.content.valueStagesGridCols,
+              );
+              return renderStageButton(stage, i, i, false, cols, vs.length, i);
+            })}
           </motion.div>
           {expandedPortal}
         </motion.div>
@@ -580,6 +621,65 @@ export function NarrativeStep({ step, active }: Props) {
   };
 
   const hero = step.content.heroImage;
+
+  const centerTitleAndStagesPanel = Boolean(
+    step.content.centerTitleAndValueStagesInPanel &&
+      step.content.valueStages &&
+      step.content.valueStages.length > 0,
+  );
+
+  const titleBand =
+    painPoints && step.content.headline ? (
+      <EraRevealBand
+        bandId="title"
+        bandIndex={b("title")}
+        stepId={step.id}
+        stepIndex={step.index}
+        eraStaging={eraStaging}
+        active={active}
+        className="flex w-full justify-center"
+      >
+        <motion.div {...innerMotion} className="space-y-3 text-center">
+          <span
+            className="block text-[10px] font-semibold uppercase tracking-[0.32em]"
+            style={{ color: accent.base, opacity: 0.85 }}
+          >
+            {step.title}
+          </span>
+          <h2
+            className="presentation-ppt-title max-w-[20ch] text-[clamp(1.9rem,4.2vw,2.9rem)] leading-[1.08]"
+            style={{ textShadow: `0 0 28px ${accent.base}22` }}
+          >
+            {step.content.headline}
+          </h2>
+        </motion.div>
+      </EraRevealBand>
+    ) : (
+      <EraRevealBand
+        bandId="title"
+        bandIndex={b("title")}
+        stepId={step.id}
+        stepIndex={step.index}
+        eraStaging={eraStaging}
+        active={active}
+        className="flex w-full justify-center"
+      >
+        <motion.div
+          {...innerMotion}
+          className={centerTitleAndStagesPanel ? "text-center" : undefined}
+        >
+          <h2
+            className={
+              centerTitleAndStagesPanel
+                ? "presentation-ppt-title mx-auto max-w-[24ch] text-center text-[clamp(1.8rem,4vw,2.55rem)]"
+                : "presentation-ppt-title max-w-[24ch] text-[clamp(1.8rem,4vw,2.55rem)]"
+            }
+          >
+            {step.title}
+          </h2>
+        </motion.div>
+      </EraRevealBand>
+    );
 
   return (
     <FloatingCard
@@ -615,53 +715,16 @@ export function NarrativeStep({ step, active }: Props) {
       }
     >
       <motion.div
-        className="flex w-full flex-col gap-5"
+        className={
+          centerTitleAndStagesPanel
+            ? "flex h-full min-h-0 w-full flex-1 flex-col gap-5"
+            : "flex w-full flex-col gap-5"
+        }
         variants={outerContainer}
         initial={reduceMotion ? false : "hidden"}
         animate={active ? "visible" : "hidden"}
       >
-        {painPoints && step.content.headline ? (
-          <EraRevealBand
-            bandId="title"
-            bandIndex={b("title")}
-            stepId={step.id}
-            stepIndex={step.index}
-            eraStaging={eraStaging}
-            active={active}
-            className="flex w-full justify-center"
-          >
-            <motion.div {...innerMotion} className="space-y-3 text-center">
-              <span
-                className="block text-[10px] font-semibold uppercase tracking-[0.32em]"
-                style={{ color: accent.base, opacity: 0.85 }}
-              >
-                {step.title}
-              </span>
-              <h2
-                className="presentation-ppt-title max-w-[20ch] text-[clamp(1.9rem,4.2vw,2.9rem)] leading-[1.08]"
-                style={{ textShadow: `0 0 28px ${accent.base}22` }}
-              >
-                {step.content.headline}
-              </h2>
-            </motion.div>
-          </EraRevealBand>
-        ) : (
-          <EraRevealBand
-            bandId="title"
-            bandIndex={b("title")}
-            stepId={step.id}
-            stepIndex={step.index}
-            eraStaging={eraStaging}
-            active={active}
-            className="flex w-full justify-center"
-          >
-            <motion.div {...innerMotion}>
-              <h2 className="presentation-ppt-title max-w-[24ch] text-[clamp(1.8rem,4vw,2.55rem)]">
-                {step.title}
-              </h2>
-            </motion.div>
-          </EraRevealBand>
-        )}
+        {!centerTitleAndStagesPanel && titleBand}
 
         {step.content.metrics && step.content.metrics.length > 0 && (
           <EraRevealBand
@@ -788,7 +851,14 @@ export function NarrativeStep({ step, active }: Props) {
           </EraRevealBand>
         )}
 
-        {renderValueStagesSection()}
+        {centerTitleAndStagesPanel ? (
+          <div className="flex min-h-0 flex-1 flex-col justify-center gap-5">
+            {titleBand}
+            {renderValueStagesSection()}
+          </div>
+        ) : (
+          renderValueStagesSection()
+        )}
 
         {step.content.evidenceMetrics &&
           step.content.evidenceMetrics.length > 0 && (
@@ -890,10 +960,11 @@ export function NarrativeStep({ step, active }: Props) {
             stepIndex={step.index}
             eraStaging={eraStaging}
             active={active}
+            className="flex w-full justify-center"
           >
             <motion.p
               {...innerMotion}
-              className="presentation-ppt-body whitespace-pre-line"
+              className="presentation-ppt-body mx-auto w-full max-w-prose whitespace-pre-line text-center text-slate-100/95"
             >
               {step.content.body}
             </motion.p>
@@ -1051,21 +1122,28 @@ export function NarrativeStep({ step, active }: Props) {
               stepIndex={step.index}
               eraStaging={eraStaging}
               active={active}
+              className="flex w-full justify-center"
             >
-              <motion.ul {...innerMotion} className="mt-1 space-y-2.5">
+              <motion.ul
+                {...innerMotion}
+                className="mx-auto mt-1 w-full max-w-prose space-y-2.5 text-center"
+              >
                 {step.content.bullets.map((bullet) => (
                   <li
                     key={bullet}
-                    className="flex items-start gap-3 text-[0.96rem] leading-relaxed text-slate-200"
+                    className="text-[0.96rem] leading-relaxed text-slate-200"
                   >
                     <span
-                      className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full"
+                      aria-hidden
+                      className="mr-2 inline-block h-1.5 w-1.5 translate-y-[-0.15em] rounded-full align-middle"
                       style={{
                         background: accent.base,
                         boxShadow: `0 0 8px ${accent.base}88`,
                       }}
                     />
-                    <span className="whitespace-pre-line">{bullet}</span>
+                    <span className="whitespace-pre-line text-center">
+                      {bullet}
+                    </span>
                   </li>
                 ))}
               </motion.ul>
