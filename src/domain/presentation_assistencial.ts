@@ -489,6 +489,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       body: "Com uma base coordenada, a jornada deixa de depender de esforço individual de compensação.",
       valueStagesFlat: true,
       valueStagesGridCols: 3,
+      valueStagesClickable: false,
       valueStages: [
         {
           number: "✓",
