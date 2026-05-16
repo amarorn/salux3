@@ -167,9 +167,8 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
                 'A expansão não espera ciclos pesados de implantação. A demanda não espera. A pressão assistencial não espera.',
             },
           ],
-          body: 'A inovação real não está em adicionar mais camadas.',
           attentionPhrase:
-            'Está em remover fricção para que a instituição cresça com mais controle.',
+            'A inovação real não está em adicionar mais camadas.\nEstá em remover fricção para que a instituição cresça com mais controle.',
           closingHighlight: 'Crescer por arquitetura é diferente de crescer por acúmulo.',
           bullets: [],
           highlightPhrases: [],
@@ -351,6 +350,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           bullets: [],
           attentionPhrase:
             'Os agentes não substituem a equipe. Ampliam a capacidade de resposta da operação.',
+          attentionAccent: 'amber',
           closingHighlight:
             'A tecnologia deixa de apenas registrar a expansão — e passa a ajudar a coordená-la.',
           highlightPhrases: [],

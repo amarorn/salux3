@@ -270,6 +270,9 @@ function ValueStageRowArrow({
 
 export function NarrativeStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
+  const attentionAccent = step.content.attentionAccent
+    ? theme.accents[step.content.attentionAccent]
+    : accent;
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
   const trackId = useContext(FloatingCardContext)?.trackId;
@@ -1703,23 +1706,23 @@ export function NarrativeStep({ step, active }: Props) {
               {...innerMotion}
               className="relative mx-auto mt-1 w-fit max-w-full overflow-hidden rounded-2xl border px-5 py-4 sm:max-w-2xl"
               style={{
-                borderColor: `${accent.base}55`,
-                background: `linear-gradient(135deg, ${accent.base}1f 0%, transparent 65%)`,
+                borderColor: `${attentionAccent.base}55`,
+                background: `linear-gradient(135deg, ${attentionAccent.base}1f 0%, transparent 65%)`,
               }}
             >
               <span
                 aria-hidden
                 className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
                 style={{
-                  background: accent.base,
-                  boxShadow: `0 0 14px ${accent.base}`,
+                  background: attentionAccent.base,
+                  boxShadow: `0 0 14px ${attentionAccent.base}`,
                 }}
               />
               <motion.span
                 aria-hidden
                 className="pointer-events-none absolute inset-0 rounded-2xl"
                 style={{
-                  boxShadow: `0 0 0 1px ${accent.base}33, 0 0 36px ${accent.base}44`,
+                  boxShadow: `0 0 0 1px ${attentionAccent.base}33, 0 0 36px ${attentionAccent.base}44`,
                 }}
                 animate={
                   active && !reduceMotion
@@ -1733,10 +1736,10 @@ export function NarrativeStep({ step, active }: Props) {
                 }}
               />
               <p
-                className="relative px-3 text-center text-[clamp(1.05rem,2.4vw,1.22rem)] font-medium italic leading-relaxed"
+                className="relative whitespace-pre-line px-3 text-center text-[clamp(1.05rem,2.4vw,1.22rem)] font-medium italic leading-relaxed"
                 style={{
-                  color: accent.base,
-                  textShadow: `0 0 24px ${accent.base}33`,
+                  color: attentionAccent.base,
+                  textShadow: `0 0 24px ${attentionAccent.base}33`,
                 }}
               >
                 “{step.content.attentionPhrase}”
@@ -1887,16 +1890,8 @@ export function NarrativeStep({ step, active }: Props) {
                 }
                 transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
               />
-              {step.content.closingQuestionLabel && (
-                <span
-                  className="block text-[11px] font-semibold uppercase tracking-[0.28em]"
-                  style={{ color: accent.base, opacity: 0.95 }}
-                >
-                  {step.content.closingQuestionLabel}
-                </span>
-              )}
               <p
-                className="mt-1 text-[1.08rem] font-semibold leading-snug text-white"
+                className="text-[1.08rem] font-semibold leading-snug text-white"
                 style={{ textShadow: `0 0 22px ${accent.base}44` }}
               >
                 {step.content.closingQuestion}

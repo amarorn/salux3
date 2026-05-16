@@ -152,6 +152,8 @@ export interface StepContent {
   bulletSplitAfter?: number;
   /** Highlight step: frase de atenção exibida com pulso após o body principal. */
   attentionPhrase?: string;
+  /** Cor da caixa `attentionPhrase` (default: accent do slide). */
+  attentionAccent?: Accent;
   /** Trilha de ruptura acumulada: URLs de notícias relacionadas. */
   newsUrls?: string[];
   /** Notícias no banner superior (em vez da foto padrão); não duplicar em `newsUrls`. */

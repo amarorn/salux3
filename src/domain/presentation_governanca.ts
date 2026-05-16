@@ -30,7 +30,7 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
       title: 'Era agêntica: a resposta ao limite da digitalização em saúde.',
       subtitle: 'Slide 01 · Abertura da trilha',
       content: {
-        headline: 'Abertura da trilha',
+        headline: 'IA Agêntica',
         cardVisual: 'strata',
         lead: 'A saúde já tem sistemas. Já tem dados. Já tem automações.',
         heroImage: {
