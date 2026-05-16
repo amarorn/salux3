@@ -197,6 +197,8 @@ export interface StepContent {
   valueStages?: ValueStage[];
   /** Texto curto exibido logo acima da grid de etapas (lead). */
   valueStagesLead?: string;
+  /** Renderiza `description` de cada etapa direto no cartão (sem precisar expandir). */
+  valueStagesShowDescription?: boolean;
   /** Cartões de "evidência numérica" — número grande com prefixo, manchete e contexto em itálico. */
   evidenceMetrics?: {
     /** Badge curta acima do número (ex.: "Dado · Evidência"). */
@@ -286,7 +288,17 @@ export interface StepContent {
     | "funnel"
     | "relay"
     | "fan"
-    | "helix";
+    | "helix"
+    | 'strata'
+    | 'evolution'
+    | 'scatter'
+    | 'gap'
+    | 'shatter'
+    | 'rhizome'
+    | 'ascent'
+    | 'pillars'
+    | 'constellation'
+    | 'phase';
 }
 
 export interface PresentationStep {

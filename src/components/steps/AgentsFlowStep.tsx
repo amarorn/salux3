@@ -91,8 +91,11 @@ function InitiaHub({
   reduce,
   active,
 }: {
+  /** Cor do hub. */
   color: string;
+  /** Funções que o hub orquestra. */
   functions: string[];
+  /** Se o hub deve ser reduzido. */
   reduce: boolean;
   active: boolean;
 }) {

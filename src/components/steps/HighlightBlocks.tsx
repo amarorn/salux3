@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { animate, motion, useReducedMotion } from 'framer-motion';
 import type { EvidenceCard } from '@/domain/types';
+import { glassPanelStyle } from '@/lib/glassPanelStyle';
 
 const GREEN = '#93c47d';
 const CYAN = '#7fd6ff';
@@ -347,11 +348,7 @@ export function EvidenceCardBlock({
       }
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
       className="relative overflow-hidden rounded-2xl border px-5 py-4"
-      style={{
-        borderColor: `${accentColor}55`,
-        background: `linear-gradient(135deg, ${accentColor}18 0%, rgba(255,255,255,0.02) 100%)`,
-        boxShadow: `0 0 0 1px ${accentColor}22, 0 18px 48px -20px ${accentColor}88`,
-      }}
+      style={glassPanelStyle(accentColor)}
     >
       <motion.span
         aria-hidden

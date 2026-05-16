@@ -60,6 +60,7 @@ export function buildNarrativeBandKeys(
   if (content.highlightPhrases && content.highlightPhrases.length > 0) keys.push('highlightPhrases');
   if (content.evidenceCard) keys.push('evidenceCard');
   if (content.closingHighlight) keys.push('closingHighlight');
+  if (content.closingQuestion) keys.push('closingQuestion');
   if (content.visual?.type === 'risk-curve') keys.push('riskCurve');
   return keys;
 }

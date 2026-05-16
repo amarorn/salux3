@@ -1,9 +1,10 @@
 import type { PresentationStep } from './types';
-import { presentationMeta as baseMeta, steps as baseSteps } from './presentation';
+import './presentation';
 import { assistencialSteps, presentationAssistencialMeta } from './presentation_assistencial';
 import { operacaoSteps, presentationOperacaoMeta } from './presentation_operacao';
 import { presentationReceitaMeta, receitaSteps } from './presentation_receita';
 import { gestaoSteps, presentationGestaoMeta } from './presentation_gestao';
+import { governancaStepsResolved, presentationGovernancaMeta } from './presentation_governanca';
 
 export type TrackId = 'era-agentica' | 'operacoes' | 'assistencial' | 'dados' | 'governanca';
 
@@ -27,8 +28,6 @@ function buildStepsById(steps: PresentationStep[]) {
 function makeTrack(id: TrackId, meta: TrackMeta, steps: PresentationStep[]): TrackPresentation {
   return { id, meta, steps, stepsById: buildStepsById(steps) };
 }
-
-const sharedSteps = baseSteps;
 
 export const tracks: TrackPresentation[] = [
   makeTrack(
@@ -70,11 +69,11 @@ export const tracks: TrackPresentation[] = [
   makeTrack(
     'governanca',
     {
-      title: 'IA agêntica',
-      subtitle: 'Políticas, auditoria e LGPD para autonomia verificável',
-      author: baseMeta.author,
+      title: presentationGovernancaMeta.title,
+      subtitle: presentationGovernancaMeta.subtitle,
+      author: presentationGovernancaMeta.author,
     },
-    sharedSteps,
+    governancaStepsResolved,
   ),
 ];
 

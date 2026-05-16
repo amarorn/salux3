@@ -42,7 +42,17 @@ export type CardVisualVariant =
   | "funnel"
   | "relay"
   | "fan"
-  | "helix";
+  | "helix"
+  | 'strata'
+  | 'evolution'
+  | 'scatter'
+  | 'gap'
+  | 'shatter'
+  | 'rhizome'
+  | 'ascent'
+  | 'pillars'
+  | 'constellation'
+  | 'phase';
 
 interface Props {
   variant?: CardVisualVariant;
@@ -3115,9 +3125,665 @@ function Helix({ accentColor, active, reduce }: V) {
   );
 }
 
+/* 41. strata — camadas empilhadas, a última quebrada */
+function Strata({ accentColor, active, reduce }: V) {
+  const layers = [
+    { label: 'SISTEMAS', whole: true },
+    { label: 'DADOS', whole: true },
+    { label: 'AUTOMAÇÕES', whole: true },
+    { label: 'COORDENAÇÃO', whole: false },
+  ];
+  const bw = 360;
+  const bh = 14;
+  const x0 = (VIEW.w - bw) / 2;
+  const y0 = 32;
+  const gap = 8;
+  return (
+    <Shell>
+      <Label x={20} y={18} color="#ffffff" opacity={0.32}>CAMADAS</Label>
+      <Label x={VIEW.w - 20} y={18} anchor="end" color={accentColor} opacity={0.75}>COORDENAÇÃO PENDENTE</Label>
+      {layers.map((l, i) => {
+        const y = y0 + i * (bh + gap);
+        if (l.whole) {
+          return (
+            <motion.g key={i}>
+              <motion.rect
+                x={x0}
+                y={y}
+                width={bw}
+                height={bh}
+                rx={3}
+                fill={accentColor}
+                fillOpacity={0.18}
+                stroke={accentColor}
+                strokeOpacity={0.6}
+                strokeWidth={1}
+                initial={reduce ? false : { opacity: 0, x: x0 - 20 }}
+                animate={active ? { opacity: 1, x: x0 } : reduce ? undefined : { opacity: 0, x: x0 - 20 }}
+                transition={{ duration: 0.6, delay: 0.4 + i * 0.12 }}
+              />
+              <text x={x0 + bw / 2} y={y + 10} textAnchor="middle" fill="#ffffff" fillOpacity={0.6} fontSize="8" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing="2">{l.label}</text>
+            </motion.g>
+          );
+        }
+        // camada quebrada — 4 fragmentos com gaps
+        const fragW = (bw - 30) / 4;
+        return Array.from({ length: 4 }).map((_, fi) => (
+          <motion.rect
+            key={`${i}-${fi}`}
+            x={x0 + fi * (fragW + 10)}
+            y={y}
+            width={fragW}
+            height={bh}
+            rx={3}
+            fill="none"
+            stroke={accentColor}
+            strokeOpacity={0.7}
+            strokeWidth={1}
+            strokeDasharray="3 3"
+            initial={reduce ? false : { opacity: 0, y: y - 4 + fi * 2 }}
+            animate={active ? { opacity: 1, y } : reduce ? undefined : { opacity: 0, y: y - 4 + fi * 2 }}
+            transition={{ duration: 0.5, delay: 0.85 + fi * 0.1 }}
+          />
+        ));
+      })}
+    </Shell>
+  );
+}
+
+/* 42. evolution — linha do tempo evolutiva com flecha */
+function Evolution({ accentColor, active, reduce }: V) {
+  const baseY = VIEW.h / 2 + 6;
+  const stops = [
+    { x: 60, label: '01' },
+    { x: 180, label: '02' },
+    { x: 300, label: '03' },
+    { x: 420, label: '04' },
+    { x: VIEW.w - 50, label: '05' },
+  ];
+  return (
+    <Shell>
+      <Label x={20} y={18} color="#ffffff" opacity={0.32}>REGISTRO MANUAL</Label>
+      <Label x={VIEW.w - 20} y={18} anchor="end" color={accentColor} opacity={0.75}>ERA AGÊNTICA</Label>
+      <motion.line
+        x1={stops[0].x}
+        y1={baseY}
+        x2={stops[stops.length - 1].x - 8}
+        y2={baseY}
+        stroke={accentColor}
+        strokeOpacity={0.5}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        initial={reduce ? false : { pathLength: 0 }}
+        animate={active ? { pathLength: 1 } : reduce ? undefined : { pathLength: 0 }}
+        transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
+      />
+      {/* ponta da seta */}
+      <motion.polygon
+        points={`${stops[stops.length - 1].x - 8},${baseY - 5} ${stops[stops.length - 1].x + 2},${baseY} ${stops[stops.length - 1].x - 8},${baseY + 5}`}
+        fill={accentColor}
+        initial={reduce ? false : { opacity: 0 }}
+        animate={active ? { opacity: 1 } : reduce ? undefined : { opacity: 0 }}
+        transition={{ duration: 0.4, delay: 2.0 }}
+      />
+      {stops.map((s, i) => (
+        <motion.g key={i}>
+          <motion.circle
+            cx={s.x}
+            cy={baseY}
+            r={i === stops.length - 1 ? 6 : 4}
+            fill={accentColor}
+            initial={reduce ? false : { opacity: 0, scale: 0 }}
+            animate={active ? { opacity: 1, scale: 1 } : reduce ? undefined : { opacity: 0, scale: 0 }}
+            transition={{ duration: 0.4, delay: 0.6 + i * 0.18 }}
+          />
+          <text x={s.x} y={baseY - 14} textAnchor="middle" fill={accentColor} fillOpacity={0.8} fontSize="9" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing="2">{s.label}</text>
+        </motion.g>
+      ))}
+      {/* anel pulsante no último */}
+      <motion.circle
+        cx={stops[stops.length - 1].x}
+        cy={baseY}
+        r={6}
+        fill="none"
+        stroke={accentColor}
+        strokeWidth={1}
+        animate={active && !reduce ? { r: [6, 16, 26], opacity: [0.7, 0.2, 0] } : { opacity: 0 }}
+        transition={{ duration: 2.4, repeat: Infinity, delay: 2.2 }}
+      />
+    </Shell>
+  );
+}
+
+/* 43. scatter — pontos espalhados sem conexão */
+function Scatter({ accentColor, active, reduce }: V) {
+  const stepId = ''; // placeholder
+  const points = Array.from({ length: 28 }).map((_, i) => {
+    const seed = (i * 137 + 23) % 1000;
+    const x = 28 + ((seed * 7919) % 1000) / 1000 * (VIEW.w - 56);
+    const y = 30 + ((seed * 4093) % 1000) / 1000 * (VIEW.h - 50);
+    return { x, y, sz: 1.6 + (seed % 3) * 0.6 };
+  });
+  void stepId;
+  return (
+    <Shell>
+      <Label x={20} y={18} color="#ffffff" opacity={0.32}>DISPERSO</Label>
+      <Label x={VIEW.w - 20} y={18} anchor="end" color={accentColor} opacity={0.75}>SEM COORDENAÇÃO</Label>
+      {points.map((p, i) => (
+        <motion.circle
+          key={i}
+          cx={p.x}
+          cy={p.y}
+          r={p.sz}
+          fill={accentColor}
+          fillOpacity={0.6}
+          initial={reduce ? false : { opacity: 0, scale: 0 }}
+          animate={active ? { opacity: 1, scale: 1 } : reduce ? undefined : { opacity: 0, scale: 0 }}
+          transition={{ duration: 0.4, delay: 0.4 + (i % 7) * 0.05 + Math.floor(i / 7) * 0.08 }}
+        />
+      ))}
+    </Shell>
+  );
+}
+
+/* 44. gap — segmentos com intervalo vazio entre eles */
+function Gap({ accentColor, active, reduce }: V) {
+  const baseY = VIEW.h / 2 + 6;
+  const segments = [
+    { x: 30, w: 80, label: 'DADO' },
+    { x: 160, w: 80, label: 'ALERTA' },
+    { x: 290, w: 80, label: 'REGISTRO' },
+    { x: 420, w: 80, label: 'AÇÃO' },
+  ];
+  return (
+    <Shell>
+      <Label x={20} y={18} color="#ffffff" opacity={0.32}>INFORMAÇÃO</Label>
+      <Label x={VIEW.w - 20} y={18} anchor="end" color={accentColor} opacity={0.75}>INTERVALO ATÉ AÇÃO</Label>
+      {segments.map((s, i) => (
+        <motion.g key={i}>
+          <motion.rect
+            x={s.x}
+            y={baseY - 5}
+            width={s.w}
+            height={10}
+            rx={3}
+            fill={accentColor}
+            fillOpacity={0.18}
+            stroke={accentColor}
+            strokeOpacity={0.7}
+            strokeWidth={1}
+            initial={reduce ? false : { opacity: 0, scaleX: 0 }}
+            animate={active ? { opacity: 1, scaleX: 1 } : reduce ? undefined : { opacity: 0, scaleX: 0 }}
+            transition={{ duration: 0.5, delay: 0.45 + i * 0.12 }}
+            style={{ transformOrigin: `${s.x}px ${baseY}px` }}
+          />
+          <text x={s.x + s.w / 2} y={baseY - 14} textAnchor="middle" fill={accentColor} fillOpacity={0.8} fontSize="8" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing="2">{s.label}</text>
+          {/* gap entre segmentos */}
+          {i < segments.length - 1 && (
+            <motion.line
+              x1={s.x + s.w}
+              x2={segments[i + 1].x}
+              y1={baseY}
+              y2={baseY}
+              stroke="#ffffff"
+              strokeOpacity={0.3}
+              strokeWidth={1}
+              strokeDasharray="2 3"
+              initial={reduce ? false : { opacity: 0 }}
+              animate={active ? { opacity: 1 } : reduce ? undefined : { opacity: 0 }}
+              transition={{ duration: 0.4, delay: 1.0 + i * 0.1 }}
+            />
+          )}
+        </motion.g>
+      ))}
+      {/* dot vermelho indicando "intervalo de perda" */}
+      {!reduce && segments.slice(0, -1).map((s, i) => {
+        const x = (s.x + s.w + segments[i + 1].x) / 2;
+        return (
+          <motion.circle
+            key={i}
+            cx={x}
+            cy={baseY}
+            r={2.5}
+            fill={accentColor}
+            animate={active ? { opacity: [0, 1, 0.3, 1, 0.3], scale: [0, 1.2, 1, 1.2, 1] } : { opacity: 0 }}
+            transition={{ duration: 2.4, repeat: Infinity, delay: 1.4 + i * 0.3 }}
+          />
+        );
+      })}
+    </Shell>
+  );
+}
+
+/* 45. shatter — fragmentos irradiando do centro (ruído amplificado) */
+function Shatter({ accentColor, active, reduce }: V) {
+  const cx = VIEW.w / 2;
+  const cy = VIEW.h / 2 + 6;
+  const frags = Array.from({ length: 20 }).map((_, i) => {
+    const angle = (i / 20) * Math.PI * 2;
+    const dist = 30 + (i % 4) * 18;
+    return {
+      tx: cx + Math.cos(angle) * dist * 2.2,
+      ty: cy + Math.sin(angle) * dist * 0.9,
+      rot: (i / 20) * 360,
+    };
+  });
+  return (
+    <Shell>
+      <Label x={20} y={18} color="#ffffff" opacity={0.32}>IA APLICADA</Label>
+      <Label x={VIEW.w - 20} y={18} anchor="end" color={accentColor} opacity={0.75}>INEFICIÊNCIA AMPLIFICADA</Label>
+      {/* centro */}
+      <motion.circle
+        cx={cx}
+        cy={cy}
+        r={4}
+        fill={accentColor}
+        initial={reduce ? false : { opacity: 0 }}
+        animate={active ? { opacity: 1 } : reduce ? undefined : { opacity: 0 }}
+        transition={{ duration: 0.4, delay: 0.4 }}
+      />
+      {frags.map((f, i) => (
+        <motion.rect
+          key={i}
+          width={6}
+          height={2}
+          rx={0.5}
+          fill={accentColor}
+          fillOpacity={0.7}
+          initial={reduce ? false : { x: cx - 3, y: cy - 1, opacity: 0, rotate: 0 }}
+          animate={
+            active
+              ? { x: f.tx - 3, y: f.ty - 1, opacity: 1, rotate: f.rot }
+              : reduce
+                ? undefined
+                : { x: cx - 3, y: cy - 1, opacity: 0, rotate: 0 }
+          }
+          transition={{
+            duration: 0.9,
+            ease: [0.22, 1, 0.36, 1],
+            delay: 0.55 + (i % 5) * 0.04,
+          }}
+        />
+      ))}
+      {/* anel de explosão */}
+      <motion.circle
+        cx={cx}
+        cy={cy}
+        r={3}
+        fill="none"
+        stroke={accentColor}
+        strokeWidth={1}
+        animate={active && !reduce ? { r: [3, 60, 100], opacity: [0.5, 0.15, 0] } : { opacity: 0 }}
+        transition={{ duration: 2.6, repeat: Infinity, delay: 1.5 }}
+      />
+    </Shell>
+  );
+}
+
+/* 46. rhizome — agente central irradiando para múltiplos domínios sem hierarquia */
+function Rhizome({ accentColor, active, reduce }: V) {
+  const cx = VIEW.w / 2;
+  const cy = VIEW.h / 2 + 6;
+  // 8 nós-domínio em formato orgânico (não-uniforme)
+  const nodes = [
+    { x: 80, y: 36 },
+    { x: 160, y: 100 },
+    { x: 240, y: 30 },
+    { x: 330, y: 92 },
+    { x: 420, y: 32 },
+    { x: 500, y: 100 },
+    { x: 110, y: 70 },
+    { x: 560, y: 60 },
+  ];
+  return (
+    <Shell>
+      <Label x={20} y={18} color="#ffffff" opacity={0.32}>AGENTE</Label>
+      <Label x={VIEW.w - 20} y={18} anchor="end" color={accentColor} opacity={0.75}>DOMÍNIOS CONECTADOS</Label>
+      {/* linhas para todos os nós */}
+      {nodes.map((n, i) => (
+        <motion.path
+          key={i}
+          d={`M ${cx} ${cy} Q ${(cx + n.x) / 2} ${cy + (n.y - cy) * 0.4} ${n.x} ${n.y}`}
+          fill="none"
+          stroke={accentColor}
+          strokeOpacity={0.4}
+          strokeWidth={1}
+          initial={reduce ? false : { pathLength: 0 }}
+          animate={active ? { pathLength: 1 } : reduce ? undefined : { pathLength: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 + i * 0.06 }}
+        />
+      ))}
+      {/* dots viajando do centro para cada nó (sinal) */}
+      {!reduce && nodes.map((n, i) => (
+        <motion.circle
+          key={`d-${i}`}
+          r={2}
+          fill={accentColor}
+          initial={{ cx, cy, opacity: 0 }}
+          animate={active ? { cx: [cx, n.x], cy: [cy, n.y], opacity: [0, 1, 0] } : { opacity: 0 }}
+          transition={{ duration: 1.6, repeat: Infinity, delay: 1.4 + i * 0.18, ease: 'easeOut' }}
+        />
+      ))}
+      {/* nós-domínio */}
+      {nodes.map((n, i) => (
+        <motion.circle
+          key={`n-${i}`}
+          cx={n.x}
+          cy={n.y}
+          r={3}
+          fill={accentColor}
+          fillOpacity={0.85}
+          initial={reduce ? false : { opacity: 0, scale: 0 }}
+          animate={active ? { opacity: 1, scale: 1 } : reduce ? undefined : { opacity: 0, scale: 0 }}
+          transition={{ duration: 0.4, delay: 0.5 + i * 0.06 }}
+        />
+      ))}
+      {/* agente central — anel pulsante */}
+      <motion.circle cx={cx} cy={cy} r={6} fill={accentColor} />
+      <motion.circle
+        cx={cx}
+        cy={cy}
+        r={6}
+        fill="none"
+        stroke={accentColor}
+        strokeWidth={1}
+        animate={active && !reduce ? { r: [6, 18, 30], opacity: [0.6, 0.2, 0] } : { opacity: 0 }}
+        transition={{ duration: 2.4, repeat: Infinity, delay: 1.2 }}
+      />
+    </Shell>
+  );
+}
+
+/* 47. ascent — degraus progressivos, cada um mais alto e luminoso que o anterior */
+function Ascent({ accentColor, active, reduce }: V) {
+  const steps = 5;
+  const stepW = 90;
+  const totalW = stepW * steps + (steps - 1) * 8;
+  const x0 = (VIEW.w - totalW) / 2;
+  const baseY = VIEW.h - 14;
+  return (
+    <Shell>
+      <Label x={20} y={18} color="#ffffff" opacity={0.32}>NÍVEL 01</Label>
+      <Label x={VIEW.w - 20} y={18} anchor="end" color={accentColor} opacity={0.75}>MATURIDADE 05</Label>
+      {Array.from({ length: steps }).map((_, i) => {
+        const h = 12 + i * 12;
+        const x = x0 + i * (stepW + 8);
+        const op = 0.25 + i * 0.18;
+        return (
+          <motion.g key={i}>
+            <motion.rect
+              x={x}
+              y={baseY - h}
+              width={stepW}
+              height={h}
+              rx={3}
+              fill={accentColor}
+              fillOpacity={op}
+              stroke={accentColor}
+              strokeOpacity={0.7}
+              strokeWidth={1}
+              initial={reduce ? false : { opacity: 0, scaleY: 0 }}
+              animate={active ? { opacity: 1, scaleY: 1 } : reduce ? undefined : { opacity: 0, scaleY: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+              style={{ transformOrigin: `${x + stepW / 2}px ${baseY}px` }}
+            />
+            <text x={x + stepW / 2} y={baseY - h - 4} textAnchor="middle" fill={accentColor} fillOpacity={0.85} fontSize="9" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing="2">0{i + 1}</text>
+          </motion.g>
+        );
+      })}
+      {/* linha de tendência */}
+      <motion.path
+        d={`M ${x0 + stepW / 2} ${baseY - 12} L ${x0 + stepW + 8 + stepW / 2} ${baseY - 24} L ${x0 + 2 * (stepW + 8) + stepW / 2} ${baseY - 36} L ${x0 + 3 * (stepW + 8) + stepW / 2} ${baseY - 48} L ${x0 + 4 * (stepW + 8) + stepW / 2} ${baseY - 60}`}
+        fill="none"
+        stroke={accentColor}
+        strokeOpacity={0.5}
+        strokeWidth={1}
+        strokeDasharray="3 3"
+        initial={reduce ? false : { pathLength: 0 }}
+        animate={active ? { pathLength: 1 } : reduce ? undefined : { pathLength: 0 }}
+        transition={{ duration: 1.4, delay: 1.4 }}
+      />
+    </Shell>
+  );
+}
+
+/* 48. pillars — colunas/pilares formando uma base estrutural */
+function Pillars({ accentColor, active, reduce }: V) {
+  const count = 8;
+  const w = 28;
+  const gap = 14;
+  const total = count * w + (count - 1) * gap;
+  const x0 = (VIEW.w - total) / 2;
+  const baseY = VIEW.h - 14;
+  return (
+    <Shell>
+      <Label x={20} y={18} color="#ffffff" opacity={0.32}>FUNDAÇÕES</Label>
+      <Label x={VIEW.w - 20} y={18} anchor="end" color={accentColor} opacity={0.75}>BASE PREPARADA</Label>
+      {/* linha de base */}
+      <motion.line
+        x1={x0 - 20}
+        x2={x0 + total + 20}
+        y1={baseY + 2}
+        y2={baseY + 2}
+        stroke={accentColor}
+        strokeOpacity={0.55}
+        strokeWidth={1.5}
+        initial={reduce ? false : { pathLength: 0 }}
+        animate={active ? { pathLength: 1 } : reduce ? undefined : { pathLength: 0 }}
+        transition={{ duration: 0.7, delay: 0.4 }}
+      />
+      {Array.from({ length: count }).map((_, i) => {
+        const x = x0 + i * (w + gap);
+        const h = 38 + (i % 3) * 8;
+        return (
+          <motion.g key={i}>
+            {/* pilar */}
+            <motion.rect
+              x={x}
+              y={baseY - h}
+              width={w}
+              height={h}
+              rx={2}
+              fill={accentColor}
+              fillOpacity={0.18}
+              stroke={accentColor}
+              strokeOpacity={0.7}
+              strokeWidth={1}
+              initial={reduce ? false : { opacity: 0, scaleY: 0 }}
+              animate={active ? { opacity: 1, scaleY: 1 } : reduce ? undefined : { opacity: 0, scaleY: 0 }}
+              transition={{ duration: 0.6, delay: 0.7 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              style={{ transformOrigin: `${x + w / 2}px ${baseY}px` }}
+            />
+            {/* capitel */}
+            <motion.rect
+              x={x - 3}
+              y={baseY - h - 4}
+              width={w + 6}
+              height={4}
+              rx={1}
+              fill={accentColor}
+              fillOpacity={0.6}
+              initial={reduce ? false : { opacity: 0 }}
+              animate={active ? { opacity: 1 } : reduce ? undefined : { opacity: 0 }}
+              transition={{ duration: 0.4, delay: 1.3 + i * 0.08 }}
+            />
+          </motion.g>
+        );
+      })}
+    </Shell>
+  );
+}
+
+/* 49. constellation — 8 pontos formando uma constelação conectada por linhas finas */
+function Constellation({ accentColor, active, reduce }: V) {
+  const nodes = [
+    { x: 80, y: 40 },
+    { x: 170, y: 80 },
+    { x: 240, y: 35 },
+    { x: 320, y: 90 },
+    { x: 380, y: 30 },
+    { x: 450, y: 78 },
+    { x: 510, y: 38 },
+    { x: 565, y: 90 },
+  ];
+  const connections: [number, number][] = [
+    [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7],
+    [0, 2], [1, 3], [2, 4], [3, 5], [4, 6], [5, 7],
+  ];
+  return (
+    <Shell>
+      <Label x={20} y={18} color="#ffffff" opacity={0.32}>PONTOS</Label>
+      <Label x={VIEW.w - 20} y={18} anchor="end" color={accentColor} opacity={0.75}>CONSTELAÇÃO COORDENADA</Label>
+      {connections.map(([a, b], i) => (
+        <motion.line
+          key={i}
+          x1={nodes[a].x}
+          y1={nodes[a].y}
+          x2={nodes[b].x}
+          y2={nodes[b].y}
+          stroke={accentColor}
+          strokeOpacity={0.35}
+          strokeWidth={0.8}
+          initial={reduce ? false : { pathLength: 0 }}
+          animate={active ? { pathLength: 1 } : reduce ? undefined : { pathLength: 0 }}
+          transition={{ duration: 0.5, delay: 0.7 + i * 0.05 }}
+        />
+      ))}
+      {nodes.map((n, i) => (
+        <motion.g key={`n-${i}`}>
+          <motion.circle
+            cx={n.x}
+            cy={n.y}
+            r={4}
+            fill={accentColor}
+            initial={reduce ? false : { opacity: 0, scale: 0 }}
+            animate={active ? { opacity: 1, scale: 1 } : reduce ? undefined : { opacity: 0, scale: 0 }}
+            transition={{ duration: 0.4, delay: 0.5 + i * 0.07 }}
+          />
+          {!reduce && (
+            <motion.circle
+              cx={n.x}
+              cy={n.y}
+              r={4}
+              fill="none"
+              stroke={accentColor}
+              strokeWidth={0.8}
+              animate={{ r: [4, 8, 12], opacity: [0.6, 0.2, 0] }}
+              transition={{ duration: 3, repeat: Infinity, delay: 1.4 + (i % 4) * 0.4 }}
+            />
+          )}
+        </motion.g>
+      ))}
+    </Shell>
+  );
+}
+
+/* 50. phase — dois estados (antes caótico, depois ordenado) lado a lado */
+function Phase({ accentColor, active, reduce }: V) {
+  const halfW = (VIEW.w - 40) / 2;
+  return (
+    <Shell>
+      <Label x={20} y={18} color="#ffffff" opacity={0.32}>FASE ANTES</Label>
+      <Label x={VIEW.w - 20} y={18} anchor="end" color={accentColor} opacity={0.75}>FASE DEPOIS</Label>
+      {/* lado esquerdo — pontos caóticos */}
+      {Array.from({ length: 12 }).map((_, i) => {
+        const seed = (i * 91 + 13) % 1000;
+        const x = 30 + ((seed * 3) % (halfW - 20));
+        const y = 30 + ((seed * 7) % (VIEW.h - 50));
+        return (
+          <motion.circle
+            key={`l-${i}`}
+            cx={x}
+            cy={y}
+            r={2}
+            fill="#ffffff"
+            fillOpacity={0.4}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={active ? { opacity: 0.6 } : reduce ? undefined : { opacity: 0 }}
+            transition={{ duration: 0.35, delay: 0.4 + (i % 6) * 0.05 }}
+          />
+        );
+      })}
+      {/* divisor central */}
+      <motion.line
+        x1={VIEW.w / 2}
+        x2={VIEW.w / 2}
+        y1={28}
+        y2={VIEW.h - 14}
+        stroke={accentColor}
+        strokeOpacity={0.5}
+        strokeWidth={0.8}
+        strokeDasharray="3 4"
+        initial={reduce ? false : { pathLength: 0 }}
+        animate={active ? { pathLength: 1 } : reduce ? undefined : { pathLength: 0 }}
+        transition={{ duration: 0.8, delay: 1.0 }}
+      />
+      {/* lado direito — pontos alinhados em grid */}
+      {Array.from({ length: 12 }).map((_, i) => {
+        const col = i % 4;
+        const row = Math.floor(i / 4);
+        const x = VIEW.w / 2 + 30 + col * ((halfW - 40) / 3);
+        const y = 38 + row * ((VIEW.h - 60) / 2);
+        return (
+          <motion.circle
+            key={`r-${i}`}
+            cx={x}
+            cy={y}
+            r={2.5}
+            fill={accentColor}
+            initial={reduce ? false : { opacity: 0, scale: 0 }}
+            animate={active ? { opacity: 1, scale: 1 } : reduce ? undefined : { opacity: 0, scale: 0 }}
+            transition={{ duration: 0.4, delay: 1.4 + i * 0.05 }}
+          />
+        );
+      })}
+      {/* linhas conectando os pontos ordenados */}
+      {Array.from({ length: 3 }).map((_, row) => {
+        const y = 38 + row * ((VIEW.h - 60) / 2);
+        if (row >= 3) return null;
+        return (
+          <motion.line
+            key={`hl-${row}`}
+            x1={VIEW.w / 2 + 30}
+            x2={VIEW.w / 2 + 30 + 3 * ((halfW - 40) / 3)}
+            y1={y}
+            y2={y}
+            stroke={accentColor}
+            strokeOpacity={0.35}
+            strokeWidth={0.8}
+            initial={reduce ? false : { pathLength: 0 }}
+            animate={active ? { pathLength: 1 } : reduce ? undefined : { pathLength: 0 }}
+            transition={{ duration: 0.5, delay: 2.0 + row * 0.15 }}
+          />
+        );
+      })}
+    </Shell>
+  );
+}
+
 export function CardVisual({ variant, accentColor, active }: Props) {
   const reduce = Boolean(useReducedMotion());
   switch (variant) {
+    case 'rhizome':
+      return <Rhizome accentColor={accentColor} active={active} reduce={reduce} />;
+    case 'ascent':
+      return <Ascent accentColor={accentColor} active={active} reduce={reduce} />;
+    case 'pillars':
+      return <Pillars accentColor={accentColor} active={active} reduce={reduce} />;
+    case 'constellation':
+      return <Constellation accentColor={accentColor} active={active} reduce={reduce} />;
+    case 'phase':
+      return <Phase accentColor={accentColor} active={active} reduce={reduce} />;
+    case 'strata':
+      return <Strata accentColor={accentColor} active={active} reduce={reduce} />;
+    case 'evolution':
+      return <Evolution accentColor={accentColor} active={active} reduce={reduce} />;
+    case 'scatter':
+      return <Scatter accentColor={accentColor} active={active} reduce={reduce} />;
+    case 'gap':
+      return <Gap accentColor={accentColor} active={active} reduce={reduce} />;
+    case 'shatter':
+      return <Shatter accentColor={accentColor} active={active} reduce={reduce} />;
     case "reveal":
       return (
         <Reveal accentColor={accentColor} active={active} reduce={reduce} />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { animate, motion, useReducedMotion } from 'framer-motion';
+import { glassPanelStyle } from '@/lib/glassPanelStyle';
 
 interface Props {
   badge?: string;
@@ -100,11 +101,7 @@ export function EvidenceGaugeCard({
   return (
     <motion.div
       className="relative overflow-hidden rounded-2xl border px-6 py-5"
-      style={{
-        borderColor: `${accentColor}55`,
-        background: `linear-gradient(135deg, ${accentColor}38 0%, rgba(10,12,20,0.98) 34%, rgba(7,9,15,0.99) 100%)`,
-        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 48px -28px ${accentColor}55`,
-      }}
+      style={glassPanelStyle(accentColor)}
       initial={reduce ? false : { opacity: 0, y: 14 }}
       animate={active ? { opacity: 1, y: 0 } : reduce ? undefined : { opacity: 0, y: 14 }}
       transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.35 + delay }}

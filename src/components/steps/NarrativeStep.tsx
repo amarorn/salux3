@@ -57,6 +57,10 @@ import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildNarrativeBandKeys } from "@/lib/eraAgenticaRevealBands";
 import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
 import { ExpandedCardPortal, renderExpandedCardPrefixContent } from "./ExpandedCardPortal";
+import {
+  glassPanelStyle,
+  glassPanelStyleEmphasis,
+} from "@/lib/glassPanelStyle";
 
 interface Props {
   step: PresentationStep;
@@ -118,11 +122,7 @@ function DualStageGroupBlock({
           <motion.div
             key={`${it.label}-${i}`}
             className="relative overflow-hidden rounded-lg border px-3 py-2.5"
-            style={{
-              borderColor: `${c.base}55`,
-              background: `linear-gradient(135deg, ${c.base}18 0%, rgba(255,255,255,0.02) 70%)`,
-              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05)`,
-            }}
+            style={glassPanelStyle(c.base)}
             initial={reduceMotion ? false : { opacity: 0, y: 8 }}
             animate={
               active
@@ -181,7 +181,7 @@ function valueStagesColCount(count: number, gridCols?: number): number {
 
 function valueStagesGridColumns(count: number, gridCols?: number): string {
   const cols = valueStagesColCount(count, gridCols);
-  return `repeat(${cols}, minmax(0, 11rem))`;
+  return `repeat(${cols}, minmax(10rem, 11rem))`;
 }
 
 function valueStageOrphanGridPlacement(
@@ -412,13 +412,6 @@ export function NarrativeStep({ step, active }: Props) {
       bandSize: number,
       indexInBand: number,
     ) => {
-      const intensity = step.content.valueStagesFlat
-        ? 0.85
-        : 0.55 + (i / Math.max(vs.length - 1, 1)) * 0.45;
-      const hex = (mult: number) =>
-        Math.round(intensity * mult)
-          .toString(16)
-          .padStart(2, "0");
       const dimmed = valueStageSpotlight !== null && valueStageSpotlight !== i;
       const focused = valueStageSpotlight === i;
       const enterDelay =
@@ -443,18 +436,12 @@ export function NarrativeStep({ step, active }: Props) {
           disabled={!active}
           aria-expanded={focused}
           aria-label={`Ampliar: ${stage.label}`}
-          className="relative flex h-full min-h-[5.5rem] w-full min-w-0 cursor-pointer flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-center outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45 disabled:cursor-default disabled:opacity-40"
+          className="relative flex h-full min-h-[5.5rem] w-full cursor-pointer flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-center outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45 disabled:cursor-default disabled:opacity-40"
           style={{
             zIndex: focused ? 2 : 1,
-            borderColor: focused
-              ? `${accent.base}aa`
-              : `${accent.base}${hex(95)}`,
-            background: focused
-              ? `linear-gradient(160deg, ${accent.base}${hex(50)} 0%, rgba(12,14,24,0.97) 40%, rgba(7,9,15,0.99) 100%)`
-              : `linear-gradient(160deg, ${accent.base}${hex(36)} 0%, rgba(10,12,20,0.98) 38%, rgba(7,9,15,0.99) 100%)`,
-            boxShadow: focused
-              ? `inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px ${accent.base}55, 0 16px 40px -8px ${accent.base}44`
-              : `inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px -16px ${accent.base}${hex(88)}`,
+            ...(focused
+              ? glassPanelStyleEmphasis(accent.base)
+              : glassPanelStyle(accent.base)),
             ...orphanPlacement,
           }}
           initial={reduceMotion ? false : { opacity: 0, y: 12 }}
@@ -515,7 +502,6 @@ export function NarrativeStep({ step, active }: Props) {
               className="font-display text-[1.03rem] font-bold tabular-nums"
               style={{
                 color: accent.base,
-                textShadow: `0 0 6px ${accent.base}44`,
               }}
             >
               {stage.number}
@@ -527,7 +513,12 @@ export function NarrativeStep({ step, active }: Props) {
               {stage.label}
             </span>
           </div>
-          {stage.description && (
+          {stage.description && step.content.valueStagesShowDescription && (
+            <p className="mt-2 text-center text-[0.94rem] leading-relaxed text-slate-100/90">
+              {stage.description}
+            </p>
+          )}
+          {stage.description && !step.content.valueStagesShowDescription && (
             <p className="mt-2 text-center text-[0.96rem] leading-relaxed text-slate-100/92">
               {stage.mediaUrl && <>(Vídeo)</>}
             </p>
@@ -815,11 +806,7 @@ export function NarrativeStep({ step, active }: Props) {
                   <motion.div
                     key={side}
                     className="relative flex-1 overflow-hidden rounded-xl border px-4 py-3.5"
-                    style={{
-                      borderColor: `${c.base}44`,
-                      background: `linear-gradient(135deg, ${c.base}1a 0%, rgba(255,255,255,0.02) 70%)`,
-                      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.06)`,
-                    }}
+                    style={glassPanelStyle(c.base)}
                     initial={reduceMotion ? false : { opacity: 0, y: 8 }}
                     animate={
                       active
@@ -1421,6 +1408,55 @@ export function NarrativeStep({ step, active }: Props) {
                 text={step.content.closingHighlight}
                 active={active}
               />
+            </motion.div>
+          </EraRevealBand>
+        )}
+
+        {step.content.closingQuestion && (
+          <EraRevealBand
+            bandId="closingQuestion"
+            bandIndex={b("closingQuestion")}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div
+              {...innerMotion}
+              className="relative mt-2 overflow-hidden rounded-2xl border px-5 py-4"
+              style={{
+                borderColor: `${accent.base}55`,
+                background: `linear-gradient(135deg, ${accent.base}1c 0%, rgba(255,255,255,0.02) 100%)`,
+                boxShadow: `0 0 0 1px ${accent.base}22, 0 0 32px -12px ${accent.base}99`,
+              }}
+            >
+              <motion.span
+                aria-hidden
+                className="pointer-events-none absolute inset-x-6 -top-px h-px"
+                style={{
+                  background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)`,
+                }}
+                animate={
+                  active && !reduceMotion
+                    ? { opacity: [0.6, 1, 0.6] }
+                    : { opacity: 0.6 }
+                }
+                transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+              />
+              {step.content.closingQuestionLabel && (
+                <span
+                  className="block text-[11px] font-semibold uppercase tracking-[0.28em]"
+                  style={{ color: accent.base, opacity: 0.95 }}
+                >
+                  {step.content.closingQuestionLabel}
+                </span>
+              )}
+              <p
+                className="mt-1 text-[1.08rem] font-semibold leading-snug text-white"
+                style={{ textShadow: `0 0 22px ${accent.base}44` }}
+              >
+                {step.content.closingQuestion}
+              </p>
             </motion.div>
           </EraRevealBand>
         )}
