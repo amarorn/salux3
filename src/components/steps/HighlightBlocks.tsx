@@ -28,7 +28,7 @@ export function HighlightPhrase({
             : { opacity: 0, x: -8, filter: 'none' }
       }
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.25 + index * 0.12 }}
-      className="relative overflow-hidden rounded-xl border px-4 py-3"
+      className="presentation-card-chip relative overflow-hidden rounded-xl border px-4 py-3"
       style={{
         borderColor: `${GREEN}55`,
         background: `linear-gradient(135deg, ${GREEN}1c 0%, rgba(147,196,125,0.04) 100%)`,

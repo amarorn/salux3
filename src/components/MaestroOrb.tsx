@@ -1,9 +1,18 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import { usePresentationStore } from '@/store/presentationStore';
 import { useCurrentPresentation } from '@/hooks/useCurrentPresentation';
 import { theme } from '@/domain/theme';
 import { dimensionsForStageAspect } from '@/domain/stageAspect';
+import type { MaestroElementTarget } from '@/lib/maestroAnchor';
+import {
+  clampSlotToCorridor,
+  computeBubbleLayout,
+  pickMaestroAnchor,
+  type MaestroBubbleLayout,
+  type MaestroBubblePlacement,
+} from '@/lib/maestroAnchor';
 import type { NodeKind, PresentationStep } from '@/domain/types';
 
 /**
@@ -16,7 +25,8 @@ import type { NodeKind, PresentationStep } from '@/domain/types';
  *   / headline / body / fallback por kind) — nunca repete entre cards.
  * - Balão fica visível enquanto o slide está ativo (sem auto-hide).
  * - Balão é deslocado horizontalmente para nunca sair da tela.
- * - Na chegada de cada slide, shape-morph breve (badge/barra/hex/etc.) e volta ao orbe.
+ * - Na chegada de cada slide, assinala um elemento (`data-maestro-anchor`) com eco
+ *   luminoso na silhueta dele; o orbe permanece nos corredores, nunca sobre o texto.
  */
 
 interface Props {
@@ -53,7 +63,6 @@ type SlotName =
  * O orbe nunca entra na caixa do card; circula pelos corredores top/bottom/left/right.
  */
 const CARD_WIDTH = 920;
-const CARD_GAP = 24;
 
 function buildForbiddenBox(stageWidth: number, stageHeight: number) {
   const cardH = Math.min(stageHeight * 0.72, 1400);
@@ -77,34 +86,20 @@ function buildOrbitWaypoints(stageWidth: number, stageHeight: number): Slot[] {
   const m = ORB_HALF + SCREEN_MARGIN;
   const topY = Math.max(m, box.top / 2);
   const bottomY = Math.min(stageHeight - m, (box.bottom + stageHeight) / 2);
-  const leftX = Math.max(m, box.left / 2);
-  const rightX = Math.min(stageWidth - m, (box.right + stageWidth) / 2);
   const cx = stageWidth / 2;
   // Faixas topo/fundo podem usar toda a largura disponível: o card está
   // verticalmente separado, então não há conflito horizontal nessas faixas.
   const xLeftEdge = m;
   const xRightEdge = stageWidth - m;
-  const lateralFits = box.left - CARD_GAP >= m;
-  const yTopInner = box.top + (box.bottom - box.top) * 0.32;
-  const yBotInner = box.top + (box.bottom - box.top) * 0.68;
-
   const points: Slot[] = [];
   // Topo: esquerda → centro → direita
   points.push({ x: xLeftEdge, y: topY });
   points.push({ x: cx, y: topY });
   points.push({ x: xRightEdge, y: topY });
-  if (lateralFits) {
-    points.push({ x: rightX, y: yTopInner });
-    points.push({ x: rightX, y: yBotInner });
-  }
   // Fundo: direita → centro → esquerda
   points.push({ x: xRightEdge, y: bottomY });
   points.push({ x: cx, y: bottomY });
   points.push({ x: xLeftEdge, y: bottomY });
-  if (lateralFits) {
-    points.push({ x: leftX, y: yBotInner });
-    points.push({ x: leftX, y: yTopInner });
-  }
   return points;
 }
 
@@ -181,166 +176,40 @@ function pickWhisper(step: PresentationStep): string {
   return KIND_WHISPERS[step.kind] ?? 'Olha por aqui.';
 }
 
-/** Formas breves na chegada de cada slide (shape-morph). */
-type MorphShape = 'badge' | 'bar' | 'hex' | 'diamond' | 'ring';
+const MORPH_MEASURE_MS = 320;
+const MORPH_HOLD_MS = 720;
 
-const MORPH_ARM_MS = 260;
-const MORPH_HOLD_MS = 680;
-
-const KIND_MORPH_SHAPE: Record<NodeKind, MorphShape> = {
-  cover: 'ring',
-  narrative: 'badge',
-  highlight: 'ring',
-  architecture: 'bar',
-  journey: 'bar',
-  integration: 'hex',
-  governance: 'diamond',
-  roadmap: 'bar',
-  closing: 'ring',
-  capacities: 'badge',
-  pathways: 'diamond',
-  'agents-flow': 'hex',
-  results: 'badge',
-};
-
-const STEP_MORPH_SHAPE: Record<string, MorphShape> = {
-  cover: 'ring',
-  closing: 'ring',
-  'highlight-context': 'ring',
-  architecture: 'bar',
-  journey: 'bar',
-  roadmap: 'bar',
-  integration: 'hex',
-  governance: 'diamond',
-  'agents-flow': 'hex',
-  capacities: 'badge',
-  pathways: 'diamond',
-  results: 'badge',
-  limit: 'hex',
-  'why-agents': 'hex',
-};
-
-/** Forma do morph na chegada — varia por slide e por kind. */
-function arrivalMorphShape(step: PresentationStep): MorphShape {
-  const fixed = STEP_MORPH_SHAPE[step.id];
-  if (fixed) return fixed;
-  if (step.kind === 'narrative') {
-    const pool: MorphShape[] = ['badge', 'bar', 'hex', 'diamond'];
-    return pool[hashString(step.id) % pool.length]!;
-  }
-  return KIND_MORPH_SHAPE[step.kind];
-}
-
-interface MaestroArrivalShapeProps {
-  shape: MorphShape;
+/** Eco luminoso na silhueta do elemento escolhido na tela. */
+function MaestroElementEcho({
+  target,
+  accent,
+}: {
+  target: MaestroElementTarget;
   accent: string;
-}
-
-/** Silhueta luminosa exibida brevemente ao pousar no slide. */
-function MaestroArrivalShape({ shape, accent }: MaestroArrivalShapeProps) {
+}) {
   const ease = [0.22, 1, 0.36, 1] as const;
-  const glow = `0 0 28px ${GOLD}aa, 0 0 12px ${accent}88, inset 0 0 20px ${GOLD}33`;
+  const glow = `0 0 28px ${GOLD}aa, 0 0 14px ${accent}88, inset 0 0 24px ${GOLD}33`;
 
-  if (shape === 'hex') {
-    return (
-      <motion.div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        initial={{ opacity: 0, scale: 0.35, rotate: -18 }}
-        animate={{ opacity: 1, scale: 1, rotate: 0 }}
-        exit={{ opacity: 0, scale: 0.5, rotate: 12 }}
-        transition={{ duration: 0.42, ease }}
-        style={{ width: 108, height: 108 }}
-      >
-        <svg viewBox="0 0 100 100" width="108" height="108" aria-hidden>
-          <polygon
-            points="50,6 90,28 90,72 50,94 10,72 10,28"
-            fill={`${GOLD}28`}
-            stroke={GOLD_BRIGHT}
-            strokeWidth="1.5"
-            style={{ filter: `drop-shadow(0 0 8px ${GOLD}cc)` }}
-          />
-          <polygon
-            points="50,20 76,34 76,66 50,80 24,66 24,34"
-            fill="none"
-            stroke={accent}
-            strokeWidth="0.9"
-            strokeOpacity="0.85"
-          />
-        </svg>
-      </motion.div>
-    );
-  }
-
-  if (shape === 'diamond') {
-    return (
-      <motion.div
-        className="absolute left-1/2 top-1/2"
-        initial={{ opacity: 0, scale: 0.3, rotate: 0, x: '-50%', y: '-50%' }}
-        animate={{ opacity: 1, scale: 1, rotate: 45, x: '-50%', y: '-50%' }}
-        exit={{ opacity: 0, scale: 0.45, rotate: 60 }}
-        transition={{ duration: 0.42, ease }}
-        style={{
-          width: 64,
-          height: 64,
-          borderRadius: 10,
-          border: `1.5px solid ${GOLD_BRIGHT}`,
-          background: `linear-gradient(135deg, ${GOLD}55 0%, ${accent}33 100%)`,
-          boxShadow: glow,
-        }}
-      />
-    );
-  }
-
-  if (shape === 'ring') {
-    return (
-      <motion.div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-        initial={{ opacity: 0, scale: 0.4 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.55 }}
-        transition={{ duration: 0.42, ease }}
-        style={{
-          width: 100,
-          height: 100,
-          border: `2px solid ${GOLD_BRIGHT}`,
-          background: `radial-gradient(circle, ${GOLD}44 0%, transparent 62%)`,
-          boxShadow: glow,
-        }}
-      />
-    );
-  }
-
-  const isBar = shape === 'bar';
   return (
     <motion.div
-      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-      initial={{ opacity: 0, scale: 0.35 }}
+      aria-hidden
+      className="pointer-events-none absolute left-1/2 top-1/2"
+      initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.5 }}
-      transition={{ duration: 0.42, ease }}
+      exit={{ opacity: 0, scale: 0.94 }}
+      transition={{ duration: 0.45, ease }}
       style={{
-        width: isBar ? 132 : 112,
-        height: isBar ? 34 : 42,
-        borderRadius: isBar ? 8 : 999,
+        width: target.width,
+        height: target.height,
+        marginLeft: -target.width / 2,
+        marginTop: -target.height / 2,
+        borderRadius: target.borderRadius,
         border: `1.5px solid ${GOLD_BRIGHT}`,
-        background: `linear-gradient(135deg, ${GOLD_BRIGHT}55 0%, ${GOLD}44 40%, ${accent}33 100%)`,
+        background: `linear-gradient(135deg, ${GOLD}44 0%, ${accent}22 55%, transparent 100%)`,
         boxShadow: glow,
       }}
     />
   );
-}
-
-/**
- * Quanto o balão precisa ser deslocado em X para caber na tela.
- * Positivo = empurra para a direita; negativo = para a esquerda.
- */
-function computeBubbleShift(orbX: number, stageWidth: number): number {
-  const half = BUBBLE_MAX_WIDTH / 2;
-  const leftOver = orbX - half - SCREEN_MARGIN;
-  const rightOver = orbX + half - (stageWidth - SCREEN_MARGIN);
-  if (leftOver < 0) return -leftOver;
-  if (rightOver > 0) return -rightOver;
-  return 0;
 }
 
 /** Slides em que o Maestro voa ao centro do palco e decompõe em fragmentos para cada ponta. */
@@ -726,15 +595,17 @@ export function MaestroOrb({ visible }: Props) {
     const offset = (hashString(`${trackId}|${current.id}`) + current.index) % orbit.length;
     return [...orbit.slice(offset), ...orbit.slice(0, offset)];
   }, [orbit, current, trackId]);
-  const slot = useMemo(
-    () => orbitRotated[0] ?? slotMap['top-center-outer'],
-    [orbitRotated, slotMap],
-  );
+  const slot = useMemo(() => {
+    const raw = orbitRotated[0] ?? slotMap['top-center-outer'];
+    return clampSlotToCorridor(raw, stage.width, stage.height, ORB_HALF, SCREEN_MARGIN);
+  }, [orbitRotated, slotMap, stage.width, stage.height]);
 
-  const placement: 'above' | 'below' = slot.y < stage.height / 2 ? 'below' : 'above';
-  const bubbleShift = useMemo(
-    () => computeBubbleShift(slot.x, stage.width),
-    [slot.x, stage.width],
+  const bubbleLayout = useMemo(
+    () =>
+      whisper
+        ? computeBubbleLayout(slot.x, slot.y, stage.width, stage.height, whisper, BUBBLE_MAX_WIDTH)
+        : null,
+    [slot.x, slot.y, stage.width, stage.height, whisper],
   );
 
   // Balão persiste enquanto o slide está ativo — só some na troca de slide
@@ -807,7 +678,46 @@ export function MaestroOrb({ visible }: Props) {
     return () => window.clearTimeout(t);
   }, [pilgrimage]);
 
-  const targetSlot = pilgrimage === 'fly' || pilgrimage === 'burst' ? stageCenter : slot;
+  const [morphTarget, setMorphTarget] = useState<MaestroElementTarget | null>(null);
+  const [shapeMorphing, setShapeMorphing] = useState(false);
+
+  useEffect(() => {
+    if (!visible || !current || reduceMotion || pilgrimageActive) {
+      setShapeMorphing(false);
+      setMorphTarget(null);
+      return;
+    }
+    setShapeMorphing(false);
+    setMorphTarget(null);
+
+    const measureTimer = window.setTimeout(() => {
+      const root = document.getElementById('salux-stage');
+      if (!root) return;
+      const target = pickMaestroAnchor(
+        root,
+        stage.width,
+        stage.height,
+        stepId,
+        ORB_HALF,
+      );
+      if (!target) return;
+      setMorphTarget(target);
+      setShapeMorphing(true);
+    }, MORPH_MEASURE_MS);
+
+    const settle = window.setTimeout(() => {
+      setShapeMorphing(false);
+      setMorphTarget(null);
+    }, MORPH_MEASURE_MS + MORPH_HOLD_MS);
+
+    return () => {
+      window.clearTimeout(measureTimer);
+      window.clearTimeout(settle);
+    };
+  }, [stepId, visible, current?.id, reduceMotion, pilgrimageActive, stage.width, stage.height]);
+
+  const targetSlot =
+    pilgrimage === 'fly' || pilgrimage === 'burst' ? stageCenter : slot;
 
   const moveTransition = useMemo(() => {
     if (pilgrimage === 'back') return { duration: 1.18, ease: [0.22, 1, 0.36, 1] as const };
@@ -817,69 +727,65 @@ export function MaestroOrb({ visible }: Props) {
 
   const whisperDuringPilgrimage = pilgrimage === 'off';
 
-  const arrivalShape = useMemo(
-    () => (current ? arrivalMorphShape(current) : 'badge' as MorphShape),
-    [current],
-  );
-
-  const [shapeMorphing, setShapeMorphing] = useState(false);
-  useEffect(() => {
-    if (!visible || !current || reduceMotion || pilgrimageActive) {
-      setShapeMorphing(false);
-      return;
-    }
-    setShapeMorphing(false);
-    const arm = window.setTimeout(() => setShapeMorphing(true), MORPH_ARM_MS);
-    const settle = window.setTimeout(() => setShapeMorphing(false), MORPH_ARM_MS + MORPH_HOLD_MS);
-    return () => {
-      window.clearTimeout(arm);
-      window.clearTimeout(settle);
-    };
-  }, [stepId, visible, current?.id, reduceMotion, pilgrimageActive]);
-
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
-          key="maestro"
-          className="pointer-events-none absolute z-30 select-none"
-          style={{ top: 0, left: 0 }}
-          initial={{ opacity: 0, x: slot.x, y: slot.y, scale: 0.6 }}
-          animate={{ opacity: 1, x: targetSlot.x, y: targetSlot.y, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.7 }}
-          transition={{
-            opacity: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-            scale: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
-            x: moveTransition,
-            y: moveTransition,
-          }}
-        >
+        <>
+          <AnimatePresence>
+            {shapeMorphing && morphTarget && pilgrimage === 'off' && (
+              <motion.div
+                key={`maestro-echo-${stepId}`}
+                aria-hidden
+                className="pointer-events-none absolute z-[28] select-none"
+                style={{ top: 0, left: 0 }}
+                initial={{ opacity: 0, x: morphTarget.cx, y: morphTarget.cy, scale: 0.92 }}
+                animate={{ opacity: 1, x: morphTarget.cx, y: morphTarget.cy, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.94 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <motion.div
+                  className="relative -translate-x-1/2 -translate-y-1/2"
+                  style={{ width: 0, height: 0 }}
+                >
+                  <MaestroElementEcho target={morphTarget} accent={accent} />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <motion.div
-            animate={
-              reduceMotion || pilgrimage !== 'off'
-                ? undefined
-                : {
-                    x: [0, 6, -4, 8, -2, 0],
-                    y: [0, -5, 4, -3, 6, 0],
-                  }
-            }
-            transition={{ duration: 9.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="relative -translate-x-1/2 -translate-y-1/2"
-            style={{ width: TOTAL_WIDTH, height: SIZE }}
+            key="maestro"
+            className="pointer-events-none absolute z-30 select-none"
+            style={{ top: 0, left: 0 }}
+            initial={{ opacity: 0, x: slot.x, y: slot.y, scale: 0.6 }}
+            animate={{ opacity: 1, x: targetSlot.x, y: targetSlot.y, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            transition={{
+              opacity: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+              scale: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+              x: moveTransition,
+              y: moveTransition,
+            }}
           >
-            <MaestroVisual
-              accent={accent}
-              intensity={intensity}
-              reduceMotion={Boolean(reduceMotion)}
-              whisper={whisper}
-              showWhisper={showWhisper && whisperDuringPilgrimage}
-              whisperPlacement={placement}
-              bubbleShift={bubbleShift}
-              stepId={stepId}
-              hideCore={pilgrimage === 'burst'}
-              arrivalShape={arrivalShape}
-              shapeMorphing={shapeMorphing && pilgrimage === 'off'}
-            />
+            <motion.div
+              animate={
+                reduceMotion || pilgrimage !== 'off' || shapeMorphing
+                  ? undefined
+                  : {
+                      x: [0, 4, -3, 5, -2, 0],
+                      y: [0, -3, 3, -2, 4, 0],
+                    }
+              }
+              transition={{ duration: 9.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="relative -translate-x-1/2 -translate-y-1/2"
+              style={{ width: TOTAL_WIDTH, height: SIZE }}
+            >
+              <MaestroVisual
+                accent={accent}
+                intensity={intensity}
+                reduceMotion={Boolean(reduceMotion)}
+                hideCore={pilgrimage === 'burst'}
+              />
             {pilgrimage === 'burst' && (
               <div
                 className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-0 w-0 overflow-visible"
@@ -977,21 +883,191 @@ export function MaestroOrb({ visible }: Props) {
             </>
           )}
         </motion.div>
+
+          {showWhisper &&
+            whisper &&
+            whisperDuringPilgrimage &&
+            !shapeMorphing &&
+            bubbleLayout &&
+            typeof document !== 'undefined' &&
+            createPortal(
+              <StageAnchoredSpeechBubble
+                key={`whisper-portal-${stepId}`}
+                orbX={targetSlot.x}
+                orbY={targetSlot.y}
+                text={whisper}
+                accent={accent}
+                layout={bubbleLayout}
+                reduceMotion={Boolean(reduceMotion)}
+              />,
+              document.getElementById('salux-stage') ?? document.body,
+            )}
+        </>
       )}
     </AnimatePresence>
+  );
+}
+
+function bubbleTailStyle(
+  placement: MaestroBubblePlacement,
+  accent: string,
+  shiftX: number,
+  shiftY: number,
+): { outer: CSSProperties; inner: CSSProperties } {
+  const base: CSSProperties = {
+    width: 0,
+    height: 0,
+  };
+
+  if (placement === 'below') {
+    return {
+      outer: {
+        ...base,
+        left: `calc(50% - ${shiftX}px)`,
+        top: -7,
+        transform: 'translateX(-50%)',
+        borderLeft: '7px solid transparent',
+        borderRight: '7px solid transparent',
+        borderBottom: `8px solid ${accent}88`,
+      },
+      inner: {
+        ...base,
+        left: `calc(50% - ${shiftX}px)`,
+        top: -5,
+        transform: 'translateX(-50%)',
+        borderLeft: '6px solid transparent',
+        borderRight: '6px solid transparent',
+        borderBottom: '7px solid rgba(8,12,20,0.65)',
+      },
+    };
+  }
+
+  if (placement === 'left') {
+    return {
+      outer: {
+        ...base,
+        right: -7,
+        top: `calc(50% - ${shiftY}px)`,
+        transform: 'translateY(-50%)',
+        borderTop: '7px solid transparent',
+        borderBottom: '7px solid transparent',
+        borderLeft: `8px solid ${accent}88`,
+      },
+      inner: {
+        ...base,
+        right: -5,
+        top: `calc(50% - ${shiftY}px)`,
+        transform: 'translateY(-50%)',
+        borderTop: '6px solid transparent',
+        borderBottom: '6px solid transparent',
+        borderLeft: '7px solid rgba(8,12,20,0.65)',
+      },
+    };
+  }
+
+  if (placement === 'right') {
+    return {
+      outer: {
+        ...base,
+        left: -7,
+        top: `calc(50% - ${shiftY}px)`,
+        transform: 'translateY(-50%)',
+        borderTop: '7px solid transparent',
+        borderBottom: '7px solid transparent',
+        borderRight: `8px solid ${accent}88`,
+      },
+      inner: {
+        ...base,
+        left: -5,
+        top: `calc(50% - ${shiftY}px)`,
+        transform: 'translateY(-50%)',
+        borderTop: '6px solid transparent',
+        borderBottom: '6px solid transparent',
+        borderRight: '7px solid rgba(8,12,20,0.65)',
+      },
+    };
+  }
+
+  return {
+    outer: {
+      ...base,
+      left: `calc(50% - ${shiftX}px)`,
+      bottom: -7,
+      transform: 'translateX(-50%)',
+      borderLeft: '7px solid transparent',
+      borderRight: '7px solid transparent',
+      borderTop: `8px solid ${accent}88`,
+    },
+    inner: {
+      ...base,
+      left: `calc(50% - ${shiftX}px)`,
+      bottom: -5,
+      transform: 'translateX(-50%)',
+      borderLeft: '6px solid transparent',
+      borderRight: '6px solid transparent',
+      borderTop: '7px solid rgba(8,12,20,0.65)',
+    },
+  };
+}
+
+interface StageAnchoredSpeechBubbleProps {
+  orbX: number;
+  orbY: number;
+  text: string;
+  accent: string;
+  layout: MaestroBubbleLayout;
+  reduceMotion: boolean;
+}
+
+function StageAnchoredSpeechBubble({
+  orbX,
+  orbY,
+  text,
+  accent,
+  layout,
+  reduceMotion,
+}: StageAnchoredSpeechBubbleProps) {
+  return (
+    <motion.div
+      className="pointer-events-none absolute z-[45] select-none"
+      style={{ left: orbX, top: orbY }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <SpeechBubble
+        text={text}
+        accent={accent}
+        placement={layout.placement}
+        reduceMotion={reduceMotion}
+        shiftX={layout.shiftX}
+        shiftY={layout.shiftY}
+        maxWidth={layout.maxWidth}
+      />
+    </motion.div>
   );
 }
 
 interface SpeechBubbleProps {
   text: string;
   accent: string;
-  placement: 'above' | 'below';
+  placement: MaestroBubblePlacement;
   reduceMotion: boolean;
-  /** Deslocamento horizontal do balão para manter dentro da tela. */
   shiftX: number;
+  shiftY: number;
+  maxWidth: number;
 }
 
-function SpeechBubble({ text, accent, placement, reduceMotion, shiftX }: SpeechBubbleProps) {
+function SpeechBubble({
+  text,
+  accent,
+  placement,
+  reduceMotion,
+  shiftX,
+  shiftY,
+  maxWidth,
+}: SpeechBubbleProps) {
   const [typed, setTyped] = useState(reduceMotion ? text : '');
   useEffect(() => {
     if (reduceMotion) {
@@ -1009,83 +1085,67 @@ function SpeechBubble({ text, accent, placement, reduceMotion, shiftX }: SpeechB
     return () => window.clearInterval(tick);
   }, [text, reduceMotion]);
 
-  const isBelow = placement === 'below';
+  const offset = ORB_HALF + 20;
+  const tailStyle = bubbleTailStyle(placement, accent, shiftX, shiftY);
+
+  const positionStyle: CSSProperties = (() => {
+    switch (placement) {
+      case 'below':
+        return {
+          left: '50%',
+          top: offset,
+          transform: `translateX(calc(-50% + ${shiftX}px)) translateY(${shiftY}px)`,
+        };
+      case 'left':
+        return {
+          right: offset,
+          top: '50%',
+          transform: `translateY(calc(-50% + ${shiftY}px)) translateX(${shiftX}px)`,
+        };
+      case 'right':
+        return {
+          left: offset,
+          top: '50%',
+          transform: `translateY(calc(-50% + ${shiftY}px)) translateX(${shiftX}px)`,
+        };
+      case 'above':
+      default:
+        return {
+          left: '50%',
+          bottom: offset,
+          transform: `translateX(calc(-50% + ${shiftX}px)) translateY(${shiftY}px)`,
+        };
+    }
+  })();
+
+  const enterY =
+    placement === 'below' ? -8 : placement === 'above' ? 8 : 0;
+  const enterX =
+    placement === 'left' ? 8 : placement === 'right' ? -8 : 0;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: isBelow ? -8 : 8, scale: 0.92 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: isBelow ? -4 : 4, scale: 0.96 }}
+      initial={{ opacity: 0, x: enterX, y: enterY, scale: 0.92 }}
+      animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       className="absolute"
       style={{
-        left: '50%',
-        transform: `translateX(calc(-50% + ${shiftX}px))`,
-        maxWidth: BUBBLE_MAX_WIDTH,
+        ...positionStyle,
+        maxWidth,
         width: 'max-content',
-        ...(isBelow
-          ? { top: '100%', marginTop: 18 }
-          : { bottom: '100%', marginBottom: 18 }),
       }}
     >
-      {/* Cauda apontando para o orbe — fica ancorada na posição original do
-          orbe (compensa o deslocamento horizontal do balão). */}
-      <span
-        aria-hidden
-        className="absolute"
-        style={{
-          left: '50%',
-          transform: `translateX(calc(-50% - ${shiftX}px))`,
-          width: 0,
-          height: 0,
-          ...(isBelow
-            ? {
-                top: -7,
-                borderLeft: '7px solid transparent',
-                borderRight: '7px solid transparent',
-                borderBottom: `8px solid ${accent}88`,
-                filter: `drop-shadow(0 -2px 4px ${accent}55)`,
-              }
-            : {
-                bottom: -7,
-                borderLeft: '7px solid transparent',
-                borderRight: '7px solid transparent',
-                borderTop: `8px solid ${accent}88`,
-                filter: `drop-shadow(0 2px 4px ${accent}55)`,
-              }),
-        }}
-      />
-      <span
-        aria-hidden
-        className="absolute"
-        style={{
-          left: '50%',
-          transform: `translateX(calc(-50% - ${shiftX}px))`,
-          width: 0,
-          height: 0,
-          ...(isBelow
-            ? {
-                top: -5,
-                borderLeft: '6px solid transparent',
-                borderRight: '6px solid transparent',
-                borderBottom: `7px solid rgba(8,12,20,0.5)`,
-              }
-            : {
-                bottom: -5,
-                borderLeft: '6px solid transparent',
-                borderRight: '6px solid transparent',
-                borderTop: `7px solid rgba(8,12,20,0.5)`,
-              }),
-        }}
-      />
+      <span aria-hidden className="absolute" style={tailStyle.outer} />
+      <span aria-hidden className="absolute" style={tailStyle.inner} />
 
       <motion.div
-        className="relative rounded-2xl border px-4 py-2.5 text-[12px] font-medium leading-snug text-white/90 backdrop-blur-md"
+        className="relative rounded-2xl border px-4 py-3 text-[13px] font-medium leading-snug text-white/95 backdrop-blur-md"
         style={{
-          borderColor: `${accent}44`,
-          background: `linear-gradient(135deg, ${accent}14 0%, rgba(8,12,20,0.42) 100%)`,
-          boxShadow: `0 10px 28px -6px ${accent}33, 0 0 0 1px ${accent}18, inset 0 1px 0 rgba(255,255,255,0.06)`,
-          minWidth: 60,
+          borderColor: `${accent}55`,
+          background: `linear-gradient(135deg, ${accent}22 0%, rgba(8,12,20,0.78) 100%)`,
+          boxShadow: `0 12px 32px -8px rgba(0,0,0,0.55), 0 0 0 1px ${accent}28, inset 0 1px 0 rgba(255,255,255,0.08)`,
+          minWidth: 72,
           whiteSpace: 'pre-wrap',
         }}
       >
@@ -1108,51 +1168,24 @@ interface MaestroVisualProps {
   accent: string;
   intensity: number;
   reduceMotion: boolean;
-  whisper: string;
-  showWhisper: boolean;
-  whisperPlacement: 'above' | 'below';
-  bubbleShift: number;
-  stepId: string;
   /** Esconde o núcleo do orbe (ex.: durante decomposição radial). */
   hideCore?: boolean;
-  arrivalShape: MorphShape;
-  shapeMorphing: boolean;
 }
 
 function MaestroVisual({
   accent,
   intensity,
   reduceMotion,
-  whisper,
-  showWhisper,
-  whisperPlacement,
-  bubbleShift,
-  stepId,
   hideCore = false,
-  arrivalShape,
-  shapeMorphing,
 }: MaestroVisualProps) {
   return (
     <motion.div className="relative" style={{ width: TOTAL_WIDTH, height: SIZE }}>
-      <AnimatePresence>
-        {showWhisper && whisper && (
-          <SpeechBubble
-            key={`whisper-${stepId}`}
-            text={whisper}
-            accent={accent}
-            placement={whisperPlacement}
-            reduceMotion={reduceMotion}
-            shiftX={bubbleShift}
-          />
-        )}
-      </AnimatePresence>
-
       <motion.div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ width: SIZE, height: SIZE }}
         animate={{
-          opacity: hideCore ? 0 : shapeMorphing ? 0 : 1,
-          scale: hideCore ? 0.85 : shapeMorphing ? 0.92 : 1,
+          opacity: hideCore ? 0 : 1,
+          scale: hideCore ? 0.85 : 1,
         }}
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       >
@@ -1454,11 +1487,6 @@ function MaestroVisual({
           ))}
       </motion.div>
 
-      <AnimatePresence>
-        {shapeMorphing && !hideCore && (
-          <MaestroArrivalShape key={`morph-${stepId}-${arrivalShape}`} shape={arrivalShape} accent={accent} />
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }

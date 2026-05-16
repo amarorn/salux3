@@ -35,7 +35,9 @@ function ContrastColumn({
   const c = toneColors(item.tone);
   return (
     <motion.div
-      className={`relative flex-1 overflow-hidden rounded-xl border px-4 py-3.5 ${className}`}
+      data-maestro-anchor
+      data-maestro-anchor-priority="1"
+      className={`presentation-card-chip relative flex-1 overflow-hidden rounded-xl border px-4 py-3.5 ${className}`}
       style={{
         borderColor: `${c.base}44`,
         background: `linear-gradient(135deg, ${c.base}1a 0%, rgba(255,255,255,0.02) 70%)`,
@@ -262,7 +264,9 @@ export function CoverStep({ step, active }: Props) {
           >
             <motion.div
               {...innerMotion}
-              className="relative mx-auto w-fit max-w-full overflow-hidden px-5 py-4 sm:max-w-xl"
+              data-maestro-anchor
+              data-maestro-anchor-priority="3"
+              className="presentation-card-quote relative mx-auto w-fit max-w-full overflow-hidden px-5 py-4 sm:max-w-xl"
               style={{
                 borderRight: "6px solid",
                 borderLeft: "6px solid",

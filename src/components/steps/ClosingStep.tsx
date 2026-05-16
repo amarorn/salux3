@@ -193,7 +193,7 @@ export function ClosingStep({ step, active }: Props) {
                       tabIndex={0}
                       aria-expanded={isFocused}
                       aria-label={row.label}
-                      className="relative cursor-pointer overflow-hidden rounded-xl border px-3.5 py-3 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
+                      className="presentation-card-chip relative cursor-pointer overflow-hidden rounded-xl border px-3.5 py-3 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
                       style={{
                         borderColor: isFocused
                           ? `${accent.base}aa`
@@ -308,7 +308,7 @@ export function ClosingStep({ step, active }: Props) {
           >
             <motion.div
               {...innerMotion}
-              className="relative overflow-hidden rounded-2xl border px-5 py-4"
+              className="presentation-card-quote relative overflow-hidden rounded-2xl border px-5 py-4"
               style={{
                 borderColor: `${accent.base}55`,
                 background: `linear-gradient(135deg, ${accent.base}1f 0%, transparent 65%)`,
