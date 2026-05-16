@@ -29,7 +29,7 @@ export function PresentationApp() {
         <IntroBackground />
 
         <PresentationCornerLogo visible={cornerLogoVisible} />
-        <MaestroOrb visible={cornerLogoVisible} />
+        <MaestroOrb visible={transitionPhase !== "morphing"} />
 
         <AnimatePresence>
           {transitionPhase === "idle" && !hasEntered && (

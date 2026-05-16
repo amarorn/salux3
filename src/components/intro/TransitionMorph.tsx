@@ -111,6 +111,9 @@ export function TransitionMorph({ onComplete }: Props) {
       {/* ── Varredura cônica holográfica ─────────────────────────────── */}
       <HolographicSweep />
 
+      {/* ── Orbe Maestro: emerge atrás do logo, expande e segue para o canto ───── */}
+      <MaestroOrbTransition />
+
       {/* ── Logo: entra em BURST canônico, balança em 3D, depois vai pro canto ───── */}
       <motion.div
         className="absolute z-20"
@@ -307,6 +310,142 @@ function HolographicSweep() {
         }}
         animate={{ rotate: 360 }}
         transition={{ delay: 0.38, duration: 1.3, ease: 'linear' }}
+      />
+    </motion.div>
+  );
+}
+
+const GOLD = '#fbbf24';
+const GOLD_BRIGHT = '#fde68a';
+const ACCENT = '#4a9cfa';
+
+/**
+ * Orbe Maestro participando da transição: emerge atrás do logo, expande
+ * em pulso futurista, depois colapsa numa estela dourada que segue o logo
+ * para o canto. Reaparece no slide seguinte na sua estação habitual.
+ */
+function MaestroOrbTransition() {
+  return (
+    <motion.div
+      className="pointer-events-none absolute z-[15] flex items-center justify-center"
+      style={{ top: '50%', left: '50%', x: '-50%', y: '-50%' }}
+    >
+      {/* Núcleo dourado — emerge e respira */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: 140,
+          height: 140,
+          background: `radial-gradient(circle, ${GOLD_BRIGHT}cc 0%, ${GOLD}88 25%, ${GOLD}33 55%, transparent 78%)`,
+          filter: 'blur(4px)',
+        }}
+        initial={{ opacity: 0, scale: 0.2 }}
+        animate={{
+          opacity: [0, 0.95, 1, 0.7, 0],
+          scale: [0.2, 1.1, 1.25, 0.6, 0.2],
+        }}
+        transition={{
+          duration: 2.0,
+          times: [0, 0.22, 0.55, 0.82, 1],
+          delay: 0.15,
+          ease: [0.16, 1, 0.3, 1],
+        }}
+      />
+      {/* Halo externo difuso */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: 320,
+          height: 320,
+          background: `radial-gradient(circle, ${GOLD}33 0%, ${ACCENT}22 35%, transparent 70%)`,
+          filter: 'blur(20px)',
+        }}
+        initial={{ opacity: 0, scale: 0.3 }}
+        animate={{ opacity: [0, 0.85, 0.5, 0], scale: [0.3, 1.0, 1.4, 1.8] }}
+        transition={{
+          duration: 2.1,
+          times: [0, 0.3, 0.7, 1],
+          delay: 0.1,
+          ease: [0.16, 1, 0.3, 1],
+        }}
+      />
+      {/* Anel iridescente — assinatura cromática */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: 180,
+          height: 180,
+          background: `conic-gradient(from 0deg, ${ACCENT}00, ${ACCENT}88 18%, ${GOLD_BRIGHT}cc 32%, ${ACCENT}88 48%, ${ACCENT}00 64%, ${GOLD}66 82%, ${ACCENT}00 100%)`,
+          maskImage:
+            'radial-gradient(circle, transparent 60%, black 66%, black 78%, transparent 84%)',
+          WebkitMaskImage:
+            'radial-gradient(circle, transparent 60%, black 66%, black 78%, transparent 84%)',
+        }}
+        initial={{ opacity: 0, rotate: 0, scale: 0.5 }}
+        animate={{
+          opacity: [0, 0.9, 0.6, 0],
+          rotate: 360,
+          scale: [0.5, 1.0, 1.15, 1.4],
+        }}
+        transition={{
+          opacity: { duration: 1.9, times: [0, 0.25, 0.7, 1], delay: 0.2 },
+          rotate: { duration: 2.1, ease: 'linear', delay: 0.2 },
+          scale: { duration: 2.1, ease: [0.16, 1, 0.3, 1], delay: 0.2 },
+        }}
+      />
+      {/* Faíscas radiando — explosão de chegada */}
+      {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => {
+        const rad = (deg * Math.PI) / 180;
+        const dist = 140 + (i % 2) * 28;
+        return (
+          <motion.span
+            key={`tm-spark-${i}`}
+            className="absolute rounded-full"
+            style={{
+              left: 0,
+              top: 0,
+              width: 5,
+              height: 5,
+              background: i % 2 === 0 ? GOLD_BRIGHT : ACCENT,
+              boxShadow: `0 0 12px ${i % 2 === 0 ? GOLD : ACCENT}, 0 0 22px ${i % 2 === 0 ? GOLD : ACCENT}99`,
+            }}
+            initial={{ x: 0, y: 0, opacity: 0, scale: 0.4 }}
+            animate={{
+              x: Math.cos(rad) * dist,
+              y: Math.sin(rad) * dist,
+              opacity: [0, 1, 0],
+              scale: [0.4, 1.2, 0.2],
+            }}
+            transition={{
+              duration: 1.0,
+              delay: 0.55 + i * 0.025,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+          />
+        );
+      })}
+      {/* Estela dourada — colapsa rumo ao canto superior esquerdo (acompanha logo) */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: 60,
+          height: 60,
+          background: `radial-gradient(circle, ${GOLD_BRIGHT}ff 0%, ${GOLD}88 40%, transparent 75%)`,
+          filter: 'blur(3px)',
+        }}
+        initial={{ opacity: 0, x: 0, y: 0, scale: 0.5 }}
+        animate={{
+          opacity: [0, 0.95, 0.4, 0],
+          x: [0, 0, -180, -360],
+          y: [0, 0, -180, -360],
+          scale: [0.5, 1, 0.6, 0.3],
+        }}
+        transition={{
+          duration: 1.1,
+          times: [0, 0.2, 0.7, 1],
+          delay: 1.2,
+          ease: [0.16, 1, 0.3, 1],
+        }}
       />
     </motion.div>
   );

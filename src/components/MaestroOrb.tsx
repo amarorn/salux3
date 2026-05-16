@@ -22,11 +22,11 @@ interface Props {
   visible: boolean;
 }
 
-const SIZE = 140;
+const SIZE = 160;
 const TOTAL_WIDTH = SIZE;
 const ORB_HALF = SIZE / 2;
 const BUBBLE_MAX_WIDTH = 320;
-const SCREEN_MARGIN = 24;
+const SCREEN_MARGIN = 150;
 const GOLD = '#fbbf24';
 const GOLD_BRIGHT = '#fde68a';
 
@@ -61,10 +61,65 @@ const SLOT_ORDER: SlotName[] = [
 ];
 
 /**
- * Constrói as estações seguras a partir das dimensões do palco. Todas estão
- * acima do topo do card (~y=290) ou abaixo do rodapé (~y=1620) no modo totem
- * — nunca sobrepondo o conteúdo do painel.
+ * Caixa proibida (card central) e corredores permitidos para o orbe.
+ * O orbe nunca entra na caixa do card; circula pelos corredores top/bottom/left/right.
  */
+const CARD_WIDTH = 920;
+const CARD_GAP = 24;
+
+function buildForbiddenBox(stageWidth: number, stageHeight: number) {
+  const cardH = Math.min(stageHeight * 0.72, 1400);
+  const left = (stageWidth - CARD_WIDTH) / 2;
+  const top = (stageHeight - cardH) / 2;
+  return {
+    left,
+    right: left + CARD_WIDTH,
+    top,
+    bottom: top + cardH,
+  };
+}
+
+/**
+ * Pontos da órbita contínua, no sentido horário. Atravessa todos os
+ * corredores disponíveis (topo, lateral direita, fundo, lateral esquerda),
+ * saltando lateralmente quando o corredor é mais estreito que o orbe.
+ */
+function buildOrbitWaypoints(stageWidth: number, stageHeight: number): Slot[] {
+  const box = buildForbiddenBox(stageWidth, stageHeight);
+  const m = ORB_HALF + SCREEN_MARGIN;
+  const topY = Math.max(m, box.top / 2);
+  const bottomY = Math.min(stageHeight - m, (box.bottom + stageHeight) / 2);
+  const leftX = Math.max(m, box.left / 2);
+  const rightX = Math.min(stageWidth - m, (box.right + stageWidth) / 2);
+  const cx = stageWidth / 2;
+  // Faixas topo/fundo podem usar toda a largura disponível: o card está
+  // verticalmente separado, então não há conflito horizontal nessas faixas.
+  const xLeftEdge = m;
+  const xRightEdge = stageWidth - m;
+  const lateralFits = box.left - CARD_GAP >= m;
+  const yTopInner = box.top + (box.bottom - box.top) * 0.32;
+  const yBotInner = box.top + (box.bottom - box.top) * 0.68;
+
+  const points: Slot[] = [];
+  // Topo: esquerda → centro → direita
+  points.push({ x: xLeftEdge, y: topY });
+  points.push({ x: cx, y: topY });
+  points.push({ x: xRightEdge, y: topY });
+  if (lateralFits) {
+    points.push({ x: rightX, y: yTopInner });
+    points.push({ x: rightX, y: yBotInner });
+  }
+  // Fundo: direita → centro → esquerda
+  points.push({ x: xRightEdge, y: bottomY });
+  points.push({ x: cx, y: bottomY });
+  points.push({ x: xLeftEdge, y: bottomY });
+  if (lateralFits) {
+    points.push({ x: leftX, y: yBotInner });
+    points.push({ x: leftX, y: yTopInner });
+  }
+  return points;
+}
+
 function buildSlots(stageWidth: number, stageHeight: number): Record<SlotName, Slot> {
   const cx = stageWidth / 2;
   const left = Math.max(ORB_HALF + SCREEN_MARGIN, stageWidth * 0.2);
@@ -221,6 +276,279 @@ type PilgrimagePhase = 'off' | 'fly' | 'burst' | 'back';
 
 const RADIAL_SHARD_COUNT = 8;
 
+/**
+ * Pulso reativo de toque/clique — cicla determinísticamente entre 5 variantes
+ * para que cada interação seja visualmente diferente.
+ */
+function TapPulse({ pulseKey, accent }: { pulseKey: number; accent: string }) {
+  const variant = pulseKey % 5;
+  const ease = [0.16, 1, 0.3, 1] as const;
+
+  // 0 — HUD reticle: cruz + cantos + dois anéis
+  if (variant === 0) {
+    return (
+      <>
+        <motion.span
+          key={`hud-ring-${pulseKey}`}
+          aria-hidden
+          className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+          initial={{ opacity: 0.9, scale: 0.4 }}
+          animate={{ opacity: 0, scale: 1.9 }}
+          transition={{ duration: 0.45, ease }}
+          style={{
+            width: 110,
+            height: 110,
+            border: `1.5px solid ${GOLD_BRIGHT}`,
+            boxShadow: `0 0 22px ${GOLD}cc, inset 0 0 12px ${accent}66`,
+          }}
+        />
+        <motion.span
+          key={`hud-cross-h-${pulseKey}`}
+          aria-hidden
+          className="absolute -translate-x-1/2 -translate-y-1/2"
+          initial={{ opacity: 0, scaleX: 0.2 }}
+          animate={{ opacity: [0, 1, 0], scaleX: 1.4 }}
+          transition={{ duration: 0.55, ease }}
+          style={{
+            width: 220,
+            height: 1.5,
+            background: `linear-gradient(90deg, transparent, ${GOLD_BRIGHT}, ${accent}, ${GOLD_BRIGHT}, transparent)`,
+            boxShadow: `0 0 12px ${GOLD}cc`,
+          }}
+        />
+        <motion.span
+          key={`hud-cross-v-${pulseKey}`}
+          aria-hidden
+          className="absolute -translate-x-1/2 -translate-y-1/2"
+          initial={{ opacity: 0, scaleY: 0.2 }}
+          animate={{ opacity: [0, 0.9, 0], scaleY: 1.3 }}
+          transition={{ duration: 0.55, ease }}
+          style={{
+            width: 1.5,
+            height: 200,
+            background: `linear-gradient(180deg, transparent, ${GOLD_BRIGHT}, ${accent}, ${GOLD_BRIGHT}, transparent)`,
+            boxShadow: `0 0 12px ${GOLD}cc`,
+          }}
+        />
+        {[
+          { x: -1, y: -1 },
+          { x: 1, y: -1 },
+          { x: -1, y: 1 },
+          { x: 1, y: 1 },
+        ].map((c, i) => (
+          <motion.span
+            key={`hud-bracket-${pulseKey}-${i}`}
+            aria-hidden
+            className="absolute"
+            initial={{ opacity: 0, x: c.x * 26, y: c.y * 26, scale: 0.4 }}
+            animate={{ opacity: [0, 1, 0], x: c.x * 56, y: c.y * 56, scale: 1 }}
+            transition={{ duration: 0.6, ease, delay: 0.04 }}
+            style={{
+              left: 0,
+              top: 0,
+              width: 8,
+              height: 8,
+              borderTop: c.y === -1 ? `1.5px solid ${accent}` : 'none',
+              borderBottom: c.y === 1 ? `1.5px solid ${accent}` : 'none',
+              borderLeft: c.x === -1 ? `1.5px solid ${accent}` : 'none',
+              borderRight: c.x === 1 ? `1.5px solid ${accent}` : 'none',
+              boxShadow: `0 0 8px ${accent}cc`,
+              transform: `translate(-50%, -50%)`,
+            }}
+          />
+        ))}
+      </>
+    );
+  }
+
+  // 1 — Triplo choque: 3 anéis concêntricos com timings escalonados
+  if (variant === 1) {
+    return (
+      <>
+        {[0, 0.08, 0.18].map((delay, i) => (
+          <motion.span
+            key={`shock-${pulseKey}-${i}`}
+            aria-hidden
+            className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+            initial={{ opacity: 0.85 - i * 0.2, scale: 0.4 }}
+            animate={{ opacity: 0, scale: 2.4 + i * 0.6 }}
+            transition={{ duration: 0.7 + i * 0.2, ease, delay }}
+            style={{
+              width: 100 + i * 20,
+              height: 100 + i * 20,
+              border: `${1.5 - i * 0.3}px solid ${i === 0 ? GOLD_BRIGHT : accent}`,
+              boxShadow: `0 0 ${20 - i * 4}px ${i === 0 ? GOLD : accent}aa`,
+            }}
+          />
+        ))}
+      </>
+    );
+  }
+
+  // 2 — Faíscas radiais: 12 partículas explodindo em todas as direções
+  if (variant === 2) {
+    return (
+      <>
+        {Array.from({ length: 12 }).map((_, i) => {
+          const deg = i * 30;
+          const rad = (deg * Math.PI) / 180;
+          const dist = 80 + (i % 3) * 18;
+          const isGold = i % 2 === 0;
+          return (
+            <motion.span
+              key={`spark-${pulseKey}-${i}`}
+              aria-hidden
+              className="absolute rounded-full"
+              initial={{ x: 0, y: 0, opacity: 0, scale: 0.5 }}
+              animate={{
+                x: Math.cos(rad) * dist,
+                y: Math.sin(rad) * dist,
+                opacity: [0, 1, 0],
+                scale: [0.5, 1.2, 0.2],
+              }}
+              transition={{ duration: 0.7, ease, delay: 0.02 + i * 0.018 }}
+              style={{
+                left: 0,
+                top: 0,
+                width: 3.5,
+                height: 3.5,
+                background: isGold ? GOLD_BRIGHT : accent,
+                boxShadow: `0 0 8px ${isGold ? GOLD : accent}, 0 0 16px ${isGold ? GOLD : accent}aa`,
+              }}
+            />
+          );
+        })}
+        <motion.span
+          key={`spark-core-${pulseKey}`}
+          aria-hidden
+          className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+          initial={{ opacity: 0.9, scale: 0.2 }}
+          animate={{ opacity: 0, scale: 1.6 }}
+          transition={{ duration: 0.4, ease }}
+          style={{
+            width: 80,
+            height: 80,
+            background: `radial-gradient(circle, ${GOLD_BRIGHT}aa, ${GOLD}55 40%, transparent 70%)`,
+            filter: 'blur(2px)',
+          }}
+        />
+      </>
+    );
+  }
+
+  // 3 — Hexágono rotacional: forma geométrica + glow
+  if (variant === 3) {
+    return (
+      <>
+        <motion.div
+          key={`hex-${pulseKey}`}
+          aria-hidden
+          className="absolute -translate-x-1/2 -translate-y-1/2"
+          initial={{ opacity: 0, scale: 0.3, rotate: 0 }}
+          animate={{ opacity: [0, 1, 0], scale: [0.3, 1.3, 2], rotate: 60 }}
+          transition={{ duration: 0.85, ease }}
+          style={{ width: 110, height: 110 }}
+        >
+          <svg viewBox="0 0 100 100" width="110" height="110">
+            <polygon
+              points="50,5 90,27 90,73 50,95 10,73 10,27"
+              fill="none"
+              stroke={GOLD_BRIGHT}
+              strokeWidth="1.5"
+              style={{ filter: `drop-shadow(0 0 6px ${GOLD}cc)` }}
+            />
+            <polygon
+              points="50,18 78,33 78,67 50,82 22,67 22,33"
+              fill="none"
+              stroke={accent}
+              strokeWidth="0.8"
+              style={{ filter: `drop-shadow(0 0 4px ${accent}aa)` }}
+            />
+          </svg>
+        </motion.div>
+        <motion.div
+          key={`hex-counter-${pulseKey}`}
+          aria-hidden
+          className="absolute -translate-x-1/2 -translate-y-1/2"
+          initial={{ opacity: 0, scale: 0.5, rotate: 0 }}
+          animate={{ opacity: [0, 0.8, 0], scale: 1.6, rotate: -90 }}
+          transition={{ duration: 0.85, ease, delay: 0.05 }}
+          style={{ width: 70, height: 70 }}
+        >
+          <svg viewBox="0 0 100 100" width="70" height="70">
+            <polygon
+              points="50,10 85,30 85,70 50,90 15,70 15,30"
+              fill={`${GOLD}22`}
+              stroke={`${accent}cc`}
+              strokeWidth="1"
+              style={{ filter: `drop-shadow(0 0 5px ${accent}aa)` }}
+            />
+          </svg>
+        </motion.div>
+      </>
+    );
+  }
+
+  // 4 — Raios divergentes: 4 traços diagonais como faíscas elétricas
+  return (
+    <>
+      {[30, 120, 210, 300].map((deg, i) => {
+        const rad = (deg * Math.PI) / 180;
+        return (
+          <motion.span
+            key={`bolt-${pulseKey}-${i}`}
+            aria-hidden
+            className="absolute -translate-x-1/2 -translate-y-1/2"
+            initial={{ opacity: 0, scaleX: 0.1, rotate: deg }}
+            animate={{
+              opacity: [0, 1, 0.7, 0],
+              scaleX: [0.1, 1, 1.2, 1.5],
+            }}
+            transition={{ duration: 0.55, ease, delay: 0.02 + i * 0.04 }}
+            style={{
+              left: Math.cos(rad) * 14,
+              top: Math.sin(rad) * 14,
+              width: 90,
+              height: 1.5,
+              background: `linear-gradient(90deg, ${GOLD_BRIGHT} 0%, ${accent} 60%, transparent 100%)`,
+              boxShadow: `0 0 10px ${GOLD}cc`,
+              transformOrigin: 'left center',
+            }}
+          />
+        );
+      })}
+      <motion.span
+        key={`bolt-core-${pulseKey}`}
+        aria-hidden
+        className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+        initial={{ opacity: 1, scale: 0.2 }}
+        animate={{ opacity: 0, scale: 1.4 }}
+        transition={{ duration: 0.45, ease }}
+        style={{
+          width: 50,
+          height: 50,
+          background: `radial-gradient(circle, ${GOLD_BRIGHT}, ${accent}66 50%, transparent 75%)`,
+          filter: 'blur(1px)',
+        }}
+      />
+      <motion.span
+        key={`bolt-ring-${pulseKey}`}
+        aria-hidden
+        className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+        initial={{ opacity: 0.6, scale: 0.6 }}
+        animate={{ opacity: 0, scale: 2.6 }}
+        transition={{ duration: 0.7, ease, delay: 0.05 }}
+        style={{
+          width: 100,
+          height: 100,
+          border: `1px dashed ${accent}`,
+          boxShadow: `0 0 14px ${accent}aa`,
+        }}
+      />
+    </>
+  );
+}
+
 function MaestroRadialShards({
   accent,
   burstKey,
@@ -307,12 +635,22 @@ export function MaestroOrb({ visible }: Props) {
     () => buildSlots(stage.width, stage.height),
     [stage.width, stage.height],
   );
+  const orbit = useMemo(
+    () => buildOrbitWaypoints(stage.width, stage.height),
+    [stage.width, stage.height],
+  );
 
   const accent = current ? theme.accents[current.accent].base : '#54c1ed';
   const whisper = useMemo(() => (current ? pickWhisper(current) : ''), [current]);
+  // Fase determinística por slide: o orbe começa num ponto diferente da órbita.
+  const orbitRotated = useMemo(() => {
+    if (!current) return orbit;
+    const offset = (hashString(`${trackId}|${current.id}`) + current.index) % orbit.length;
+    return [...orbit.slice(offset), ...orbit.slice(0, offset)];
+  }, [orbit, current, trackId]);
   const slot = useMemo(
-    () => (current ? pickSlot(slotMap, trackId, current) : slotMap['top-center-outer']),
-    [current, slotMap, trackId],
+    () => orbitRotated[0] ?? slotMap['top-center-outer'],
+    [orbitRotated, slotMap],
   );
 
   const placement: 'above' | 'below' = slot.y < stage.height / 2 ? 'below' : 'above';
@@ -342,6 +680,15 @@ export function MaestroOrb({ visible }: Props) {
 
   const [pilgrimage, setPilgrimage] = useState<PilgrimagePhase>('off');
   const [burstKey, setBurstKey] = useState(0);
+
+  // Pulso reativo a cada clique/toque do utilizador (independente de mudar slide).
+  const [pulseKey, setPulseKey] = useState(0);
+  useEffect(() => {
+    if (!visible || reduceMotion) return;
+    const onTap = () => setPulseKey((k) => k + 1);
+    window.addEventListener('pointerdown', onTap, { passive: true });
+    return () => window.removeEventListener('pointerdown', onTap);
+  }, [visible, reduceMotion]);
 
   const stageCenter = useMemo(
     () => ({ x: stage.width * 0.5, y: stage.height * 0.43 }),
@@ -387,7 +734,7 @@ export function MaestroOrb({ visible }: Props) {
   const moveTransition = useMemo(() => {
     if (pilgrimage === 'back') return { duration: 1.18, ease: [0.22, 1, 0.36, 1] as const };
     if (pilgrimage === 'fly') return { duration: 1.08, ease: [0.16, 1, 0.3, 1] as const };
-    return { duration: 1.4, ease: [0.65, 0, 0.35, 1] as const };
+    return { duration: 1.65, ease: [0.16, 1, 0.3, 1] as const };
   }, [pilgrimage]);
 
   const whisperDuringPilgrimage = pilgrimage === 'off';
@@ -449,19 +796,85 @@ export function MaestroOrb({ visible }: Props) {
           </motion.div>
 
           {!reduceMotion && pilgrimage === 'off' && (
-            <motion.span
-              key={`trail-${stepId}`}
-              aria-hidden
-              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
-              initial={{ opacity: 0.6, scale: 0.3 }}
-              animate={{ opacity: 0, scale: 4 }}
-              transition={{ duration: 1.5, ease: 'easeOut' }}
-              style={{
-                width: 120,
-                height: 120,
-                background: `radial-gradient(circle, ${accent}55, transparent 70%)`,
-              }}
-            />
+            <>
+              {/* Onda dourada principal — colapso + expansão suave */}
+              <motion.span
+                key={`arrival-glow-${stepId}`}
+                aria-hidden
+                className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+                initial={{ opacity: 0.85, scale: 0.2 }}
+                animate={{ opacity: 0, scale: 3.6 }}
+                transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                  width: 140,
+                  height: 140,
+                  background: `radial-gradient(circle, ${GOLD}88 0%, ${GOLD}33 40%, transparent 75%)`,
+                  filter: 'blur(2px)',
+                }}
+              />
+              {/* Anel fino accent — assinatura cromática do slide */}
+              <motion.span
+                key={`arrival-ring-${stepId}`}
+                aria-hidden
+                className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+                initial={{ opacity: 0, scale: 0.4 }}
+                animate={{ opacity: [0, 0.9, 0], scale: 2.4 }}
+                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], times: [0, 0.4, 1] }}
+                style={{
+                  width: 160,
+                  height: 160,
+                  border: `1.5px solid ${accent}`,
+                  boxShadow: `0 0 24px ${accent}88, inset 0 0 18px ${accent}55`,
+                }}
+              />
+              {/* Faíscas radiais — 6 partículas correm para fora */}
+              {[0, 60, 120, 180, 240, 300].map((deg, i) => {
+                const rad = (deg * Math.PI) / 180;
+                const dist = 70 + (i % 2) * 18;
+                return (
+                  <motion.span
+                    key={`arrival-spark-${stepId}-${i}`}
+                    aria-hidden
+                    className="absolute rounded-full"
+                    initial={{ x: 0, y: 0, opacity: 0, scale: 0.4 }}
+                    animate={{
+                      x: Math.cos(rad) * dist,
+                      y: Math.sin(rad) * dist,
+                      opacity: [0, 1, 0],
+                      scale: [0.4, 1.1, 0.2],
+                    }}
+                    transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay: 0.05 + i * 0.04 }}
+                    style={{
+                      left: 0,
+                      top: 0,
+                      width: 4,
+                      height: 4,
+                      background: i % 2 === 0 ? GOLD_BRIGHT : accent,
+                      boxShadow: `0 0 10px ${i % 2 === 0 ? GOLD : accent}, 0 0 18px ${i % 2 === 0 ? GOLD : accent}88`,
+                    }}
+                  />
+                );
+              })}
+              {/* Pulso reativo — varia entre 5 estilos a cada clique/toque */}
+              {pulseKey > 0 && (
+                <TapPulse pulseKey={pulseKey} accent={accent} />
+              )}
+              {/* Lens flare horizontal — linha brilhante de assinatura */}
+              <motion.span
+                key={`arrival-flare-${stepId}`}
+                aria-hidden
+                className="absolute -translate-x-1/2 -translate-y-1/2"
+                initial={{ opacity: 0, scaleX: 0.2 }}
+                animate={{ opacity: [0, 0.85, 0], scaleX: 1 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                  width: 180,
+                  height: 1.5,
+                  background: `linear-gradient(90deg, transparent, ${GOLD_BRIGHT}, ${accent}, transparent)`,
+                  boxShadow: `0 0 10px ${GOLD}cc`,
+                }}
+              />
+            </>
           )}
         </motion.div>
       )}
@@ -835,6 +1248,71 @@ function MaestroVisual({
           }
           transition={{ duration: 2.1, repeat: Infinity, ease: 'easeInOut' }}
         />
+
+        {/* Rim light — borda iluminada de um lado (depth) */}
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            inset: 30,
+            background: `radial-gradient(ellipse at 30% 28%, ${GOLD_BRIGHT}66 0%, ${GOLD}22 18%, transparent 38%)`,
+            mixBlendMode: 'screen',
+          }}
+          animate={
+            reduceMotion
+              ? undefined
+              : { opacity: [0.6, 0.9, 0.7, 0.95, 0.6] }
+          }
+          transition={{ duration: 4.4, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        {/* Anel iridescente cromático — assinatura futurista, rotação lenta */}
+        {!reduceMotion && (
+          <motion.div
+            className="absolute rounded-full"
+            style={{
+              inset: 26,
+              background: `conic-gradient(from 0deg, ${accent}00, ${accent}55 18%, ${GOLD_BRIGHT}88 32%, ${accent}55 48%, ${accent}00 64%, ${GOLD}33 82%, ${accent}00 100%)`,
+              maskImage:
+                'radial-gradient(circle, transparent 62%, black 68%, black 78%, transparent 84%)',
+              WebkitMaskImage:
+                'radial-gradient(circle, transparent 62%, black 68%, black 78%, transparent 84%)',
+              filter: 'blur(0.4px)',
+              opacity: 0.85,
+            }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
+          />
+        )}
+
+        {/* Specular highlight — ponto brilhante simulando luz vinda de cima/esquerda */}
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            inset: 48,
+            background: `radial-gradient(ellipse at 28% 25%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.4) 8%, transparent 22%)`,
+            mixBlendMode: 'screen',
+          }}
+          animate={
+            reduceMotion
+              ? undefined
+              : { opacity: [0.75, 1, 0.85, 1, 0.75] }
+          }
+          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        {/* Heat-haze shimmer — distorção sutil que respira */}
+        {!reduceMotion && (
+          <motion.div
+            className="pointer-events-none absolute rounded-full"
+            style={{
+              inset: -20,
+              background: `radial-gradient(circle, transparent 60%, ${accent}10 72%, transparent 86%)`,
+              filter: 'blur(8px)',
+            }}
+            animate={{ scale: [1, 1.04, 0.98, 1.05, 1], opacity: [0.4, 0.7, 0.5, 0.75, 0.4] }}
+            transition={{ duration: 6.2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
 
         {!reduceMotion &&
           [0, 1, 2, 3].map((i) => (
