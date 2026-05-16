@@ -165,10 +165,9 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         ],
         evidenceMetrics: [
           {
-            style: 'bar',
+            style: 'highlight',
             badge: 'Dado · Evidência',
             value: 1,
-            unit: '',
             prefix: 'Prioridade',
             headline:
               'Eficiência operacional e produtividade estão entre as principais prioridades dos executivos de saúde. (Deloitte)',
@@ -240,6 +239,7 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         attentionPhrase:
           'Automatizar um processo ruim não cria eficiência. Apenas escala a ineficiência.',
         body: 'Quatro condições que tornam a IA ineficaz:',
+        bodyAfterTitle: true,
         valueStagesFlat: true,
         valueStagesGridCols: 2,
         valueStagesRevealChunkSize: 2,

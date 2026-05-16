@@ -27,8 +27,14 @@ import {
   Landmark,
   Plus,
   ChevronRight,
+  ArrowRight,
   type LucideIcon,
 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { resolveContactFormUrl } from "@/config/contact";
+
+const FORM_BUTTON_CLASS =
+  "pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full border border-violet-400/35 bg-violet-500/10 px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-violet-200 shadow-[0_18px_48px_-22px_rgba(124,58,237,0.55)] transition-[border-color,background-color,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-violet-400/55 hover:bg-violet-500/18";
 
 const PAIN_POINT_ICONS: Record<string, LucideIcon> = {
   "building-2": Building2,
@@ -46,6 +52,7 @@ import { AnimatedRiskCurve } from "../visuals/AnimatedRiskCurve";
 import { AnimatedNarrativeMetrics } from "../visuals/AnimatedNarrativeMetrics";
 import { KpiCards } from "../visuals/KpiCards";
 import { EvidenceMetricCard } from "../visuals/EvidenceMetricCard";
+import { EvidenceHighlightCard } from "../visuals/EvidenceHighlightCard";
 import { EvidenceGaugeCard } from "../visuals/EvidenceGaugeCard";
 import { EvidenceRangeCard } from "../visuals/EvidenceRangeCard";
 import { RoadStages } from "../visuals/RoadStages";
@@ -273,6 +280,7 @@ export function NarrativeStep({ step, active }: Props) {
   const attentionAccent = step.content.attentionAccent
     ? theme.accents[step.content.attentionAccent]
     : accent;
+  const formUrl = resolveContactFormUrl();
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
   const trackId = useContext(FloatingCardContext)?.trackId;
@@ -1074,6 +1082,26 @@ export function NarrativeStep({ step, active }: Props) {
       </EraRevealBand>
     );
 
+  const bodyBand =
+    step.content.body && !painPoints ? (
+      <EraRevealBand
+        bandId="body"
+        bandIndex={b("body")}
+        stepId={step.id}
+        stepIndex={step.index}
+        eraStaging={eraStaging}
+        active={active}
+        className="flex w-full justify-center"
+      >
+        <motion.p
+          {...innerMotion}
+          className="presentation-ppt-body mx-auto w-full max-w-prose whitespace-pre-line text-center text-slate-100/95"
+        >
+          {step.content.body}
+        </motion.p>
+      </EraRevealBand>
+    ) : null;
+
   return (
     <FloatingCard
       accent={step.accent}
@@ -1131,6 +1159,8 @@ export function NarrativeStep({ step, active }: Props) {
         animate={active ? "visible" : "hidden"}
       >
         {!centerTitleAndStagesPanel && titleBand}
+
+        {step.content.bodyAfterTitle && bodyBand}
 
         {step.content.metrics && step.content.metrics.length > 0 && (
           <EraRevealBand
@@ -1296,6 +1326,21 @@ export function NarrativeStep({ step, active }: Props) {
             >
               <motion.div {...innerMotion} className="space-y-3">
                 {step.content.evidenceMetrics.map((m, i) => {
+                  if (m.style === "highlight") {
+                    return (
+                      <EvidenceHighlightCard
+                        key={`${m.value}-${m.prefix ?? ""}-${i}`}
+                        badge={m.badge}
+                        prefix={m.prefix}
+                        value={m.value}
+                        headline={m.headline}
+                        context={m.context}
+                        accentColor={accent.base}
+                        active={active}
+                        delay={i * 0.45}
+                      />
+                    );
+                  }
                   if (m.style === "range") {
                     return (
                       <EvidenceRangeCard
@@ -1376,24 +1421,7 @@ export function NarrativeStep({ step, active }: Props) {
           </div>
         )}
 
-        {step.content.body && !painPoints && (
-          <EraRevealBand
-            bandId="body"
-            bandIndex={b("body")}
-            stepId={step.id}
-            stepIndex={step.index}
-            eraStaging={eraStaging}
-            active={active}
-            className="flex w-full justify-center"
-          >
-            <motion.p
-              {...innerMotion}
-              className="presentation-ppt-body mx-auto w-full max-w-prose whitespace-pre-line text-center text-slate-100/95"
-            >
-              {step.content.body}
-            </motion.p>
-          </EraRevealBand>
-        )}
+        {!step.content.bodyAfterTitle && bodyBand}
 
         {step.content.bullets &&
           step.content.bullets.length > 0 &&
@@ -1895,6 +1923,48 @@ export function NarrativeStep({ step, active }: Props) {
               >
                 {step.content.closingQuestion}
               </p>
+            </motion.div>
+          </EraRevealBand>
+        )}
+
+        {step.content.closingQuestion && (
+          <EraRevealBand
+            bandId="contactCta"
+            bandIndex={b("contactCta")}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+            className="flex w-full justify-center"
+          >
+            <motion.div
+              {...innerMotion}
+              data-no-click-advance
+              className="mt-2 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
+            >
+              {formUrl.startsWith("http") || formUrl.startsWith("mailto:") ? (
+                <a
+                  data-no-click-advance
+                  href={formUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className={FORM_BUTTON_CLASS}
+                >
+                  Ir para o formulário
+                  <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+                </a>
+              ) : (
+                <Link
+                  data-no-click-advance
+                  to={formUrl}
+                  onClick={(e) => e.stopPropagation()}
+                  className={FORM_BUTTON_CLASS}
+                >
+                  Ir para o formulário
+                  <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+                </Link>
+              )}
             </motion.div>
           </EraRevealBand>
         )}

@@ -215,6 +215,8 @@ export interface StepContent {
   lead?: string;
   /** Revela cada parágrafo do `lead` por clique (separados por linha em branco). */
   leadByParagraph?: boolean;
+  /** Exibe `body` logo abaixo do título (antes de etapas e métricas). */
+  bodyAfterTitle?: boolean;
   /** Etapas numeradas em grid (4 colunas) — usadas em "ruptura acumulada". */
   valueStages?: ValueStage[];
   /** Texto curto exibido logo acima da grid de etapas (lead). */
@@ -239,8 +241,8 @@ export interface StepContent {
     headline: string;
     /** Parágrafo em itálico (contexto/explicação). */
     context?: string;
-    /** Estilo visual do número: 'bar' (default) | 'gauge' | 'range'. */
-    style?: "bar" | "gauge" | "range";
+    /** Estilo visual: 'bar' | 'gauge' | 'range' | 'highlight' (rótulo em destaque, sem gráfico). */
+    style?: "bar" | "gauge" | "range" | "highlight";
     /** Valor final do intervalo (apenas para style='range'). Quando definido, exibe "value a rangeEnd". */
     rangeEnd?: number;
     /** Rótulo curto após o número (ex.: "meses"). */

@@ -41,6 +41,7 @@ export function buildNarrativeBandKeys(
   }
 
   const keys: string[] = ['title'];
+  if (content.body && !painPoints && content.bodyAfterTitle) keys.push('body');
   if (content.metrics && content.metrics.length > 0) keys.push('metrics');
   if (content.lead) {
     if (content.leadByParagraph) {
@@ -67,7 +68,7 @@ export function buildNarrativeBandKeys(
     keys.push('dualStagesPositive');
     keys.push('dualStagesNegative');
   }
-  if (content.body && !painPoints) keys.push('body');
+  if (content.body && !painPoints && !content.bodyAfterTitle) keys.push('body');
   if (
     content.bullets &&
     content.bullets.length > 0 &&
@@ -110,7 +111,10 @@ export function buildNarrativeBandKeys(
   if (content.highlightPhrases && content.highlightPhrases.length > 0) keys.push('highlightPhrases');
   if (content.evidenceCard) keys.push('evidenceCard');
   if (content.closingHighlight) keys.push('closingHighlight');
-  if (content.closingQuestion) keys.push('closingQuestion');
+  if (content.closingQuestion) {
+    keys.push('closingQuestion');
+    keys.push('contactCta');
+  }
   if (content.visual?.type === 'risk-curve') keys.push('riskCurve');
   return keys;
 }
