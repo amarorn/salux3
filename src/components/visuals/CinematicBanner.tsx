@@ -68,8 +68,8 @@ export function CinematicBanner({
   if (transparentCutout) {
     return (
       <>
-        <div className="absolute inset-0 bg-[#05070d]" aria-hidden />
-        <div className="absolute inset-0 flex items-center justify-center p-3">
+        <motion.div className="absolute inset-0 bg-[#05070d]" aria-hidden />
+        <motion.div className="absolute inset-0 flex items-center justify-center p-3">
           <img
             src={src}
             alt={alt ?? ""}
@@ -77,7 +77,7 @@ export function CinematicBanner({
             className="max-h-full max-w-full object-contain object-center"
             style={matteImgStyle}
           />
-        </div>
+        </motion.div>
       </>
     );
   }
