@@ -201,6 +201,8 @@ export interface StepContent {
   hideValueFlow?: boolean;
   /** Faixa de foto superior sem moldura (sem borda, sombra nem cantos arredondados). */
   bannerUnframed?: boolean;
+  /** Altura Tailwind do banner (ex.: `h-[300px]`). */
+  bannerHeightClass?: string;
   /** Esconde o arco SVG decorativo no fundo do painel de conteúdo do `FloatingCard`. */
   hideFloatingWatermarkSvg?: boolean;
   /** Vídeo no banner do card (substitui a foto lateral). */

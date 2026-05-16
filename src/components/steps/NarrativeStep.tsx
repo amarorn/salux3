@@ -1085,12 +1085,15 @@ export function NarrativeStep({ step, active }: Props) {
       hideValueFlow={true}
       bannerUnframed={Boolean(step.content.bannerUnframed)}
       hideWatermarkSvg={Boolean(step.content.hideFloatingWatermarkSvg)}
-      bannerEraStaging={eraStaging}
+      bannerEraStaging={
+        eraStaging && !step.content.heroImage?.transparentCutout
+      }
       stepIndex={step.index}
       bannerNewsUrls={step.content.bannerNewsUrls}
       onBannerNewsExpand={handleExpandImage}
       bannerHeightClass={
-        step.content.valueStagesRevealSequentialCards ? "h-[300px]" : undefined
+        step.content.bannerHeightClass ??
+        (step.content.valueStagesRevealSequentialCards ? "h-[300px]" : undefined)
       }
       width={
         painPoints

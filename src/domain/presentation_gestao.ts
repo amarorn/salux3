@@ -8,6 +8,8 @@ import gestaoSlide3FilaRede from '@/assets/presentation/gestao-slide3-fila-rede.
 import gestaoSlide4Comando from '@/assets/presentation/gestao-slide4-comando.png?url';
 import gestaoSemTituloPosterUrl from '@/assets/intro/gestao-sem-titulo-poster.jpg?url';
 import gestao8PosterUrl from '@/assets/intro/gestao-8-poster.jpg?url';
+import gestaoSlide10BoardroomUrl from '@/assets/presentation/gestao-slide10-boardroom.png?url';
+import gestaoSlide9ResultadoUrl from '@/assets/presentation/gestao-slide9-resultado.png?url';
 
 export const presentationGestaoMeta = {
   title: 'Gestão da operação em saúde',
@@ -395,7 +397,10 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
       content: {
         headline: 'Sua rede está sendo coordenada como sistema — ou administrada por partes?',
         cardVisual: 'shield',
-        omitSidePhoto: true,
+        heroImage: {
+          src: gestaoSlide10BoardroomUrl,
+          alt: 'Equipe de gestão analisando painéis de dados em sala de comando',
+        },
         body:
           'A nova fase da saúde pública não será definida por quem digitalizou mais processos.\nSerá definida por quem conseguir coordenar informação, capacidade instalada, regulação e cuidado em uma lógica única de execução.',
         attentionPhrase:
@@ -435,6 +440,14 @@ const gestaoResultsStep: PresentationStep = {
   content: {
     headline: 'Resultado',
     cardVisual: 'bridge',
+    heroImage: {
+      src: gestaoSlide9ResultadoUrl,
+      alt: 'Rede desorganizada transformada em operação coordenada com hospital no centro',
+      transparentCutout: true,
+    },
+    bannerUnframed: true,
+    bannerHeightClass: 'h-[300px]',
+    hideFloatingWatermarkSvg: true,
     valueStagesLead:
       'Com uma base coordenada, a rede deixa de depender apenas de esforço contínuo de compensação.',
     valueStagesFlat: true,

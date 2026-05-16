@@ -107,6 +107,8 @@ export function ClosingStep({ step, active }: Props) {
     clearEra,
   ]);
 
+  const hero = step.content.heroImage;
+
   return (
     <FloatingCard
       accent={step.accent}
@@ -116,6 +118,10 @@ export function ClosingStep({ step, active }: Props) {
       cardVisual={step.content.cardVisual}
       hideValueFlow={true}
       bannerUnframed
+      sidePhotoSrc={hero?.src}
+      sidePhotoAlt={hero?.alt}
+      bannerTransparentCutout={Boolean(hero?.transparentCutout)}
+      bannerLightenBlackMatte={Boolean(hero?.lightenBlackMatte)}
     >
       <motion.div
         className="flex flex-col gap-6"
