@@ -1,18 +1,54 @@
 import type { StepContent } from '@/domain/types';
 
+/** Divide um lead em parágrafos por linha em branco ou quebra simples. */
+export function splitLeadParagraphs(lead: string): string[] {
+  return lead
+    .split(/\n\s*\n|\n/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
+}
+
 /** Ordem alinhada com `NarrativeStep` (de cima para baixo). */
 export function buildNarrativeBandKeys(
   content: StepContent,
   painPoints: boolean,
   useBalloon: boolean,
 ): string[] {
+  const exclusiveCards =
+    Boolean(content.valueStagesRevealSequentialCards) &&
+    Boolean(content.valueStages?.length) &&
+    !content.valueStagesRoad &&
+    typeof content.valueStagesRevealChunkSize === 'number' &&
+    content.valueStagesRevealChunkSize > 0;
+
+  if (exclusiveCards && content.valueStages?.length) {
+    const chunk = content.valueStagesRevealChunkSize!;
+    const n = Math.ceil(content.valueStages.length / chunk);
+    const keys: string[] = [];
+    if (content.valueStagesRevealFirstOnClick) {
+      keys.push('valueStagesCardRow');
+    }
+    for (let i = 0; i < n; i++) keys.push(`valueStagesChunk${i}`);
+    if (content.attentionPhrase) keys.push('attention');
+    return keys;
+  }
+
   const keys: string[] = ['title'];
   if (content.metrics && content.metrics.length > 0) keys.push('metrics');
-  if (content.lead) keys.push('lead');
+  if (content.lead) {
+    if (content.leadByParagraph) {
+      const paragraphs = splitLeadParagraphs(content.lead);
+      paragraphs.forEach((_, i) => keys.push(`lead${i}`));
+    } else {
+      keys.push('lead');
+    }
+  }
   if (content.contrastPair) keys.push('contrastPair');
   if (content.valueStages && content.valueStages.length > 0) {
     const chunk = content.valueStagesRevealChunkSize;
-    if (typeof chunk === 'number' && chunk > 0) {
+    if (content.valueStagesRoad) {
+      content.valueStages.forEach((_, i) => keys.push(`roadStage${i}`));
+    } else if (typeof chunk === 'number' && chunk > 0) {
       const n = Math.ceil(content.valueStages.length / chunk);
       for (let i = 0; i < n; i++) keys.push(`valueStagesChunk${i}`);
     } else {

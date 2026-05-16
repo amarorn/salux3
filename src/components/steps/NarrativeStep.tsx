@@ -6,6 +6,7 @@ import {
   useMemo,
   useRef,
   useState,
+  Fragment,
   type RefObject,
   type ReactNode,
   type CSSProperties,
@@ -25,6 +26,7 @@ import {
   TrendingDown,
   Landmark,
   Plus,
+  ChevronRight,
   type LucideIcon,
 } from "lucide-react";
 
@@ -38,7 +40,7 @@ const PAIN_POINT_ICONS: Record<string, LucideIcon> = {
   plus: Plus,
 };
 import { FloatingCard, FloatingCardContext } from "../FloatingCard";
-import type { PresentationStep } from "@/domain/types";
+import type { Accent, PresentationStep } from "@/domain/types";
 import { theme } from "@/domain/theme";
 import { AnimatedRiskCurve } from "../visuals/AnimatedRiskCurve";
 import { AnimatedNarrativeMetrics } from "../visuals/AnimatedNarrativeMetrics";
@@ -46,6 +48,7 @@ import { KpiCards } from "../visuals/KpiCards";
 import { EvidenceMetricCard } from "../visuals/EvidenceMetricCard";
 import { EvidenceGaugeCard } from "../visuals/EvidenceGaugeCard";
 import { EvidenceRangeCard } from "../visuals/EvidenceRangeCard";
+import { RoadStages } from "../visuals/RoadStages";
 import { getCardTextVariants } from "./cardTextMotion";
 import {
   ClosingHighlight,
@@ -54,13 +57,48 @@ import {
 } from "./HighlightBlocks";
 import { usePresentationStore } from "@/store/presentationStore";
 import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
-import { buildNarrativeBandKeys } from "@/lib/eraAgenticaRevealBands";
+import { buildNarrativeBandKeys, splitLeadParagraphs } from "@/lib/eraAgenticaRevealBands";
 import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
 import { ExpandedCardPortal, renderExpandedCardPrefixContent } from "./ExpandedCardPortal";
 import {
   glassPanelStyle,
-  glassPanelStyleEmphasis,
 } from "@/lib/glassPanelStyle";
+
+function accentPaletteForValueStage(
+  stepAccent: Accent,
+  stage: { accent?: Accent },
+) {
+  const key = stage.accent ?? stepAccent;
+  return theme.accents[key];
+}
+
+function accentHexToRgbTuple(hex: string): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return "71,85,105";
+  const n = parseInt(m[1], 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return `${r},${g},${b}`;
+}
+
+/** Fundo e borda do vidro seguem o acento do cartão (não só o texto). */
+function valueStageCardGlassStyle(
+  accentHex: string,
+  emphasis: boolean,
+): CSSProperties {
+  const rgb = accentHexToRgbTuple(accentHex);
+  const baseA = emphasis ? 0.24 : 0.16;
+  const washA = emphasis ? 0.06 : 0.036;
+  const edgeA = emphasis ? 0.55 : 0.38;
+  return {
+    borderColor: emphasis ? `${accentHex}aa` : `rgba(${rgb},${edgeA})`,
+    background: `linear-gradient(135deg, rgba(${rgb},${baseA}) 0%, rgba(255,255,255,${washA}) 72%)`,
+    boxShadow: emphasis
+      ? `inset 0 1px 0 rgba(255,255,255,0.11), 0 0 0 1px ${accentHex}55`
+      : `inset 0 1px 0 rgba(255,255,255,0.06)`,
+  };
+}
 
 interface Props {
   step: PresentationStep;
@@ -204,6 +242,32 @@ function valueStageOrphanGridPlacement(
   return { gridColumn: `${col} / ${col + 1}` };
 }
 
+/** Seta entre cartões da grelha evolutiva (trilha em linha). */
+function ValueStageRowArrow({
+  accentColor,
+  emphasized,
+}: {
+  accentColor: string;
+  emphasized: boolean;
+}) {
+  return (
+    <div
+      className="pointer-events-none flex h-[5.5rem] shrink-0 items-center justify-center px-0.5 sm:px-1"
+      aria-hidden
+    >
+      <ChevronRight
+        className="h-5 w-5 shrink-0 transition-[opacity,filter] duration-300 sm:h-6 sm:w-6"
+        strokeWidth={2.25}
+        style={{
+          color: accentColor,
+          opacity: emphasized ? 0.92 : 0.2,
+          filter: emphasized ? `drop-shadow(0 0 10px ${accentColor}55)` : undefined,
+        }}
+      />
+    </div>
+  );
+}
+
 export function NarrativeStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const reduceMotion = useReducedMotion();
@@ -248,6 +312,9 @@ export function NarrativeStep({ step, active }: Props) {
   const b = (id: string) => bandKeys.indexOf(id);
   const setEraCfg = usePresentationStore((s) => s.setEraStagedRevealConfig);
   const clearEra = usePresentationStore((s) => s.clearEraStagedReveal);
+  const eraStagedRevealPhase = usePresentationStore((s) =>
+    s.eraStagedRevealStepId === step.id ? s.eraStagedRevealPhase : -1,
+  );
   const stagingLayout = Boolean(active && eraStaging && !reduceMotion);
   const innerMotion = stagingLayout ? {} : { variants: item };
   const outerContainer: Variants = stagingLayout
@@ -257,7 +324,14 @@ export function NarrativeStep({ step, active }: Props) {
   useLayoutEffect(() => {
     if (!active || !eraStaging) return;
     if (reduceMotion) {
-      setEraCfg(step.id, 1);
+      if (
+        step.content.valueStagesRevealSequentialCards &&
+        step.content.valueStagesRevealOneAtATime
+      ) {
+        setEraCfg(step.id, bandKeys.length, bandKeys.length - 1);
+      } else {
+        setEraCfg(step.id, 1);
+      }
       return () => {
         if (usePresentationStore.getState().eraStagedRevealStepId === step.id)
           clearEra();
@@ -274,6 +348,8 @@ export function NarrativeStep({ step, active }: Props) {
     reduceMotion,
     step.id,
     bandKeys.length,
+    step.content.valueStagesRevealSequentialCards,
+    step.content.valueStagesRevealOneAtATime,
     setEraCfg,
     clearEra,
   ]);
@@ -287,7 +363,8 @@ export function NarrativeStep({ step, active }: Props) {
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const stageRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const stageRefs = useRef<(HTMLElement | null)[]>([]);
+  const roadStageRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const expandImage = Boolean(step.content.newsUrls?.length);
 
   // Fecha o balão e reseta o tracer quando o slide deixa de estar ativo
@@ -369,6 +446,7 @@ export function NarrativeStep({ step, active }: Props) {
   const renderValueStagesSection = (): ReactNode => {
     const vs = step.content.valueStages;
     if (!vs?.length) return null;
+    const valueStagesClickable = step.content.valueStagesClickable !== false;
     const chunks = valueStagesChunks;
     const revealChunk = step.content.valueStagesRevealChunkSize ?? 1;
 
@@ -385,23 +463,61 @@ export function NarrativeStep({ step, active }: Props) {
     const expandedPortal = (
       <AnimatePresence>
         {active &&
+          valueStagesClickable &&
           valueStageSpotlight !== null &&
           vs[valueStageSpotlight] !== undefined && (
             <ExpandedCardPortal
               key={`stage-expanded-${valueStageSpotlight}`}
               text={vs[valueStageSpotlight]!.label}
-              accentColor={accent.base}
+              accentColor={
+                accentPaletteForValueStage(
+                  step.accent,
+                  vs[valueStageSpotlight]!,
+                ).base
+              }
               reducedMotion={Boolean(reduceMotion)}
-              origin={stageRefs.current[valueStageSpotlight] ?? null}
+              origin={
+                (step.content.valueStagesRoad
+                  ? roadStageRefs.current[valueStageSpotlight]
+                  : stageRefs.current[valueStageSpotlight]) ?? null
+              }
               onClose={() => setValueStageSpotlight(null)}
               prefix={vs[valueStageSpotlight]!.number}
               description={
                 vs[valueStageSpotlight]!.description || undefined
               }
+              imageSrc={vs[valueStageSpotlight]?.mediaUrl}
+              imageAlt={vs[valueStageSpotlight]?.label}
             />
           )}
       </AnimatePresence>
     );
+
+    if (step.content.valueStagesRoad) {
+      return (
+        <>
+          <div className="relative flex w-full flex-col items-center gap-3">
+            {valueStagesLeadBlock}
+            <RoadStages
+              stages={vs}
+              accentColor={accent.base}
+              stepId={step.id}
+              stepIndex={step.index}
+              active={active}
+              bandIndexFor={b}
+              spotlightIndex={valueStageSpotlight}
+              onStageToggle={(i: number) => {
+                setValueStageSpotlight((s) => (s === i ? null : i));
+              }}
+              setStageButtonRef={(i: number, el: HTMLButtonElement | null) => {
+                roadStageRefs.current[i] = el;
+              }}
+            />
+          </div>
+          {expandedPortal}
+        </>
+      );
+    }
 
     const renderStageButton = (
       stage: (typeof vs)[number],
@@ -412,8 +528,13 @@ export function NarrativeStep({ step, active }: Props) {
       bandSize: number,
       indexInBand: number,
     ) => {
-      const dimmed = valueStageSpotlight !== null && valueStageSpotlight !== i;
-      const focused = valueStageSpotlight === i;
+      const stagePal = accentPaletteForValueStage(step.accent, stage);
+      const dimmed =
+        valueStagesClickable &&
+        valueStageSpotlight !== null &&
+        valueStageSpotlight !== i;
+      const focused =
+        valueStagesClickable && valueStageSpotlight === i;
       const enterDelay =
         active && valueStageSpotlight === null
           ? chunked
@@ -425,90 +546,65 @@ export function NarrativeStep({ step, active }: Props) {
         bandSize,
         indexInBand,
       );
-      return (
-        <motion.button
-          ref={(el) => {
-            stageRefs.current[i] = el;
-          }}
-          key={`${stage.number}-${stage.label}-${i}`}
-          type="button"
-          data-no-click-advance
-          disabled={!active}
-          aria-expanded={focused}
-          aria-label={`Ampliar: ${stage.label}`}
-          className="relative flex h-full min-h-[5.5rem] w-full cursor-pointer flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-center outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45 disabled:cursor-default disabled:opacity-40"
-          style={{
-            zIndex: focused ? 2 : 1,
-            ...(focused
-              ? glassPanelStyleEmphasis(accent.base)
-              : glassPanelStyle(accent.base)),
-            ...orphanPlacement,
-          }}
-          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-          animate={
-            !active
-              ? reduceMotion
-                ? undefined
-                : { opacity: 0, y: 12 }
-              : dimmed
-                ? {
-                    opacity: 0.35,
-                    scale: 0.97,
-                    transition: {
-                      duration: 0.32,
-                      ease: [0.22, 1, 0.36, 1],
-                    },
-                  }
-                : {
-                    opacity: 1,
-                    scale: 1,
-                    y: 0,
-                    transition: {
-                      duration: 0.55,
-                      ease: [0.22, 1, 0.36, 1],
-                      delay: enterDelay,
-                    },
-                  }
-          }
-          whileHover={
-            reduceMotion || !active || valueStageSpotlight !== null
-              ? undefined
-              : {
-                  y: -2,
-                  scale: 1.02,
-                  transition: {
-                    duration: 0.25,
-                    ease: [0.22, 1, 0.36, 1],
-                  },
-                }
-          }
-          whileTap={reduceMotion || !active ? undefined : { scale: 0.96 }}
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!active) return;
-            setValueStageSpotlight((s) => (s === i ? null : i));
-          }}
-        >
+      const shellClass =
+        "relative flex h-full min-h-[5.5rem] w-full flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-center text-slate-100/90 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out";
+      const focusRingClass = valueStagesClickable
+        ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45 disabled:cursor-default disabled:opacity-40"
+        : "cursor-default";
+
+      const inner = (
+        <>
           <span
             aria-hidden
             className="pointer-events-none absolute inset-x-3 -top-px h-px"
             style={{
-              background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)`,
+              background: `linear-gradient(90deg, transparent, ${stagePal.base}, transparent)`,
             }}
           />
           <div className="flex items-baseline justify-center gap-1.5 text-center">
-            <span
-              className="font-display text-[1.03rem] font-bold tabular-nums"
-              style={{
-                color: accent.base,
-              }}
+            <motion.span
+              className="font-display inline-block text-[1.03rem] font-bold tabular-nums"
+              style={{ color: stagePal.base }}
+              initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+              animate={
+                !active
+                  ? reduceMotion
+                    ? { opacity: 0 }
+                    : { opacity: 0, y: 10 }
+                  : dimmed
+                    ? {
+                        opacity: 0.52,
+                        y: 0,
+                        transition: {
+                          duration: 0.28,
+                          ease: [0.22, 1, 0.36, 1],
+                        },
+                      }
+                    : reduceMotion
+                      ? {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.38,
+                            delay: enterDelay + 0.06,
+                            ease: [0.22, 1, 0.36, 1],
+                          },
+                        }
+                      : {
+                          opacity: 1,
+                          y: 0,
+                          transition: {
+                            duration: 0.42,
+                            delay: enterDelay + 0.07,
+                            ease: [0.22, 1, 0.36, 1],
+                          },
+                        }
+              }
             >
               {stage.number}
-            </span>
+            </motion.span>
             <span
               className="text-[11px] font-semibold uppercase tracking-[0.22em]"
-              style={{ color: accent.base, opacity: 0.9 }}
+              style={{ color: stagePal.base, opacity: 0.9 }}
             >
               {stage.label}
             </span>
@@ -523,14 +619,295 @@ export function NarrativeStep({ step, active }: Props) {
               {stage.mediaUrl && <>(Vídeo)</>}
             </p>
           )}
-          <span className="mt-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
-            Clique para ampliar
-          </span>
+          {valueStagesClickable ? (
+            <span
+              className="mt-2 block text-[10px] font-semibold uppercase tracking-[0.2em]"
+              style={{ color: stagePal.base, opacity: 0.42 }}
+            >
+              Clique para ampliar
+            </span>
+          ) : null}
+        </>
+      );
+
+      if (!valueStagesClickable) {
+        return (
+          <motion.div
+            key={`${stage.number}-${stage.label}-${i}`}
+            data-no-click-advance
+            onPointerDown={(e) => e.stopPropagation()}
+            className={`${shellClass} ${focusRingClass}`}
+            style={{
+              zIndex: 1,
+              ...valueStageCardGlassStyle(stagePal.base, false),
+              ...orphanPlacement,
+            }}
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={
+              !active
+                ? reduceMotion
+                  ? undefined
+                  : { opacity: 0, y: 12 }
+                : {
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      duration: 0.55,
+                      ease: [0.22, 1, 0.36, 1],
+                      delay: enterDelay,
+                    },
+                  }
+            }
+          >
+            {inner}
+          </motion.div>
+        );
+      }
+
+      return (
+        <motion.button
+          ref={(el) => {
+            stageRefs.current[i] = el;
+          }}
+          key={`${stage.number}-${stage.label}-${i}`}
+          type="button"
+          data-no-click-advance
+          disabled={!active}
+          aria-expanded={focused}
+          aria-label={`Ampliar: ${stage.label}`}
+          className={`${shellClass} ${focusRingClass}`}
+          style={{
+            zIndex: focused ? 2 : 1,
+            ...valueStageCardGlassStyle(stagePal.base, focused),
+            ...orphanPlacement,
+          }}
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={
+            !active
+              ? reduceMotion
+                ? undefined
+                : { opacity: 0, y: 12 }
+              : dimmed
+                ? {
+                    opacity: 0.35,
+                    transition: {
+                      duration: 0.32,
+                      ease: [0.22, 1, 0.36, 1],
+                    },
+                  }
+                : {
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      duration: 0.55,
+                      ease: [0.22, 1, 0.36, 1],
+                      delay: enterDelay,
+                    },
+                  }
+          }
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!active) return;
+            setValueStageSpotlight((s) => (s === i ? null : i));
+          }}
+        >
+          {inner}
         </motion.button>
       );
     };
 
     if (chunks) {
+      if (step.content.valueStagesRevealSequentialCards) {
+        const cols = valueStagesColCount(
+          vs.length,
+          step.content.valueStagesGridCols,
+        );
+        const oneAtATime = Boolean(step.content.valueStagesRevealOneAtATime);
+        const firstCardDelayed = Boolean(
+          step.content.valueStagesRevealFirstOnClick,
+        );
+
+        if (oneAtATime) {
+          const phaseStart = firstCardDelayed ? 1 : 0;
+          const nCards = vs.length;
+          const visibleCardIndex = (() => {
+            if (eraStagedRevealPhase < phaseStart) return null;
+            const idx = eraStagedRevealPhase - phaseStart;
+            if (idx < nCards) return idx;
+            // Fases depois do último cartão (ex.: atenção): não deixar a faixa vazia
+            return nCards - 1;
+          })();
+          if (reduceMotion) {
+            return (
+              <>
+                <div className="relative flex w-full flex-col items-center space-y-3 overflow-visible py-1">
+                  {valueStagesLeadBlock}
+                  <motion.div
+                    {...innerMotion}
+                    className="flex w-full flex-col items-center space-y-3"
+                  >
+                    <div className="flex w-full shrink-0 flex-wrap justify-center gap-2 px-1">
+                      {vs.map((stage, i) => (
+                        <div
+                          key={`${stage.number}-${stage.label}-${i}-rm`}
+                          className="flex min-w-[10rem] max-w-[11rem] justify-center"
+                        >
+                          {renderStageButton(
+                            stage,
+                            i,
+                            i,
+                            true,
+                            cols,
+                            nCards,
+                            i,
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
+                {expandedPortal}
+              </>
+            );
+          }
+          return (
+            <>
+              <div className="relative flex w-full flex-col items-center space-y-3 overflow-visible py-1">
+                {valueStagesLeadBlock}
+                <motion.div
+                  {...innerMotion}
+                  className="flex w-full flex-col items-center space-y-3"
+                >
+                  {firstCardDelayed ? (
+                    <EraRevealBand
+                      reveal="single"
+                      bandId="valueStagesCardRow"
+                      bandIndex={b("valueStagesCardRow")}
+                      stepId={step.id}
+                      stepIndex={step.index}
+                      eraStaging={eraStaging}
+                      active={active}
+                      className="pointer-events-none absolute left-0 top-0 h-0 w-0 overflow-hidden opacity-0"
+                    >
+                      <span aria-hidden className="block h-0 w-0" />
+                    </EraRevealBand>
+                  ) : null}
+                  <div className="flex min-h-[5.75rem] w-full shrink-0 justify-center px-1">
+                    <AnimatePresence mode="wait" initial={false}>
+                      {visibleCardIndex !== null &&
+                        vs[visibleCardIndex] !== undefined && (
+                          <motion.div
+                            key={visibleCardIndex}
+                            className="flex w-full min-w-[10rem] max-w-[11rem] justify-center"
+                            initial={
+                              reduceMotion ? false : { opacity: 0, x: 16 }
+                            }
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={
+                              reduceMotion
+                                ? { opacity: 0 }
+                                : { opacity: 0, x: -16 }
+                            }
+                            transition={{
+                              duration: 0.28,
+                              ease: [0.22, 1, 0.36, 1],
+                            }}
+                          >
+                            {renderStageButton(
+                              vs[visibleCardIndex]!,
+                              visibleCardIndex,
+                              visibleCardIndex,
+                              true,
+                              cols,
+                              nCards,
+                              visibleCardIndex,
+                            )}
+                          </motion.div>
+                        )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              </div>
+              {expandedPortal}
+            </>
+          );
+        }
+
+        const phaseOffset = firstCardDelayed ? 1 : 0;
+        const arrowLit = (afterIndex: number) =>
+          !active ||
+          Boolean(reduceMotion) ||
+          eraStagedRevealPhase >= afterIndex + phaseOffset;
+        return (
+          <>
+            <div className="relative flex w-full flex-col items-center space-y-3 overflow-visible py-1">
+              {valueStagesLeadBlock}
+              <motion.div
+                {...innerMotion}
+                className="flex w-full flex-col items-center space-y-3"
+              >
+                {firstCardDelayed && (
+                  <EraRevealBand
+                    bandId="valueStagesCardRow"
+                    bandIndex={b("valueStagesCardRow")}
+                    stepId={step.id}
+                    stepIndex={step.index}
+                    eraStaging={eraStaging}
+                    active={active}
+                    className="pointer-events-none absolute left-0 top-0 h-0 w-0 overflow-hidden opacity-0"
+                  >
+                    <span aria-hidden className="block h-0 w-0" />
+                  </EraRevealBand>
+                )}
+                <div className="flex w-full shrink-0 justify-center px-1">
+                  <motion.div
+                    data-no-click-advance
+                    className="relative isolate z-10 flex w-max max-w-full flex-row flex-wrap items-center justify-center gap-y-2"
+                    onPointerDown={(e) => e.stopPropagation()}
+                  >
+                    {vs.map((stage, i) => (
+                      <Fragment key={`${stage.number}-${stage.label}-${i}-row`}>
+                        {i > 0 ? (
+                          <ValueStageRowArrow
+                            accentColor={accent.base}
+                            emphasized={arrowLit(i)}
+                          />
+                        ) : null}
+                        <div
+                          className="flex min-w-[10rem] max-w-[11rem] flex-[0_0_auto] justify-center"
+                        >
+                          <EraRevealBand
+                            bandId={`valueStagesChunk${i}`}
+                            bandIndex={b(`valueStagesChunk${i}`)}
+                            stepId={step.id}
+                            stepIndex={step.index}
+                            eraStaging={eraStaging}
+                            active={active}
+                            className="w-full"
+                          >
+                            {renderStageButton(
+                              stage,
+                              i,
+                              i,
+                              true,
+                              cols,
+                              vs.length,
+                              i,
+                            )}
+                          </EraRevealBand>
+                        </div>
+                      </Fragment>
+                    ))}
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+            {expandedPortal}
+          </>
+        );
+      }
+
       return (
         <>
           {chunks.map((slice, gi) => (
@@ -544,41 +921,43 @@ export function NarrativeStep({ step, active }: Props) {
               active={active}
               className="flex w-full justify-center"
             >
-              <motion.div
-                {...innerMotion}
-                className="relative flex w-full flex-col items-center space-y-3 overflow-visible py-1"
-              >
+              <div className="flex w-full flex-col items-center space-y-3 overflow-visible py-1">
                 {gi === 0 ? valueStagesLeadBlock : null}
-                <div className="flex w-full shrink-0 justify-center px-1">
-                  <motion.div
-                    data-no-click-advance
-                    className="relative isolate z-10 grid w-max max-w-full auto-rows-fr justify-items-stretch gap-2.5"
-                    style={{
-                      gridTemplateColumns: valueStagesGridColumns(
-                        slice.length,
-                        step.content.valueStagesGridCols,
-                      ),
-                    }}
-                    onPointerDown={(e) => e.stopPropagation()}
-                  >
-                    {slice.map((stage, ji) => {
-                      const cols = valueStagesColCount(
-                        slice.length,
-                        step.content.valueStagesGridCols,
-                      );
-                      return renderStageButton(
-                        stage,
-                        gi * revealChunk + ji,
-                        ji,
-                        true,
-                        cols,
-                        slice.length,
-                        ji,
-                      );
-                    })}
-                  </motion.div>
-                </div>
-              </motion.div>
+                <motion.div
+                  {...innerMotion}
+                  className="relative flex w-full flex-col items-center"
+                >
+                  <div className="flex w-full shrink-0 justify-center px-1">
+                    <motion.div
+                      data-no-click-advance
+                      className="relative isolate z-10 grid w-max max-w-full auto-rows-fr justify-items-stretch gap-2.5"
+                      style={{
+                        gridTemplateColumns: valueStagesGridColumns(
+                          slice.length,
+                          step.content.valueStagesGridCols,
+                        ),
+                      }}
+                      onPointerDown={(e) => e.stopPropagation()}
+                    >
+                      {slice.map((stage, ji) => {
+                        const cols = valueStagesColCount(
+                          slice.length,
+                          step.content.valueStagesGridCols,
+                        );
+                        return renderStageButton(
+                          stage,
+                          gi * revealChunk + ji,
+                          ji,
+                          true,
+                          cols,
+                          slice.length,
+                          ji,
+                        );
+                      })}
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
             </EraRevealBand>
           ))}
           {expandedPortal}
@@ -596,34 +975,36 @@ export function NarrativeStep({ step, active }: Props) {
         active={active}
         className="flex w-full justify-center"
       >
-        <motion.div
-          {...innerMotion}
-          className="relative flex w-full flex-col items-center space-y-3 overflow-visible py-1"
-        >
+        <div className="flex w-full flex-col items-center space-y-3 overflow-visible py-1">
           {valueStagesLeadBlock}
-          <div className="flex w-full shrink-0 justify-center px-1">
-            <motion.div
-              data-no-click-advance
-              className="relative isolate z-10 grid w-max max-w-full auto-rows-fr justify-items-stretch gap-2.5"
-              style={{
-                gridTemplateColumns: valueStagesGridColumns(
-                  vs.length,
-                  step.content.valueStagesGridCols,
-                ),
-              }}
-              onPointerDown={(e) => e.stopPropagation()}
-            >
-              {vs.map((stage, i) => {
-                const cols = valueStagesColCount(
-                  vs.length,
-                  step.content.valueStagesGridCols,
-                );
-                return renderStageButton(stage, i, i, false, cols, vs.length, i);
-              })}
-            </motion.div>
-          </div>
+          <motion.div
+            {...innerMotion}
+            className="relative flex w-full flex-col items-center"
+          >
+            <div className="flex w-full shrink-0 justify-center px-1">
+              <motion.div
+                data-no-click-advance
+                className="relative isolate z-10 grid w-max max-w-full auto-rows-fr justify-items-stretch gap-2.5"
+                style={{
+                  gridTemplateColumns: valueStagesGridColumns(
+                    vs.length,
+                    step.content.valueStagesGridCols,
+                  ),
+                }}
+                onPointerDown={(e) => e.stopPropagation()}
+              >
+                {vs.map((stage, i) => {
+                  const cols = valueStagesColCount(
+                    vs.length,
+                    step.content.valueStagesGridCols,
+                  );
+                  return renderStageButton(stage, i, i, false, cols, vs.length, i);
+                })}
+              </motion.div>
+            </div>
+          </motion.div>
           {expandedPortal}
-        </motion.div>
+        </div>
       </EraRevealBand>
     );
   };
@@ -697,8 +1078,14 @@ export function NarrativeStep({ step, active }: Props) {
       sidePhotoSrc={hero?.src}
       sidePhotoAlt={hero?.alt}
       bannerTransparentCutout={Boolean(hero?.transparentCutout)}
+      bannerLightenBlackMatte={Boolean(hero?.lightenBlackMatte)}
       cardVisual={step.content.cardVisual}
       hideValueFlow={true}
+      bannerUnframed={Boolean(step.content.bannerUnframed)}
+      hideWatermarkSvg={Boolean(step.content.hideFloatingWatermarkSvg)}
+      bannerHeightClass={
+        step.content.valueStagesRevealSequentialCards ? "h-[300px]" : undefined
+      }
       width={
         painPoints
           ? step.content.painPointsGridCols === 4
@@ -709,9 +1096,9 @@ export function NarrativeStep({ step, active }: Props) {
           : step.content.dualStages
             ? 900
             : step.content.valueStagesRevealChunkSize
-            ? 920
+            ? 1000
             : step.content.valueStages && step.content.valueStages.length >= 4
-              ? 920
+              ? 1000
               : step.content.valueStages && step.content.valueStages.length > 0
                 ? 760
                 : undefined
@@ -765,7 +1152,7 @@ export function NarrativeStep({ step, active }: Props) {
           </EraRevealBand>
         )}
 
-        {step.content.lead && (
+        {step.content.lead && !step.content.leadByParagraph && (
           <EraRevealBand
             bandId="lead"
             bandIndex={b("lead")}
@@ -783,6 +1170,28 @@ export function NarrativeStep({ step, active }: Props) {
             </motion.p>
           </EraRevealBand>
         )}
+
+        {step.content.lead &&
+          step.content.leadByParagraph &&
+          splitLeadParagraphs(step.content.lead).map((paragraph, i) => (
+            <EraRevealBand
+              key={`lead${i}`}
+              bandId={`lead${i}`}
+              bandIndex={b(`lead${i}`)}
+              stepId={step.id}
+              stepIndex={step.index}
+              eraStaging={eraStaging}
+              active={active}
+              className="flex w-full justify-center"
+            >
+              <motion.p
+                {...innerMotion}
+                className="presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center text-slate-100/95"
+              >
+                {paragraph}
+              </motion.p>
+            </EraRevealBand>
+          ))}
 
         {step.content.contrastPair && (
           <EraRevealBand
@@ -1273,6 +1682,12 @@ export function NarrativeStep({ step, active }: Props) {
             stepIndex={step.index}
             eraStaging={eraStaging}
             active={active}
+            reveal={
+              step.content.valueStagesRevealSequentialCards &&
+              step.content.valueStagesRevealOneAtATime
+                ? "single"
+                : "cumulative"
+            }
             className="flex w-full justify-center"
           >
             <motion.div

@@ -51,19 +51,9 @@ export function ExpandedCardPortal({
   imageAlt,
   accentColor,
   reducedMotion,
-  origin,
+  origin: _origin,
   onClose,
 }: ExpandedCardPortalProps) {
-  const startOffset = (() => {
-    if (reducedMotion || typeof window === "undefined" || !origin)
-      return { dx: 0, dy: 0 };
-    const rect = origin.getBoundingClientRect();
-    return {
-      dx: rect.left + rect.width / 2 - window.innerWidth / 2,
-      dy: rect.top + rect.height / 2 - window.innerHeight / 2,
-    };
-  })();
-
   if (typeof document === "undefined") return null;
 
   return createPortal(
@@ -99,18 +89,10 @@ export function ExpandedCardPortal({
           background: `linear-gradient(145deg, ${accentColor}1e 0%, rgba(11,15,24,0.97) 100%)`,
           boxShadow: `0 0 0 1px ${accentColor}33, 0 50px 130px -20px ${accentColor}44, 0 50px 130px -20px rgba(0,0,0,0.88)`,
         }}
-        initial={
-          reducedMotion
-            ? { opacity: 0, scale: 0.9 }
-            : { opacity: 0, scale: 0.08, x: startOffset.dx, y: startOffset.dy }
-        }
-        animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-        exit={
-          reducedMotion
-            ? { opacity: 0, scale: 0.9 }
-            : { opacity: 0, scale: 0.88, y: 10, filter: "none" }
-        }
-        transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         onClick={(e) => {
           e.stopPropagation();
           onClose();

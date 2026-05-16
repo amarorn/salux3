@@ -64,10 +64,18 @@ interface FloatingCardProps {
   stepId?: string;
   /** Banner com PNG transparente: fundo `#05070d`, sem tratamento “foto cheia”. */
   bannerTransparentCutout?: boolean;
+  /** PNG com chapa preta: `mix-blend-mode: lighten` (fundo escuro da app). */
+  bannerLightenBlackMatte?: boolean;
   /** Desativa o visual decorativo no rodapé do painel. */
   hideValueFlow?: boolean;
   /** Variante temática do visual de rodapé (default: 'flow'). */
   cardVisual?: CardVisualVariant;
+  /** Altura do banner superior (`h-[460px]` por omissão). Quando há muito texto + grelha, usar classe mais baixa para o bloco dos cartões caber no palco (a câmera assume ~1280px de altura). */
+  bannerHeightClass?: string;
+  /** Sem caixa em torno da foto (sem borda/sombra/arredondamento). */
+  bannerUnframed?: boolean;
+  /** Esconde o arco SVG sobre o painel de texto. */
+  hideWatermarkSvg?: boolean;
   children: ReactNode;
 }
 
@@ -85,8 +93,12 @@ export function FloatingCard({
   bannerVideoPoster,
   stepId,
   bannerTransparentCutout = false,
+  bannerLightenBlackMatte = false,
   hideValueFlow,
   cardVisual,
+  bannerHeightClass,
+  bannerUnframed = false,
+  hideWatermarkSvg = false,
   children,
 }: FloatingCardProps) {
   const ctx = useContext(FloatingCardContext);
@@ -109,7 +121,8 @@ export function FloatingCard({
   return (
     <div
       className={clsx(
-        "flex items-stretch gap-3",
+        "flex items-stretch",
+        bannerUnframed ? "gap-0" : "gap-3",
         resolvedFlip ? "flex-col-reverse" : "flex-col",
       )}
       style={{ width: resolvedWidth }}
@@ -120,11 +133,14 @@ export function FloatingCard({
           initial={layerInitial}
           animate={layerAnimate}
           className={clsx(
-            "relative h-[460px] w-full mt-5 shrink-0 overflow-hidden rounded-3xl duration-500 ease-out",
+            "relative w-full shrink-0 overflow-hidden",
+            bannerUnframed ? "mt-0" : "mt-5 rounded-3xl duration-500 ease-out",
+            bannerHeightClass ?? "h-[460px]",
             bannerTransparentCutout && "bg-[#05070d]",
-            active
-              ? "border-white/20 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"
-              : "shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)] group-hover:-translate-y-1 group-hover:border-white/16",
+            !bannerUnframed &&
+              (active
+                ? "border-white/20 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"
+                : "shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)] group-hover:-translate-y-1 group-hover:border-white/16"),
           )}
         >
           {resolvedVideoSrc ? (
@@ -166,6 +182,8 @@ export function FloatingCard({
               accentColor={accentColor.base}
               active={active}
               transparentCutout={bannerTransparentCutout}
+              lightenBlackMatte={bannerLightenBlackMatte}
+              plain={bannerUnframed}
             />
           )}
         </motion.div>
@@ -178,8 +196,9 @@ export function FloatingCard({
           "relative w-full p-12",
           omitSidePhoto
             ? "min-h-[1100px] rounded-3xl "
-            : // ? "min-h-[1100px] rounded-3xl border border-white/10"
-              "min-h-[420px]",
+            : bannerHeightClass
+              ? "min-h-[360px]"
+              : "min-h-[420px]",
           omitSidePhoto &&
             (active
               ? // ? "border-white/18 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"
@@ -230,49 +249,50 @@ export function FloatingCard({
             mixBlendMode: "screen",
           }}
         />
-        {/* Marca-d'água orgânica do accent na borda — um arco solto, não percorre tudo */}
-        <svg
-          aria-hidden
-          className="pointer-events-none absolute -z-10"
-          style={{ inset: "-6% -8% -10% -8%", opacity: active ? 0.6 : 0.3 }}
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <linearGradient
-              id={`fc-arc-${hashStepId(stepId)}`}
-              x1="0"
-              y1="0"
-              x2="1"
-              y2="1"
-            >
-              <stop offset="0%" stopColor={accentColor.base} stopOpacity="0" />
-              <stop
-                offset="50%"
-                stopColor={accentColor.base}
-                stopOpacity="0.5"
-              />
-              <stop
-                offset="100%"
-                stopColor={accentColor.base}
-                stopOpacity="0"
-              />
-            </linearGradient>
-          </defs>
-          <path
-            d={
-              hashStepId(stepId) % 3 === 0
-                ? "M -5 18 Q 50 4 105 24"
-                : hashStepId(stepId) % 3 === 1
-                  ? "M -5 85 Q 60 95 105 78"
-                  : "M 8 -5 Q 30 50 22 105"
-            }
-            fill="none"
-            stroke={`url(#fc-arc-${hashStepId(stepId)})`}
-            strokeWidth="0.3"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
+        {!hideWatermarkSvg && (
+          <svg
+            aria-hidden
+            className="pointer-events-none absolute -z-10"
+            style={{ inset: "-6% -8% -10% -8%", opacity: active ? 0.6 : 0.3 }}
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <linearGradient
+                id={`fc-arc-${hashStepId(stepId)}`}
+                x1="0"
+                y1="0"
+                x2="1"
+                y2="1"
+              >
+                <stop offset="0%" stopColor={accentColor.base} stopOpacity="0" />
+                <stop
+                  offset="50%"
+                  stopColor={accentColor.base}
+                  stopOpacity="0.5"
+                />
+                <stop
+                  offset="100%"
+                  stopColor={accentColor.base}
+                  stopOpacity="0"
+                />
+              </linearGradient>
+            </defs>
+            <path
+              d={
+                hashStepId(stepId) % 3 === 0
+                  ? "M -5 18 Q 50 4 105 24"
+                  : hashStepId(stepId) % 3 === 1
+                    ? "M -5 85 Q 60 95 105 78"
+                    : "M 8 -5 Q 30 50 22 105"
+              }
+              fill="none"
+              stroke={`url(#fc-arc-${hashStepId(stepId)})`}
+              strokeWidth="0.3"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        )}
         <div
           className={clsx(
             "relative flex h-full flex-col",

@@ -1,6 +1,11 @@
 import type { PresentationStep } from './types';
 import { steps as baseSteps } from './presentation';
 
+import governancaTrilha5NoticiaIa from '@/assets/presentation/governanca-trilha5-noticia-ia.png?url';
+import governancaTrilha5AiTech from '@/assets/presentation/governanca-trilha5-ai-tech.png?url';
+import governancaTrilha5TransformacaoOps from '@/assets/presentation/governanca-trilha5-transformacao-ops.png?url';
+import governancaWhyAgentsBannerUrl from '@/assets/presentation/governanca-why-agents-banner.png?url';
+
 export const presentationGovernancaMeta = {
   title: 'IA agêntica',
   subtitle: 'A resposta arquitetural ao limite da digitalização em saúde',
@@ -21,20 +26,33 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
     return {
       ...s,
       kind: 'narrative',
-      accent: 'violet',
+      accent: 'cyan',
       title: 'Era agêntica: a resposta ao limite da digitalização em saúde.',
       subtitle: 'Slide 01 · Abertura da trilha',
       content: {
         headline: 'Abertura da trilha',
         cardVisual: 'strata',
         lead: 'A saúde já tem sistemas. Já tem dados. Já tem automações.',
+        heroImage: {
+          src: governancaTrilha5NoticiaIa,
+          alt: 'Uso de IA na saúde — evidência (Agência Brasil)',
+        },
+        valueStagesRoad: true,
         valueStagesFlat: true,
         valueStagesGridCols: 4,
         valueStages: [
-          { number: '✓', label: 'Sistemas' },
-          { number: '✓', label: 'Dados' },
-          { number: '✓', label: 'Automações' },
-          { number: '✕', label: 'Coordenação' },
+          { number: '✓', label: 'Sistemas', mediaUrl: governancaTrilha5AiTech },
+          { number: '✓', label: 'Dados', mediaUrl: governancaTrilha5AiTech },
+          {
+            number: '✓',
+            label: 'Automações',
+            mediaUrl: governancaTrilha5NoticiaIa,
+          },
+          {
+            number: '✕',
+            label: 'Coordenação',
+            mediaUrl: governancaTrilha5TransformacaoOps,
+          },
         ],
         attentionPhrase:
           'Depois de digitalizar processos, o próximo desafio é transformar dados, contexto e inteligência em ação coordenada.',
@@ -53,17 +71,52 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
       content: {
         headline: 'Digitalização',
         cardVisual: 'evolution',
+        heroImage: {
+          src: governancaTrilha5AiTech,
+          alt: 'IA, dados e interação humano–máquina na operação em saúde',
+        },
         lead:
           'Prontuários eletrônicos, sistemas de gestão, módulos especializados, integrações e automações organizaram a informação e reduziram dependências manuais.\n\nEsse ciclo resolveu principalmente o registro, a documentação e a disponibilidade dos dados.',
+        leadByParagraph: true,
         valueStagesLead: 'A linha evolutiva da saúde digital:',
         valueStagesFlat: true,
         valueStagesGridCols: 5,
+        /** Blocos de cor: 2 × ciano, 2 × âmbar, 1 × roxo (Era agêntica). */
+        valueStagesRevealChunkSize: 1,
+        valueStagesRevealSequentialCards: true,
+        valueStagesRevealFirstOnClick: true,
+        valueStagesRevealOneAtATime: true,
         valueStages: [
-          { number: '01', label: 'Registro manual' },
-          { number: '02', label: 'Sistemas' },
-          { number: '03', label: 'Integrações' },
-          { number: '04', label: 'Automações' },
-          { number: '05 →', label: 'Era agêntica' },
+          {
+            number: '01',
+            label: 'Registro manual',
+            accent: 'cyan',
+            mediaUrl: governancaTrilha5AiTech,
+          },
+          {
+            number: '02',
+            label: 'Sistemas',
+            accent: 'cyan',
+            mediaUrl: governancaTrilha5AiTech,
+          },
+          {
+            number: '03',
+            label: 'Integrações',
+            accent: 'amber',
+            mediaUrl: governancaTrilha5NoticiaIa,
+          },
+          {
+            number: '04',
+            label: 'Automações',
+            accent: 'amber',
+            mediaUrl: governancaTrilha5TransformacaoOps,
+          },
+          {
+            number: '05 →',
+            label: 'Era agêntica',
+            accent: 'violet',
+            mediaUrl: governancaTrilha5AiTech,
+          },
         ],
         attentionPhrase:
           'Digitalizar foi necessário. Mas digitalizar não é o mesmo que coordenar.',
@@ -84,6 +137,14 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
       content: {
         headline: 'Limite tecnológico',
         cardVisual: 'scatter',
+        heroImage: {
+          src: governancaWhyAgentsBannerUrl,
+          alt:
+            'Ilustração de saúde digital: telemóvel com ícone clínico e estetoscópio azul sobre fundo escuro',
+          lightenBlackMatte: true,
+        },
+        bannerUnframed: true,
+        hideFloatingWatermarkSvg: true,
         lead: 'Mesmo com mais sistemas, dados e automações, instituições ainda convivem com:',
         valueStagesFlat: true,
         valueStagesGridCols: 4,

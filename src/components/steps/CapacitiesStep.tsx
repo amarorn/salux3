@@ -131,6 +131,9 @@ export function CapacitiesStep({ step, active }: Props) {
       bannerTransparentCutout={Boolean(
         step.content.heroImage?.transparentCutout,
       )}
+      bannerLightenBlackMatte={Boolean(
+        step.content.heroImage?.lightenBlackMatte,
+      )}
       width={760}
       badge={step.title}
       cardVisual={step.content.cardVisual}

@@ -147,6 +147,7 @@ export function CoverStep({ step, active }: Props) {
       sidePhotoSrc={hero?.src}
       sidePhotoAlt={hero?.alt}
       bannerTransparentCutout={Boolean(hero?.transparentCutout)}
+      bannerLightenBlackMatte={Boolean(hero?.lightenBlackMatte)}
       hideValueFlow={true}
       // cardVisual={step.content.cardVisual}
     >

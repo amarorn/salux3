@@ -48,7 +48,11 @@ interface PresentationState {
   reset: () => void;
   /** Volta ao ecrã inicial para escolher outra trilha (mantém a sessão na mesma rota). */
   returnToTrackSelection: () => void;
-  setEraStagedRevealConfig: (stepId: string, maxPhases: number) => void;
+  setEraStagedRevealConfig: (
+    stepId: string,
+    maxPhases: number,
+    initialPhase?: number,
+  ) => void;
   clearEraStagedReveal: () => void;
   tryAdvanceEraStagedReveal: () => boolean;
 }
@@ -177,12 +181,19 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       governanceRevealExpanded: false,
       ...eraRevealCleared,
     }),
-  setEraStagedRevealConfig: (stepId, maxPhases) =>
+  setEraStagedRevealConfig: (stepId, maxPhases, initialPhase) => {
+    const max = Math.max(1, maxPhases);
+    const cap = max - 1;
+    const phase =
+      initialPhase === undefined
+        ? 0
+        : Math.max(0, Math.min(initialPhase, cap));
     set({
       eraStagedRevealStepId: stepId,
-      eraStagedRevealPhase: 0,
-      eraStagedRevealMax: Math.max(1, maxPhases),
-    }),
+      eraStagedRevealPhase: phase,
+      eraStagedRevealMax: max,
+    });
+  },
   clearEraStagedReveal: () => set(eraRevealCleared),
   tryAdvanceEraStagedReveal: () => {
     const s = get();

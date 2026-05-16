@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { motion, useAnimation, useReducedMotion } from 'framer-motion';
+import clsx from 'clsx';
 import type { PresentationStep } from '@/domain/types';
 import { CoverStep } from './steps/CoverStep';
 import { NarrativeStep } from './steps/NarrativeStep';
@@ -70,11 +71,14 @@ function CardFlipShell({
   active,
   flipPhoto,
   stepLabel,
+  unframedBanner,
   children,
 }: {
   active: boolean;
   flipPhoto: boolean;
   stepLabel: string;
+  /** Cantos superiores rectos para o banner não ser “cortado” pela moldura do cartão. */
+  unframedBanner?: boolean;
   children: ReactNode;
 }) {
   const reduceMotion = useReducedMotion();
@@ -127,7 +131,10 @@ function CardFlipShell({
           aria-roledescription="Slide"
           aria-current={active ? 'step' : undefined}
           aria-label={stepLabel}
-          className="group block rounded-3xl text-left outline-none focus-visible:ring-4 focus-visible:ring-violet-300/60"
+          className={clsx(
+            'group block text-left outline-none focus-visible:ring-4 focus-visible:ring-violet-300/60',
+            unframedBanner ? 'rounded-b-3xl rounded-t-none' : 'rounded-3xl',
+          )}
         >
           {children}
         </div>
@@ -176,7 +183,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
             omitSidePhoto: step.content.omitSidePhoto,
           }}
         >
-          <CardFlipShell active={active} flipPhoto={flipPhoto} stepLabel={stepLabel}>
+          <CardFlipShell active={active} flipPhoto={flipPhoto} stepLabel={stepLabel} unframedBanner={Boolean(step.content.bannerUnframed)}>
             <StepBody step={step} active={active} />
           </CardFlipShell>
         </FloatingCardContext.Provider>

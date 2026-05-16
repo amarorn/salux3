@@ -61,18 +61,20 @@ export interface ContrastPair {
   right: ContrastItem;
 }
 
+export type Accent = "violet" | "cyan" | "emerald" | "amber" | "rose" | "slate";
+
 export interface ValueStage {
   /** Número exibido em destaque (ex.: "01"). */
   number: string;
   /** Rótulo curto em caps (ex.: "REGISTRO"). */
   label: string;
+  /** Cor do cartão; default = acento do slide. */
+  accent?: Accent;
   /** Descrição curta. Opcional — quando ausente, só o número + label aparecem. */
   description?: string;
   /** URL do mídia associada (ex.: vídeo ou imagem). */
   mediaUrl?: string;
 }
-
-export type Accent = "violet" | "cyan" | "emerald" | "amber" | "rose" | "slate";
 
 export interface NodePosition {
   x: number;
@@ -127,7 +129,13 @@ export interface StepContent {
     caption?: string;
   };
   /** `transparentCutout`: PNG com alpha — fundo do banner = app; sem vinheta pesada. */
-  heroImage?: { src: string; alt?: string; transparentCutout?: boolean };
+  /** `lightenBlackMatte`: PNG com chapa preta — `mix-blend-mode: lighten` sobre fundo escuro (#05070d). */
+  heroImage?: {
+    src: string;
+    alt?: string;
+    transparentCutout?: boolean;
+    lightenBlackMatte?: boolean;
+  };
   /** Trilha assistencial: oculta diagrama de camadas; foco em texto e evidência. */
   architectureMinimal?: boolean;
   /** Trilha assistencial: oculta grelha de sistemas; foco narrativo. */
@@ -187,18 +195,26 @@ export interface StepContent {
   omitSidePhoto?: boolean;
   /** Esconde o visual decorativo do rodapé do cartão (`CardVisual` / “value flow”). */
   hideValueFlow?: boolean;
+  /** Faixa de foto superior sem moldura (sem borda, sombra nem cantos arredondados). */
+  bannerUnframed?: boolean;
+  /** Esconde o arco SVG decorativo no fundo do painel de conteúdo do `FloatingCard`. */
+  hideFloatingWatermarkSvg?: boolean;
   /** Vídeo no banner do card (substitui a foto lateral). */
   bannerMedia?: BannerMedia;
   /** Par de contraste (ex.: visível × despercebido) usado na capa. */
   contrastPair?: ContrastPair;
   /** Texto curto exibido logo abaixo do título (lead) — usado em capa e steps narrativos. */
   lead?: string;
+  /** Revela cada parágrafo do `lead` por clique (separados por linha em branco). */
+  leadByParagraph?: boolean;
   /** Etapas numeradas em grid (4 colunas) — usadas em "ruptura acumulada". */
   valueStages?: ValueStage[];
   /** Texto curto exibido logo acima da grid de etapas (lead). */
   valueStagesLead?: string;
   /** Renderiza `description` de cada etapa direto no cartão (sem precisar expandir). */
   valueStagesShowDescription?: boolean;
+  /** Renderiza valueStages como uma "estrada" curva — cada marco revela por clique e o último tem linha de chegada. */
+  valueStagesRoad?: boolean;
   /** Cartões de "evidência numérica" — número grande com prefixo, manchete e contexto em itálico. */
   evidenceMetrics?: {
     /** Badge curta acima do número (ex.: "Dado · Evidência"). */
@@ -243,6 +259,14 @@ export interface StepContent {
   valueStagesGridCols?: 2 | 3 | 4 | 5;
   /** Quantas etapas revelar por clique (requer `forceEraStagedReveal` nas faixas do slide). */
   valueStagesRevealChunkSize?: number;
+  /** Só os cartões `valueStages` contam como fases de clique; título, lead e métricas ficam sempre visíveis. */
+  valueStagesRevealSequentialCards?: boolean;
+  /** Com `valueStagesRevealSequentialCards`: primeiro clique só “liga” a linha; o 1.º cartão só aparece no clique seguinte. */
+  valueStagesRevealFirstOnClick?: boolean;
+  /** Com `valueStagesRevealSequentialCards`: um cartão por fase; o anterior some (não acumula na grelha). */
+  valueStagesRevealOneAtATime?: boolean;
+  /** Quando `false`, os cartões de `valueStages` são só informativos (sem ampliar ao clicar). Default: interativos. */
+  valueStagesClickable?: boolean;
   /** Agrupa título do slide + grelha `valueStages` e centra o bloco no espaço vertical do painel (abaixo do banner). */
   centerTitleAndValueStagesInPanel?: boolean;
   /** Revelação por clique neste slide mesmo fora das trilhas era-agentica/operacoes. */

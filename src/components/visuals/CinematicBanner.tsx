@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type CSSProperties } from "react";
 import { motion, useReducedMotion } from 'framer-motion';
 
 interface CinematicBannerProps {
@@ -14,6 +14,10 @@ interface CinematicBannerProps {
   particles?: number;
   /** Arte com transparência: fundo escuro fixo, `object-contain`, overlays mínimos. */
   transparentCutout?: boolean;
+  /** Chapa preta #000 no ficheiro: dissolve sobre fundo escuro da app (`mix-blend-mode: lighten`). */
+  lightenBlackMatte?: boolean;
+  /** Imagem estática, sem efeitos (Ken Burns, vignette, partículas). */
+  plain?: boolean;
 }
 
 /**
@@ -30,6 +34,8 @@ export function CinematicBanner({
   active,
   particles = 5,
   transparentCutout = false,
+  lightenBlackMatte = false,
+  plain = false,
 }: CinematicBannerProps) {
   const reduceMotion = useReducedMotion();
 
@@ -55,6 +61,10 @@ export function CinematicBanner({
     }));
   }, [src, particles]);
 
+  const matteImgStyle: CSSProperties | undefined = lightenBlackMatte
+    ? { mixBlendMode: "lighten" }
+    : undefined;
+
   if (transparentCutout) {
     return (
       <>
@@ -65,9 +75,24 @@ export function CinematicBanner({
             alt={alt ?? ""}
             {...(!alt ? { "aria-hidden": true as const } : {})}
             className="max-h-full max-w-full object-contain object-center"
+            style={matteImgStyle}
           />
         </div>
       </>
+    );
+  }
+
+  if (plain) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <img
+          src={src}
+          alt={alt ?? ""}
+          {...(!alt ? { "aria-hidden": true as const } : {})}
+          className="max-h-full max-w-full object-contain object-center"
+          style={matteImgStyle}
+        />
+      </div>
     );
   }
 

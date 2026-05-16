@@ -314,6 +314,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       headline: "Jornada",
       cardVisual: "thread",
       omitSidePhoto: true,
+      valueStagesClickable: false,
       journeyStages: [],
       lead: "Cada etapa parece resolvida isoladamente. Mas o cuidado não acontece em etapas isoladas.",
       valueStagesFlat: true,

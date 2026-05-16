@@ -131,6 +131,8 @@ interface EraRevealBandProps {
   stepIndex: number;
   eraStaging: boolean;
   active: boolean;
+  /** `single`: só nesta fase (a anterior some). `cumulative` (default): esta fase e todas as anteriores. */
+  reveal?: "cumulative" | "single";
   style?: React.CSSProperties;
   className?: string;
   children: ReactNode;
@@ -143,6 +145,7 @@ export function EraRevealBand({
   stepIndex,
   eraStaging,
   active,
+  reveal = "cumulative",
   style,
   className,
   children,
@@ -161,8 +164,13 @@ export function EraRevealBand({
     return <EraDrift seed={`${stepId}:${bandId}:idle`}>{children}</EraDrift>;
   }
 
-  const showAll = stepId !== currentStepId || trackedId !== stepId || reduce;
-  const visible = showAll || phase >= bandIndex;
+  const showAll =
+    stepId !== currentStepId ||
+    trackedId !== stepId ||
+    (reduce && reveal !== "single");
+  const visible =
+    showAll ||
+    (reveal === "single" ? phase === bandIndex : phase >= bandIndex);
   const preset = REVEAL_PRESETS[presetIndex(stepId, stepIndex, bandIndex)]!;
 
   return (

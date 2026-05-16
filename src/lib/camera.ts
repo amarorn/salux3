@@ -4,12 +4,11 @@ const NODE_PADDING = 480;
 
 /**
  * Largura/altura máxima estimada do conteúdo de um step (FloatingCard:
- * painel até 760px + foto lateral 240 + gap 12 ≈ 1012; mais um pouco de
- * folga para badges e sombras). Usado para impedir que `step.scale`
+ * painel + foto; mais parágrafos + linha de cartões pode exceder ~1520px). Usado para impedir que `step.scale`
  * deixe o conteúdo maior que o palco em telas verticais.
  */
 const MAX_STEP_CONTENT_WIDTH = 1024;
-const MAX_STEP_CONTENT_HEIGHT = 1280;
+const MAX_STEP_CONTENT_HEIGHT = 1520;
 const SAFE_MARGIN = 0.92;
 
 export function cameraForStep(step: PresentationStep, viewport: ViewportSize): CameraState {

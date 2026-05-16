@@ -1,5 +1,6 @@
 import type { PresentationStep } from './types';
 import { steps as baseSteps } from './presentation';
+import landingImgCorridorUrl from '@/assets/landing/img-corridor.png?url';
 
 export const presentationGestaoMeta = {
   title: 'Gestão da operação em saúde',
@@ -60,6 +61,10 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
           'Os sinais estão espalhados por toda a rede — e costumam ser tratados como problemas isolados. Na prática, são a expressão visível de um único desequilíbrio:',
         attentionPhrase:
           'A rede cresce em demanda e complexidade. A coordenação não cresce na mesma proporção.',
+        heroImage: {
+          src: landingImgCorridorUrl,
+          alt: 'Corredor hospitalar',
+        },
         body: 'O que acontece quando isso não é corrigido:',
         bullets: [
           'Filas deixam de ser fluxo e se tornam passivo assistencial',
