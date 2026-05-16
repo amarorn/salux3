@@ -29,13 +29,11 @@ export function getContentPanelVariants(flipPhoto: boolean): Variants {
     hidden: {
       opacity: 0,
       x: 28 * dir,
-      filter: 'blur(12px)',
       transition: { duration: 0.24, ease: EASE_SOFT },
     },
     visible: {
       opacity: 1,
       x: 0,
-      filter: 'blur(0px)',
       transition: { duration: 0.48, delay: 0.14, ease: EASE_SOFT },
     },
   };

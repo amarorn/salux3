@@ -67,7 +67,7 @@ function AnimatedMetricLine({
   }, [active, reducedMotion, target, staggerDelay]);
 
   return (
-    <div className="rounded-2xl border border-white/[0.09] bg-gradient-to-br from-white/[0.06] via-white/[0.02] to-transparent px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-[1px] transition-[border-color,box-shadow] duration-300 hover:border-white/[0.14]">
+    <div className="rounded-2xl border border-white/[0.09] bg-gradient-to-br from-white/[0.06] via-white/[0.02] to-transparent px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)]  transition-[border-color,box-shadow] duration-300 hover:border-white/[0.14]">
       <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
         <span className="relative inline-flex shrink-0 overflow-hidden rounded-lg px-1 py-0.5">
           <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-lg">

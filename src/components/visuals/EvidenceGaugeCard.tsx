@@ -102,7 +102,7 @@ export function EvidenceGaugeCard({
       className="relative overflow-hidden rounded-2xl border px-6 py-5"
       style={{
         borderColor: `${accentColor}55`,
-        background: `linear-gradient(135deg, ${accentColor}1f 0%, rgba(255,255,255,0.02) 75%)`,
+        background: `linear-gradient(135deg, ${accentColor}38 0%, rgba(10,12,20,0.98) 34%, rgba(7,9,15,0.99) 100%)`,
         boxShadow: `inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 48px -28px ${accentColor}55`,
       }}
       initial={reduce ? false : { opacity: 0, y: 14 }}
@@ -164,7 +164,7 @@ export function EvidenceGaugeCard({
                 <stop offset="100%" stopColor={accentColor} stopOpacity="1" />
               </linearGradient>
               <filter id="gauge-glow" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="3" />
+                <feGaussianBlur stdDeviation="0" />
               </filter>
             </defs>
 
@@ -342,13 +342,13 @@ export function EvidenceGaugeCard({
                 letterSpacing: '-0.03em',
                 textShadow: `0 0 24px ${accentColor}88, 0 0 56px ${accentColor}44`,
               }}
-              initial={reduce ? false : { opacity: 0, filter: 'blur(6px)' }}
+              initial={reduce ? false : { opacity: 0, filter: 'none' }}
               animate={
                 active
-                  ? { opacity: 1, filter: 'blur(0px)' }
+                  ? { opacity: 1, filter: 'none' }
                   : reduce
                     ? undefined
-                    : { opacity: 0, filter: 'blur(6px)' }
+                    : { opacity: 0, filter: 'none' }
               }
               transition={{ duration: 0.7, delay: 0.6 + delay }}
             >

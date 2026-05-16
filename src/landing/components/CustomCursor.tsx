@@ -62,13 +62,13 @@ export function CustomCursor() {
     <div className="pointer-events-none fixed inset-0 z-[100] mix-blend-difference">
       <div
         ref={auraRef}
-        className="absolute left-0 top-0 h-[4.5rem] w-[4.5rem] rounded-full bg-[radial-gradient(circle_at_40%_35%,rgba(167,139,250,0.35),rgba(6,182,212,0.12)_45%,transparent_70%)] blur-[14px]"
+        className="absolute left-0 top-0 h-[4.5rem] w-[4.5rem] rounded-full bg-[radial-gradient(circle_at_40%_35%,rgba(167,139,250,0.35),rgba(6,182,212,0.12)_45%,transparent_70%)]"
         style={{ willChange: 'transform,opacity' }}
         aria-hidden
       />
       <div
         ref={ringRef}
-        className="absolute left-0 top-0 flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.26] bg-white/[0.04] backdrop-blur-[2px]"
+        className="absolute left-0 top-0 flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.26] bg-white/[0.04]"
         style={{ willChange: 'transform' }}
       />
       <div

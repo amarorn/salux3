@@ -20,7 +20,7 @@ export function NavigationControls() {
       >
         <div
           data-no-click-advance
-          className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] p-1.5 shadow-[0_22px_60px_-22px_rgba(0,0,0,0.6)] backdrop-blur-xl"
+          className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] p-1.5 shadow-[0_22px_60px_-22px_rgba(0,0,0,0.6)]"
         >
           <ControlButton onClick={() => setStep(steps[0]!.id)} aria-label="Voltar à capa">
             <Home className="h-4 w-4" />
@@ -83,7 +83,7 @@ export function NavigationControls() {
       >
         <div
           data-no-click-advance
-          className="pointer-events-auto flex items-center gap-3 rounded-2xl border border-white/15 bg-white/[0.06] px-4 py-2.5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)] backdrop-blur-xl"
+          className="pointer-events-auto flex items-center gap-3 rounded-2xl border border-white/15 bg-white/[0.06] px-4 py-2.5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]"
         >
           <Compass className="h-4 w-4 text-ppt-highlight" strokeWidth={1.8} />
           <div className="flex max-w-[min(52vw,420px)] flex-col leading-tight">

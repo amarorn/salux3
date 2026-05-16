@@ -407,9 +407,9 @@ function TransitionPipeline({
           <div key={`${phase}-${t}`} className="flex flex-1 items-center">
             <motion.div
               initial={
-                reduce ? false : { opacity: 0, y: 8, filter: "blur(6px)" }
+                reduce ? false : { opacity: 0, y: 8, filter: "none" }
               }
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              animate={{ opacity: 1, y: 0, filter: "none" }}
               transition={{
                 duration: 0.45,
                 ease: [0.22, 1, 0.36, 1],

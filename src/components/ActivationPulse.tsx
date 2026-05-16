@@ -56,7 +56,7 @@ export function ActivationPulse({ position, color }: ActivationPulseProps) {
           translateX: '-50%',
           translateY: '-50%',
           background: `radial-gradient(circle, ${color}55 0%, ${color}22 30%, transparent 70%)`,
-          filter: 'blur(12px)',
+          filter: 'none',
         }}
         initial={{ scale: 0.6, opacity: 0.85 }}
         animate={{ scale: 2.6, opacity: 0 }}

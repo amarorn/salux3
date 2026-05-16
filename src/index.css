@@ -38,7 +38,6 @@ html {
 [data-reveal] {
   opacity: 0;
   transform: translateY(42px);
-  filter: blur(8px);
 }
 
 body.presentation-body {

@@ -104,7 +104,7 @@ export function EnergiaSpeechWaves({ reduceMotion, boosted }: EnergiaSpeechWaves
           <stop offset="100%" stopColor="#ffaa33" stopOpacity="0" />
         </linearGradient>
         <filter id={gid('waveGlow')} x="-10%" y="-120%" width="120%" height="340%">
-          <feGaussianBlur stdDeviation="4.5" result="blur" />
+          <feGaussianBlur stdDeviation="0" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />

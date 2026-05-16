@@ -22,22 +22,22 @@
       <stop offset="100%" stop-color="#ff6600" stop-opacity="0"/>
     </radialGradient>
     <filter id="deepBloom" x="-200%" y="-200%" width="500%" height="500%">
-      <feGaussianBlur stdDeviation="7" result="b1"/>
-      <feGaussianBlur stdDeviation="20" result="b2"/>
-      <feGaussianBlur stdDeviation="48" result="b3"/>
-      <feGaussianBlur stdDeviation="90" result="b4"/>
+      <feGaussianBlur stdDeviation="0" result="b1"/>
+      <feGaussianBlur stdDeviation="0" result="b2"/>
+      <feGaussianBlur stdDeviation="0" result="b3"/>
+      <feGaussianBlur stdDeviation="0" result="b4"/>
       <feMerge><feMergeNode in="b4"/><feMergeNode in="b3"/><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feGaussianBlur stdDeviation="0" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feGaussianBlur stdDeviation="0" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <filter id="dotGlow" x="-200%" y="-200%" width="500%" height="500%">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feGaussianBlur stdDeviation="0" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>

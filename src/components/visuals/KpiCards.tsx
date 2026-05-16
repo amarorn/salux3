@@ -36,11 +36,11 @@ export function KpiCards({
   };
 
   const card = {
-    hidden: reducedMotion ? {} : { opacity: 0, y: 18, filter: "blur(6px)" },
+    hidden: reducedMotion ? {} : { opacity: 0, y: 18, filter: "none" },
     visible: {
       opacity: 1,
       y: 0,
-      filter: "",
+      filter: "none",
       transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as const },
     },
   };

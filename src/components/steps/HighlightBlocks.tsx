@@ -18,13 +18,13 @@ export function HighlightPhrase({
   const reduce = useReducedMotion();
   return (
     <motion.div
-      initial={reduce ? false : { opacity: 0, x: -8, filter: 'blur(6px)' }}
+      initial={reduce ? false : { opacity: 0, x: -8, filter: 'none' }}
       animate={
         active
-          ? { opacity: 1, x: 0, filter: 'blur(0px)' }
+          ? { opacity: 1, x: 0, filter: 'none' }
           : reduce
             ? undefined
-            : { opacity: 0, x: -8, filter: 'blur(6px)' }
+            : { opacity: 0, x: -8, filter: 'none' }
       }
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.25 + index * 0.12 }}
       className="relative overflow-hidden rounded-xl border px-4 py-3"

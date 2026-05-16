@@ -173,7 +173,10 @@ function DualStageGroupBlock({
 }
 
 function valueStagesColCount(count: number, gridCols?: number): number {
-  return gridCols ?? (count === 4 ? 2 : Math.min(count, 4));
+  if (typeof gridCols === "number" && gridCols > 0) {
+    return Math.min(gridCols, Math.max(1, count));
+  }
+  return count === 4 ? 2 : Math.min(count, 4);
 }
 
 function valueStagesGridColumns(count: number, gridCols?: number): string {
@@ -189,6 +192,14 @@ function valueStageOrphanGridPlacement(
   if (cols < 2 || bandSize < 1) return undefined;
   const r = bandSize % cols;
   if (r !== 1 || indexInBand !== bandSize - 1) return undefined;
+  if (cols === 2) {
+    return {
+      gridColumn: "1 / -1",
+      justifySelf: "center",
+      maxWidth: "11rem",
+      width: "100%",
+    };
+  }
   const col = Math.floor((cols - 1) / 2) + 1;
   return { gridColumn: `${col} / ${col + 1}` };
 }
@@ -438,7 +449,9 @@ export function NarrativeStep({ step, active }: Props) {
             borderColor: focused
               ? `${accent.base}aa`
               : `${accent.base}${hex(95)}`,
-            background: `linear-gradient(160deg, ${accent.base}${hex(30)} 0%, rgba(255,255,255,0.02) 70%)`,
+            background: focused
+              ? `linear-gradient(160deg, ${accent.base}${hex(50)} 0%, rgba(12,14,24,0.97) 40%, rgba(7,9,15,0.99) 100%)`
+              : `linear-gradient(160deg, ${accent.base}${hex(36)} 0%, rgba(10,12,20,0.98) 38%, rgba(7,9,15,0.99) 100%)`,
             boxShadow: focused
               ? `inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px ${accent.base}55, 0 16px 40px -8px ${accent.base}44`
               : `inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px -16px ${accent.base}${hex(88)}`,
@@ -502,7 +515,7 @@ export function NarrativeStep({ step, active }: Props) {
               className="font-display text-[1.03rem] font-bold tabular-nums"
               style={{
                 color: accent.base,
-                textShadow: `0 0 12px ${accent.base}66`,
+                textShadow: `0 0 6px ${accent.base}44`,
               }}
             >
               {stage.number}
@@ -542,36 +555,38 @@ export function NarrativeStep({ step, active }: Props) {
             >
               <motion.div
                 {...innerMotion}
-                className="relative flex w-full flex-col items-stretch space-y-3 overflow-visible py-1"
+                className="relative flex w-full flex-col items-center space-y-3 overflow-visible py-1"
               >
                 {gi === 0 ? valueStagesLeadBlock : null}
-                <motion.div
-                  data-no-click-advance
-                  className="relative isolate z-10 mx-auto grid w-full max-w-[min(100%,56rem)] auto-rows-fr justify-center justify-items-stretch gap-2.5"
-                  style={{
-                    gridTemplateColumns: valueStagesGridColumns(
-                      slice.length,
-                      step.content.valueStagesGridCols,
-                    ),
-                  }}
-                  onPointerDown={(e) => e.stopPropagation()}
-                >
-                  {slice.map((stage, ji) => {
-                    const cols = valueStagesColCount(
-                      slice.length,
-                      step.content.valueStagesGridCols,
-                    );
-                    return renderStageButton(
-                      stage,
-                      gi * revealChunk + ji,
-                      ji,
-                      true,
-                      cols,
-                      slice.length,
-                      ji,
-                    );
-                  })}
-                </motion.div>
+                <div className="flex w-full shrink-0 justify-center px-1">
+                  <motion.div
+                    data-no-click-advance
+                    className="relative isolate z-10 grid w-max max-w-full auto-rows-fr justify-items-stretch gap-2.5"
+                    style={{
+                      gridTemplateColumns: valueStagesGridColumns(
+                        slice.length,
+                        step.content.valueStagesGridCols,
+                      ),
+                    }}
+                    onPointerDown={(e) => e.stopPropagation()}
+                  >
+                    {slice.map((stage, ji) => {
+                      const cols = valueStagesColCount(
+                        slice.length,
+                        step.content.valueStagesGridCols,
+                      );
+                      return renderStageButton(
+                        stage,
+                        gi * revealChunk + ji,
+                        ji,
+                        true,
+                        cols,
+                        slice.length,
+                        ji,
+                      );
+                    })}
+                  </motion.div>
+                </div>
               </motion.div>
             </EraRevealBand>
           ))}
@@ -592,28 +607,30 @@ export function NarrativeStep({ step, active }: Props) {
       >
         <motion.div
           {...innerMotion}
-          className="relative flex w-full flex-col items-stretch space-y-3 overflow-visible py-1"
+          className="relative flex w-full flex-col items-center space-y-3 overflow-visible py-1"
         >
           {valueStagesLeadBlock}
-          <motion.div
-            data-no-click-advance
-            className="relative isolate z-10 mx-auto grid w-full max-w-[min(100%,56rem)] auto-rows-fr justify-center justify-items-stretch gap-2.5"
-            style={{
-              gridTemplateColumns: valueStagesGridColumns(
-                vs.length,
-                step.content.valueStagesGridCols,
-              ),
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            {vs.map((stage, i) => {
-              const cols = valueStagesColCount(
-                vs.length,
-                step.content.valueStagesGridCols,
-              );
-              return renderStageButton(stage, i, i, false, cols, vs.length, i);
-            })}
-          </motion.div>
+          <div className="flex w-full shrink-0 justify-center px-1">
+            <motion.div
+              data-no-click-advance
+              className="relative isolate z-10 grid w-max max-w-full auto-rows-fr justify-items-stretch gap-2.5"
+              style={{
+                gridTemplateColumns: valueStagesGridColumns(
+                  vs.length,
+                  step.content.valueStagesGridCols,
+                ),
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              {vs.map((stage, i) => {
+                const cols = valueStagesColCount(
+                  vs.length,
+                  step.content.valueStagesGridCols,
+                );
+                return renderStageButton(stage, i, i, false, cols, vs.length, i);
+              })}
+            </motion.div>
+          </div>
           {expandedPortal}
         </motion.div>
       </EraRevealBand>
@@ -852,7 +869,7 @@ export function NarrativeStep({ step, active }: Props) {
         )}
 
         {centerTitleAndStagesPanel ? (
-          <div className="flex min-h-0 flex-1 flex-col justify-center gap-5">
+          <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5">
             {titleBand}
             {renderValueStagesSection()}
           </div>
@@ -1500,7 +1517,7 @@ function ExpandedNewsImage({
     >
       <motion.div
         aria-hidden
-        className="absolute inset-0 cursor-zoom-out bg-black/75 backdrop-blur-md"
+        className="absolute inset-0 cursor-zoom-out bg-black/80"
       />
       <motion.img
         src={imageUrl}
@@ -1852,12 +1869,12 @@ function PainPointsBalloon({
   const tile = {
     hidden: reducedMotion
       ? {}
-      : { opacity: 0, y: 14, scale: 0.94, filter: "blur(6px)" },
+      : { opacity: 0, y: 14, scale: 0.94, filter: "none" },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
-      filter: "blur(0px)",
+      filter: "none",
       transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
     },
   };
@@ -1877,11 +1894,11 @@ function PainPointsBalloon({
         aria-hidden
         className="absolute inset-0 cursor-pointer"
         onClick={onClose}
-        initial={{ backdropFilter: "blur(0px)" }}
-        animate={{ backdropFilter: "blur(14px)" }}
-        exit={{ backdropFilter: "blur(0px)" }}
+        initial={{ backdropFilter: "none" }}
+        animate={{ backdropFilter: "none" }}
+        exit={{ backdropFilter: "none" }}
         transition={{ duration: 0.4 }}
-        style={{ background: "rgba(4, 6, 12, 0.72)" }}
+        style={{ background: "rgba(4, 6, 12, 0.82)" }}
       />
 
       <motion.div
@@ -1896,10 +1913,10 @@ function PainPointsBalloon({
                 scale: 0.02,
                 x: origin.dx,
                 y: origin.dy,
-                filter: "blur(14px)",
+                filter: "none",
               }
         }
-        animate={{ opacity: 1, scale: 1, x: 0, y: 0, filter: "blur(0px)" }}
+        animate={{ opacity: 1, scale: 1, x: 0, y: 0, filter: "none" }}
         exit={
           reducedMotion
             ? { opacity: 0 }
@@ -1907,7 +1924,7 @@ function PainPointsBalloon({
                 opacity: 0,
                 scale: 0.94,
                 y: 8,
-                filter: "blur(8px)",
+                filter: "none",
                 transition: { duration: 0.35 },
               }
         }
@@ -2177,12 +2194,12 @@ function PainPointChips({
   const chip = {
     hidden: reducedMotion
       ? {}
-      : { opacity: 0, y: 10, scale: 0.96, filter: "blur(4px)" },
+      : { opacity: 0, y: 10, scale: 0.96, filter: "none" },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
-      filter: "blur(0px)",
+      filter: "none",
       transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
     },
   };
@@ -2394,12 +2411,12 @@ function ExpandedChip({
         aria-hidden
         className="absolute inset-0 cursor-pointer"
         onClick={onClose}
-        initial={{ backdropFilter: "blur(0px)", background: "rgba(4,6,12,0)" }}
+        initial={{ backdropFilter: "none", background: "rgba(4,6,12,0)" }}
         animate={{
-          backdropFilter: "blur(14px)",
-          background: "rgba(4,6,12,0.68)",
+          backdropFilter: "none",
+          background: "rgba(4,6,12,0.78)",
         }}
-        exit={{ backdropFilter: "blur(0px)", background: "rgba(4,6,12,0)" }}
+        exit={{ backdropFilter: "none", background: "rgba(4,6,12,0)" }}
         transition={{ duration: 0.4 }}
       />
 
@@ -2422,7 +2439,7 @@ function ExpandedChip({
         exit={
           reducedMotion
             ? { opacity: 0, scale: 0.9 }
-            : { opacity: 0, scale: 0.88, y: 10, filter: "blur(8px)" }
+            : { opacity: 0, scale: 0.88, y: 10, filter: "none" }
         }
         transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
         onClick={(e) => {

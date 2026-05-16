@@ -35,21 +35,21 @@ const SPARKS: SparkConfig[] = [
   // Dot quente central — segue rapidamente, sem orbitar
   { orbit: 0,  phase: 0,           speed: 0,    size: 6,  opacity: 0.9,  blur: 0, stiffness: 480, damping: 28, mass: 0.4, color: '#fff7c0' },
   // Halo pulsante difuso
-  { orbit: 0,  phase: 0,           speed: 0,    size: 28, opacity: 0.28, blur: 8, stiffness: 220, damping: 24, mass: 0.7, color: '#ffcc55' },
+  { orbit: 0,  phase: 0,           speed: 0,    size: 28, opacity: 0.28, blur: 0, stiffness: 220, damping: 24, mass: 0.7, color: '#ffcc55' },
   // Faísca dourada — órbita externa rápida
-  { orbit: 22, phase: 0,           speed: 2.6,  size: 4,  opacity: 0.85, blur: 1, stiffness: 220, damping: 22, mass: 0.55, color: '#ffe5a0' },
+  { orbit: 22, phase: 0,           speed: 2.6,  size: 4,  opacity: 0.85, blur: 0, stiffness: 220, damping: 22, mass: 0.55, color: '#ffe5a0' },
   // Faísca dourada — órbita média
   { orbit: 16, phase: Math.PI / 3, speed: -1.9, size: 3,  opacity: 0.78, blur: 0, stiffness: 180, damping: 22, mass: 0.6,  color: '#ffcc55' },
   // Faísca ciano — órbita externa
-  { orbit: 26, phase: Math.PI,     speed: 1.4,  size: 4,  opacity: 0.78, blur: 1, stiffness: 200, damping: 22, mass: 0.6,  color: '#44ddff' },
+  { orbit: 26, phase: Math.PI,     speed: 1.4,  size: 4,  opacity: 0.78, blur: 0, stiffness: 200, damping: 22, mass: 0.6,  color: '#44ddff' },
   // Faísca ciano — órbita interna
   { orbit: 14, phase: 1.6,         speed: -2.4, size: 3,  opacity: 0.7,  blur: 0, stiffness: 180, damping: 22, mass: 0.6,  color: '#22ddff' },
   // Faísca branca-azul difusa
-  { orbit: 32, phase: 4.2,         speed: 1.05, size: 3,  opacity: 0.55, blur: 2, stiffness: 140, damping: 22, mass: 0.7,  color: '#a8f0ff' },
+  { orbit: 32, phase: 4.2,         speed: 1.05, size: 3,  opacity: 0.55, blur: 0, stiffness: 140, damping: 22, mass: 0.7,  color: '#a8f0ff' },
   // Faísca dourada lenta — trail visual
-  { orbit: 38, phase: 5.4,         speed: -0.8, size: 3,  opacity: 0.45, blur: 2, stiffness: 110, damping: 24, mass: 0.85, color: '#ffe5a0' },
+  { orbit: 38, phase: 5.4,         speed: -0.8, size: 3,  opacity: 0.45, blur: 0, stiffness: 110, damping: 24, mass: 0.85, color: '#ffe5a0' },
   // Faísca ciano longe — sublimação
-  { orbit: 48, phase: 2.3,         speed: 0.55, size: 2.5, opacity: 0.35, blur: 3, stiffness: 80, damping: 24, mass: 1.0,  color: '#44ddff' },
+  { orbit: 48, phase: 2.3,         speed: 0.55, size: 2.5, opacity: 0.35, blur: 0, stiffness: 80, damping: 24, mass: 1.0,  color: '#44ddff' },
   // Pontos finos errantes
   { orbit: 18, phase: 0.7,         speed: 3.4,  size: 2,  opacity: 0.6,  blur: 0, stiffness: 240, damping: 22, mass: 0.5,  color: '#fff7c0' },
 ];

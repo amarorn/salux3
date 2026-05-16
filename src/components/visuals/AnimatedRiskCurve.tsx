@@ -36,7 +36,7 @@ export function AnimatedRiskCurve({ active }: { active: boolean }) {
               <stop offset="100%" stopColor="#fb7185" stopOpacity="0" />
             </linearGradient>
             <filter id="risk-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feGaussianBlur stdDeviation="0" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />

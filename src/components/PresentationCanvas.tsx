@@ -98,12 +98,12 @@ function BackgroundGlow() {
     <>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -left-32 top-1/4 h-[480px] w-[480px] rounded-full opacity-30 blur-3xl"
+        className="pointer-events-none absolute -left-32 top-1/4 h-[480px] w-[480px] rounded-full opacity-30"
         style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.45), transparent 70%)' }}
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute right-0 bottom-0 h-[520px] w-[520px] rounded-full opacity-30 blur-3xl"
+        className="pointer-events-none absolute right-0 bottom-0 h-[520px] w-[520px] rounded-full opacity-30"
         style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.4), transparent 70%)' }}
       />
     </>

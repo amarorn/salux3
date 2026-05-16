@@ -57,7 +57,7 @@ export function CardValueFlow({ accentColor, active, caption }: Props) {
             <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
           </linearGradient>
           <filter id="flow-glow" x="-20%" y="-50%" width="140%" height="200%">
-            <feGaussianBlur stdDeviation="2.5" />
+            <feGaussianBlur stdDeviation="0" />
             <feComposite
               in="SourceGraphic"
               in2="SourceGraphic"

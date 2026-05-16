@@ -80,12 +80,12 @@ export function ExpandedCardPortal({
         aria-hidden
         className="absolute inset-0 cursor-pointer"
         onClick={onClose}
-        initial={{ backdropFilter: "blur(0px)", background: "rgba(4,6,12,0)" }}
+        initial={{ backdropFilter: "none", background: "rgba(4,6,12,0)" }}
         animate={{
-          backdropFilter: "blur(14px)",
-          background: "rgba(4,6,12,0.68)",
+          backdropFilter: "none",
+          background: "rgba(4,6,12,0.78)",
         }}
-        exit={{ backdropFilter: "blur(0px)", background: "rgba(4,6,12,0)" }}
+        exit={{ backdropFilter: "none", background: "rgba(4,6,12,0)" }}
         transition={{ duration: 0.4 }}
       />
 
@@ -108,7 +108,7 @@ export function ExpandedCardPortal({
         exit={
           reducedMotion
             ? { opacity: 0, scale: 0.9 }
-            : { opacity: 0, scale: 0.88, y: 10, filter: "blur(8px)" }
+            : { opacity: 0, scale: 0.88, y: 10, filter: "none" }
         }
         transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
         onClick={(e) => {

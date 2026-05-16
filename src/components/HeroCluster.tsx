@@ -59,7 +59,7 @@ function HeroClusterComponent({ active }: HeroClusterProps) {
               <motion.div
                 animate={{ rotate: -360 }}
                 transition={{ duration: 80, ease: 'linear', repeat: Infinity }}
-                className="flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-white/80 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)] backdrop-blur"
+                className="flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-white/80 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]"
               >
                 <span
                   className="h-1.5 w-1.5 rounded-full"
@@ -79,7 +79,7 @@ function HeroClusterComponent({ active }: HeroClusterProps) {
       >
         <div className="relative">
           <div
-            className="absolute inset-0 rounded-full blur-3xl"
+            className="absolute inset-0 rounded-full"
             style={{
               background:
                 'radial-gradient(circle, rgba(124,58,237,0.45), rgba(6,182,212,0.25) 60%, transparent 80%)',

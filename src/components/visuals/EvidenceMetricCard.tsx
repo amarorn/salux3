@@ -58,7 +58,7 @@ export function EvidenceMetricCard({
       className="relative overflow-hidden rounded-2xl border px-6 py-5"
       style={{
         borderColor: `${accentColor}55`,
-        background: `linear-gradient(135deg, ${accentColor}1f 0%, rgba(255,255,255,0.02) 75%)`,
+        background: `linear-gradient(135deg, ${accentColor}38 0%, rgba(10,12,20,0.98) 34%, rgba(7,9,15,0.99) 100%)`,
         boxShadow: `inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 48px -28px ${accentColor}55`,
       }}
       initial={reduce ? false : { opacity: 0, y: 14 }}
@@ -140,13 +140,13 @@ export function EvidenceMetricCard({
             letterSpacing: '-0.03em',
             textShadow: `0 0 28px ${accentColor}88, 0 0 60px ${accentColor}44`,
           }}
-          initial={reduce ? false : { opacity: 0, filter: 'blur(8px)', y: 6 }}
+          initial={reduce ? false : { opacity: 0, filter: 'none', y: 6 }}
           animate={
             active
-              ? { opacity: 1, filter: 'blur(0px)', y: 0 }
+              ? { opacity: 1, filter: 'none', y: 0 }
               : reduce
                 ? undefined
-                : { opacity: 0, filter: 'blur(8px)', y: 6 }
+                : { opacity: 0, filter: 'none', y: 6 }
           }
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.5 + delay }}
         >

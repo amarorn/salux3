@@ -47,8 +47,8 @@ export function PresentationApp() {
           {hasEntered && (
             <motion.div
               key="presentation"
-              initial={{ opacity: 0, scale: 0.96, filter: "blur(6px)" }}
-              animate={{ opacity: 1, scale: 1, filter: "" }}
+              initial={{ opacity: 0, scale: 0.96, filter: "none" }}
+              animate={{ opacity: 1, scale: 1, filter: "none" }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="absolute inset-0"
             >

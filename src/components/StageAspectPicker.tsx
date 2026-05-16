@@ -15,7 +15,7 @@ export function StageAspectPicker() {
     <div
       role="radiogroup"
       aria-label="Proporção do palco da apresentação"
-      className="flex flex-col gap-1.5 rounded-xl border border-white/[0.08] bg-black/25 px-3 py-2.5 backdrop-blur-md"
+      className="flex flex-col gap-1.5 rounded-xl border border-white/[0.08] bg-black/25 px-3 py-2.5"
     >
       <span className="px-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
         Palco

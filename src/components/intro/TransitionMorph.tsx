@@ -153,8 +153,8 @@ export function TransitionMorph({ onComplete }: Props) {
       {/* ── Título da trilha ─────────────────────────────────────────── */}
       <motion.div
         className="absolute inset-x-0 bottom-10 z-10 flex items-center justify-center gap-3"
-        initial={{ opacity: 0, y: 14, filter: 'blur(8px)' }}
-        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        initial={{ opacity: 0, y: 14, filter: 'none' }}
+        animate={{ opacity: 1, y: 0, filter: 'none' }}
         transition={{ delay: 1.0, duration: 0.55, ease: EASE_BURST }}
       >
         <motion.span

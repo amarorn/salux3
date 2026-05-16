@@ -149,7 +149,7 @@ interface FormCardProps {
 function FormCard({ state, errors, status, submitError, onChange, onSubmit }: FormCardProps) {
   const submitting = status === 'submitting';
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/[0.025] p-8 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.85)] backdrop-blur-md sm:p-10">
+    <section className="rounded-3xl border border-white/10 bg-white/[0.025] p-8 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.85)] sm:p-10">
       <header className="mb-8">
         <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-violet-300/80">
           Conversa direta
@@ -303,7 +303,7 @@ function Field({
 
 function SuccessPanel() {
   return (
-    <section className="flex flex-col items-center gap-6 rounded-3xl border border-emerald-400/25 bg-emerald-500/[0.05] p-10 text-center shadow-[0_30px_80px_-30px_rgba(16,185,129,0.45)] backdrop-blur-md">
+    <section className="flex flex-col items-center gap-6 rounded-3xl border border-emerald-400/25 bg-emerald-500/[0.05] p-10 text-center shadow-[0_30px_80px_-30px_rgba(16,185,129,0.45)]">
       <span
         aria-hidden
         className="inline-flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/15"

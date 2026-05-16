@@ -53,7 +53,7 @@ export function MagneticButton({ to, children, className = '' }: Props) {
       onMouseMove={onMove}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
-      className={`relative inline-flex overflow-hidden rounded-full border border-white/18 bg-white/[0.06] px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.22em] text-white shadow-[0_20px_60px_-24px_rgba(0,0,0,0.85)] backdrop-blur-md transition-[border-color,background-color] duration-[480ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-white/38 hover:bg-white/[0.11] ${className}`}
+      className={`relative inline-flex overflow-hidden rounded-full border border-white/18 bg-white/[0.06] px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.22em] text-white shadow-[0_20px_60px_-24px_rgba(0,0,0,0.85)] transition-[border-color,background-color] duration-[480ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-white/38 hover:bg-white/[0.11] ${className}`}
     >
       <motion.span style={{ x: sx, y: sy, scale }} className="inline-block">
         {children}

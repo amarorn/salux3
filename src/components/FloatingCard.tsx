@@ -201,7 +201,7 @@ export function FloatingCard({
               radial-gradient(68% 48% at 78% 72%, ${accentColor.base}18 0%, transparent 75%),
               radial-gradient(70% 55% at 50% 45%, rgba(13,16,24,0.85) 0%, rgba(6,8,14,0.55) 60%, transparent 100%)
             `,
-            filter: "blur(36px)",
+            filter: "none",
             opacity: active ? 1 : 0.55,
             transition: "opacity 500ms ease-out",
           }}
@@ -215,7 +215,7 @@ export function FloatingCard({
             background: `radial-gradient(55% 45% at ${20 + (hashStepId(stepId) % 50)}% ${30 + (hashStepId(stepId + "y") % 40)}%, ${accentColor.base}1a 0%, transparent 70%)`,
             opacity: active ? 0.9 : 0.4,
             mixBlendMode: "screen",
-            filter: "blur(22px)",
+            filter: "none",
           }}
         />
         {/* Partículas/grain levíssimo, só pra quebrar planos chapados */}

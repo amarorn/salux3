@@ -40,7 +40,7 @@ export function PresentationNavArrows() {
         data-no-click-advance
         className="pointer-events-none absolute right-6 top-6 z-30"
       >
-        <span className="pointer-events-auto rounded-full border border-white/15 bg-white/[0.05] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/70 backdrop-blur-md">
+        <span className="pointer-events-auto rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/70">
           {indicators.position}
         </span>
       </motion.div>
@@ -78,7 +78,7 @@ function ArrowButton({ side, onClick, disabled, ariaLabel, children }: ArrowButt
           if (!disabled) onClick();
         }}
         className={clsx(
-          'pointer-events-auto group inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/14 bg-black/35 text-white/85 shadow-[0_18px_44px_-20px_rgba(0,0,0,0.85)] backdrop-blur-md transition-[border-color,background-color,transform] duration-300',
+          'pointer-events-auto group inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/14 bg-black/50 text-white/85 shadow-[0_18px_44px_-20px_rgba(0,0,0,0.85)] transition-[border-color,background-color,transform] duration-300',
           'hover:border-white/30 hover:bg-black/55 hover:text-white',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/50',
           'active:scale-[0.96]',

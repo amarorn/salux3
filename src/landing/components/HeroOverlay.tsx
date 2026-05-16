@@ -11,11 +11,11 @@ const lineVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 32, filter: 'blur(14px)' },
+  hidden: { opacity: 0, y: 32, filter: 'none' },
   visible: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
+    filter: 'none',
     transition: { duration: 0.78, ease: [0.16, 1, 0.3, 1] },
   },
 };
@@ -87,7 +87,7 @@ export function HeroOverlay() {
           {!mobile && (
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-[-20px] rounded-full bg-violet-500/10 opacity-0 blur-3xl transition-[opacity] duration-[520ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-[0.75]"
+              className="pointer-events-none absolute inset-[-20px] rounded-full bg-violet-500/10 opacity-0 transition-[opacity] duration-[520ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-[0.75]"
             />
           )}
           <div className="pointer-events-auto">

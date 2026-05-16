@@ -207,7 +207,7 @@ function FragmentedVsCoordinatedPreview({
                 <stop offset="100%" stopColor="#54c1ed" stopOpacity="0.6" />
               </linearGradient>
               <filter id="coord-glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="1.5" result="blur" />
+                <feGaussianBlur stdDeviation="0" result="blur" />
                 <feMerge>
                   <feMergeNode in="blur" />
                   <feMergeNode in="SourceGraphic" />
@@ -377,8 +377,8 @@ export function RoadmapStep({ step, active }: Props) {
           {/* Título */}
           <motion.div
             className="sm:col-span-2 lg:col-span-3"
-            initial={reduceMotion ? false : { opacity: 0, y: -10, filter: 'blur(4px)' }}
-            animate={active ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: -10, filter: 'blur(4px)' }}
+            initial={reduceMotion ? false : { opacity: 0, y: -10, filter: 'none' }}
+            animate={active ? { opacity: 1, y: 0, filter: 'none' } : { opacity: 0, y: -10, filter: 'none' }}
             transition={{
               duration: 0.55,
               ease: [0.22, 1, 0.36, 1],
@@ -405,13 +405,13 @@ export function RoadmapStep({ step, active }: Props) {
               <motion.div
                 key={card.title}
                 className="min-h-0"
-                initial={reduceMotion ? false : { opacity: 0, y: yFrom, scale: 0.95, filter: 'blur(5px)' }}
+                initial={reduceMotion ? false : { opacity: 0, y: yFrom, scale: 0.95, filter: 'none' }}
                 animate={
                   !active
-                    ? { opacity: 0, y: yFrom, scale: 0.95, filter: 'blur(5px)' }
+                    ? { opacity: 0, y: yFrom, scale: 0.95, filter: 'none' }
                     : isDimmed
                       ? { opacity: 0.35, scale: 0.97, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }
-                      : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
+                      : { opacity: 1, y: 0, scale: 1, filter: 'none' }
                 }
                 transition={{ delay, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               >

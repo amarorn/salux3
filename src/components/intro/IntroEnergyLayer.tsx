@@ -61,7 +61,7 @@ export function IntroEnergyLayer({
           style={{
             background:
               'radial-gradient(circle, rgba(255,228,140,0.85) 0%, rgba(255,170,60,0.55) 18%, rgba(70,160,255,0.35) 42%, rgba(20,80,200,0.15) 65%, transparent 80%)',
-            filter: 'blur(28px)',
+            filter: 'none',
             mixBlendMode: 'screen',
             willChange: 'opacity, transform',
             scale: coreScale,
@@ -83,7 +83,7 @@ export function IntroEnergyLayer({
           style={{
             background:
               'radial-gradient(circle, rgba(255,210,120,0.55) 0%, rgba(120,200,255,0.28) 35%, transparent 70%)',
-            filter: 'blur(40px)',
+            filter: 'none',
             mixBlendMode: 'screen',
             opacity: coreOpacityBoost,
             willChange: 'opacity',

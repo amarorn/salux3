@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Reveal ao scroll (GSAP + ScrollTrigger): opacidade, deslocamento e blur.
+ * Reveal ao scroll (GSAP + ScrollTrigger): opacidade e deslocamento.
  */
 export function bindRevealOnScroll(element: HTMLElement | null): () => void {
   if (!element) {
@@ -14,11 +14,10 @@ export function bindRevealOnScroll(element: HTMLElement | null): () => void {
   const ctx = gsap.context(() => {
     gsap.fromTo(
       element,
-      { opacity: 0, y: 56, filter: 'blur(14px)' },
+      { opacity: 0, y: 56 },
       {
         opacity: 1,
         y: 0,
-        filter: 'blur(0px)',
         duration: 1.05,
         ease: 'power3.out',
         scrollTrigger: {

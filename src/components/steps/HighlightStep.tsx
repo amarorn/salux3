@@ -140,11 +140,11 @@ export function HighlightStep({ step, active }: Props) {
                   <motion.span
                     key={`${word}-${i}`}
                     className="inline-block"
-                    initial={{ opacity: 0, y: 6, filter: 'blur(4px)' }}
+                    initial={{ opacity: 0, y: 6, filter: 'none' }}
                     animate={
                       active
-                        ? { opacity: 1, y: 0, filter: 'blur(0px)' }
-                        : { opacity: 0, y: 6, filter: 'blur(4px)' }
+                        ? { opacity: 1, y: 0, filter: 'none' }
+                        : { opacity: 0, y: 6, filter: 'none' }
                     }
                     transition={{
                       duration: 0.45,

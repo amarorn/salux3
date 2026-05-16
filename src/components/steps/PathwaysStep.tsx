@@ -160,8 +160,8 @@ export function PathwaysStep({ step, active }: Props) {
           </div>
           <motion.p
             key={focused?.product}
-            initial={reduce ? false : { opacity: 0, y: 6, filter: 'blur(6px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={reduce ? false : { opacity: 0, y: 6, filter: 'none' }}
+            animate={{ opacity: 1, y: 0, filter: 'none' }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="mt-1 font-display text-[1.4rem] font-extrabold leading-tight"
             style={{ color: '#fff', textShadow: `0 0 16px ${accent.base}66` }}

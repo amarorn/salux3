@@ -127,7 +127,7 @@ export function IntroScreen() {
           >
             <motion.div
               aria-hidden
-              className="pointer-events-none absolute -inset-32 -z-10 rounded-full blur-3xl"
+              className="pointer-events-none absolute -inset-32 -z-10 rounded-full"
               style={{
                 background:
                   'radial-gradient(circle, rgba(74,156,250,0.32), rgba(82,160,239,0.09) 48%, transparent 72%)',
@@ -233,12 +233,12 @@ function TrackCard({ track, index, accent, disabled, dimmed, onHoverChange, onCl
     <motion.button
       type="button"
       disabled={disabled}
-      initial={{ opacity: 0, y: 20, scale: 0.97, filter: 'blur(6px)' }}
+      initial={{ opacity: 0, y: 20, scale: 0.97, filter: 'none' }}
       animate={{
         opacity: dimmed ? 0.45 : 1,
         y: 0,
         scale: hovered ? 1.025 : dimmed ? 0.985 : 1,
-        filter: dimmed ? 'blur(2px)' : 'blur(0px)',
+        filter: 'none',
       }}
       transition={{ delay: hovered || dimmed ? 0 : 0.08 + index * 0.06, duration: hovered || dimmed ? 0.32 : 0.65, ease: [0.22, 1, 0.36, 1] }}
       onHoverStart={() => {
@@ -402,7 +402,7 @@ function SectionMarquee({ ready }: { ready: boolean }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: ready ? 0.5 : 0 }}
       transition={{ delay: 0.4, duration: 0.8 }}
-      className="relative w-screen overflow-hidden border-t border-white/[0.05] bg-black/15 py-2.5 backdrop-blur-sm"
+      className="relative w-screen overflow-hidden border-t border-white/[0.05] bg-black/15 py-2.5"
       style={{
         maskImage: 'linear-gradient(90deg, transparent, black 10%, black 90%, transparent)',
         WebkitMaskImage: 'linear-gradient(90deg, transparent, black 10%, black 90%, transparent)',

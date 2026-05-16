@@ -106,7 +106,7 @@ function FloatingOrbs() {
     <>
       <motion.div
         aria-hidden
-        className="absolute h-[420px] w-[420px] rounded-full opacity-40 blur-3xl"
+        className="absolute h-[420px] w-[420px] rounded-full opacity-40"
         style={{
           background: 'radial-gradient(circle, rgba(74,156,250,0.55), transparent 70%)',
         }}
@@ -115,7 +115,7 @@ function FloatingOrbs() {
       />
       <motion.div
         aria-hidden
-        className="absolute right-0 h-[520px] w-[520px] rounded-full opacity-35 blur-3xl"
+        className="absolute right-0 h-[520px] w-[520px] rounded-full opacity-35"
         style={{
           background: 'radial-gradient(circle, rgba(84,193,237,0.45), transparent 70%)',
         }}

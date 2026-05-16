@@ -96,7 +96,7 @@ export function EvidenceRangeCard({
       className="relative overflow-hidden rounded-2xl border px-6 py-5"
       style={{
         borderColor: `${accentColor}55`,
-        background: `linear-gradient(135deg, ${accentColor}1f 0%, rgba(255,255,255,0.02) 75%)`,
+        background: `linear-gradient(135deg, ${accentColor}38 0%, rgba(10,12,20,0.98) 34%, rgba(7,9,15,0.99) 100%)`,
         boxShadow: `inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 48px -28px ${accentColor}55`,
       }}
       initial={reduce ? false : { opacity: 0, y: 14 }}
@@ -169,15 +169,15 @@ export function EvidenceRangeCard({
               fontSize: 'clamp(2.4rem, 6.2vw, 3.6rem)',
               fontWeight: 800,
               letterSpacing: '-0.03em',
-              textShadow: `0 0 24px ${accentColor}88, 0 0 56px ${accentColor}44`,
+              textShadow: `0 0 10px ${accentColor}55`,
             }}
-            initial={reduce ? false : { opacity: 0, filter: 'blur(8px)', y: 6 }}
+            initial={reduce ? false : { opacity: 0, filter: 'none', y: 6 }}
             animate={
               active
-                ? { opacity: 1, filter: 'blur(0px)', y: 0 }
+                ? { opacity: 1, filter: 'none', y: 0 }
                 : reduce
                   ? undefined
-                  : { opacity: 0, filter: 'blur(8px)', y: 6 }
+                  : { opacity: 0, filter: 'none', y: 6 }
             }
             transition={{ duration: 0.7, delay: 0.5 + delay }}
           >
@@ -200,15 +200,15 @@ export function EvidenceRangeCard({
                   fontSize: 'clamp(2.4rem, 6.2vw, 3.6rem)',
                   fontWeight: 800,
                   letterSpacing: '-0.03em',
-                  textShadow: `0 0 24px ${accentColor}88, 0 0 56px ${accentColor}44`,
+                  textShadow: `0 0 10px ${accentColor}55`,
                 }}
-                initial={reduce ? false : { opacity: 0, filter: 'blur(8px)', y: 6 }}
+                initial={reduce ? false : { opacity: 0, filter: 'none', y: 6 }}
                 animate={
                   active
-                    ? { opacity: 1, filter: 'blur(0px)', y: 0 }
+                    ? { opacity: 1, filter: 'none', y: 0 }
                     : reduce
                       ? undefined
-                      : { opacity: 0, filter: 'blur(8px)', y: 6 }
+                      : { opacity: 0, filter: 'none', y: 6 }
                 }
                 transition={{ duration: 0.7, delay: 0.8 + delay }}
               >
@@ -237,9 +237,6 @@ export function EvidenceRangeCard({
               <stop offset="50%" stopColor={accentColor} stopOpacity="1" />
               <stop offset="100%" stopColor={accentColor} stopOpacity="0.7" />
             </linearGradient>
-            <filter id="range-glow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="2.4" />
-            </filter>
           </defs>
 
           {/* track de fundo (linha horizontal) */}
@@ -301,7 +298,6 @@ export function EvidenceRangeCard({
             strokeOpacity={0.45}
             strokeWidth={14}
             strokeLinecap="round"
-            filter="url(#range-glow)"
             initial={reduce ? false : { pathLength: 0 }}
             animate={active ? { pathLength: 1 } : reduce ? undefined : { pathLength: 0 }}
             transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.95 + delay }}

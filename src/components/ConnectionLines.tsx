@@ -60,7 +60,7 @@ function ConnectionLinesComponent({ activeStepId, isOverview }: ConnectionLinesP
           <stop offset="100%" stopColor="#4a9cfa" />
         </linearGradient>
         <filter id="particle-glow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="3.2" result="blur" />
+          <feGaussianBlur stdDeviation="0" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />

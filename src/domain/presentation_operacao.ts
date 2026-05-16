@@ -326,7 +326,6 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           valueStagesLead: 'O que os Agentes fazem na operação:',
           valueStagesFlat: true,
           valueStagesGridCols: 2,
-          valueStagesRevealChunkSize: 3,
           valueStages: [
             {
               number: '01',

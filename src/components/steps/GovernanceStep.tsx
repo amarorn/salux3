@@ -265,8 +265,8 @@ function RevealPillarChip({ label, index }: { label: string; index: number }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12, scale: 0.94, filter: 'blur(3px)' }}
-      animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+      initial={{ opacity: 0, y: 12, scale: 0.94, filter: 'none' }}
+      animate={{ opacity: 1, y: 0, scale: 1, filter: 'none' }}
       transition={{
         delay: 0.04 + index * 0.07,
         duration: 0.5,
@@ -287,7 +287,7 @@ function RevealPillarChip({ label, index }: { label: string; index: number }) {
       {/* Glow de canto */}
       <span
         aria-hidden
-        className="pointer-events-none absolute -right-4 -top-4 h-12 w-12 rounded-full blur-xl"
+        className="pointer-events-none absolute -right-4 -top-4 h-12 w-12 rounded-full opacity-25"
         style={{
           background: 'rgba(245,158,11,0.4)',
           opacity: hovered ? 1 : 0,
@@ -312,8 +312,8 @@ function PillarCard({ pillar, index, active }: PillarCardProps) {
 
   return (
     <motion.div
-      initial={reduceMotion ? false : { opacity: 0, y: 14, scale: 0.96, filter: 'blur(4px)' }}
-      animate={active ? { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' } : { opacity: 0, y: 14, scale: 0.96, filter: 'blur(4px)' }}
+      initial={reduceMotion ? false : { opacity: 0, y: 14, scale: 0.96, filter: 'none' }}
+      animate={active ? { opacity: 1, y: 0, scale: 1, filter: 'none' } : { opacity: 0, y: 14, scale: 0.96, filter: 'none' }}
       transition={{ delay: active ? 0.18 + index * 0.09 : 0, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
@@ -354,7 +354,7 @@ function PillarCard({ pillar, index, active }: PillarCardProps) {
 
       <span
         aria-hidden
-        className="pointer-events-none absolute -right-6 -top-6 h-14 w-14 rounded-full blur-2xl"
+        className="pointer-events-none absolute -right-6 -top-6 h-14 w-14 rounded-full opacity-20"
         style={{ background: 'rgba(245,158,11,0.3)', opacity: hovered ? 1 : 0, transition: 'opacity 400ms' }}
       />
     </motion.div>
