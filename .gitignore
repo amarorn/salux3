@@ -9,3 +9,4 @@ dist-ssr
 .env.local
 .idea
 .vscode
+*.tsbuildinfo
