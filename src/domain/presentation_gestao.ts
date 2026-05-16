@@ -32,7 +32,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
       title: 'Quando a pressão assistencial supera a capacidade de coordenação da rede?',
       subtitle: 'Sinais de uma rede que opera sob carga',
       content: {
-        headline: 'Abertura',
+        headline: 'Gestão',
         cardVisual: 'heartbeat',
         lead: 'Sua rede reconhece algum destes sinais?',
         valueStagesFlat: true,
@@ -116,7 +116,6 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
               'Milhões de pessoas aguardam atendimento sem priorização orientada por risco clínico.\nFila não é apenas volume acumulado — é perda de capacidade de organizar acesso, risco e prioridade.',
           },
         },
-        closingQuestionLabel: 'CTA · Pergunta-gatilho',
         closingQuestion:
           'Qual é o % de capacidade instalada que sua rede usa de forma desigual hoje?',
         heroImage: {
