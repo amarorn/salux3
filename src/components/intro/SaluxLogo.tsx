@@ -264,7 +264,6 @@ export function SaluxLogo({
       {fxAberration && wantBurst && (
         <>
           <motion.g
-            style={{ mixBlendMode: "screen" as const }}
             initial={{ opacity: 0, x: -2 }}
             animate={{ opacity: [0, 0.55, 0], x: [-2, -2, 0] }}
             transition={{
@@ -279,7 +278,6 @@ export function SaluxLogo({
             ))}
           </motion.g>
           <motion.g
-            style={{ mixBlendMode: "screen" as const }}
             initial={{ opacity: 0, x: 2 }}
             animate={{ opacity: [0, 0.55, 0], x: [2, 2, 0] }}
             transition={{
@@ -428,18 +426,21 @@ export function SaluxLogo({
   const idleTiltActive = idleActive;
 
   return (
-    <div
+    <motion.div
       className={className}
       style={{
         display: "inline-block",
+        overflow: "visible",
+        background: "transparent",
         perspective: idleTiltActive ? "900px" : undefined,
       }}
     >
       <motion.div
         style={{
           display: "inline-block",
-          transformStyle: "preserve-3d",
-          willChange: idleTiltActive ? "transform" : undefined,
+          overflow: "visible",
+          background: "transparent",
+          transformStyle: idleTiltActive ? "preserve-3d" : undefined,
         }}
         animate={
           idleTiltActive
@@ -466,6 +467,7 @@ export function SaluxLogo({
           width={width}
           aria-label="Salux"
           role="img"
+          style={{ display: "block", overflow: "visible", background: "transparent" }}
         >
           <defs>
             {symbolGradientDefs}
@@ -554,7 +556,7 @@ export function SaluxLogo({
           )}
         </svg>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
 

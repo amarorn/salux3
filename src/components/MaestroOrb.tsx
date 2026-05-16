@@ -16,6 +16,7 @@ import type { NodeKind, PresentationStep } from '@/domain/types';
  *   / headline / body / fallback por kind) — nunca repete entre cards.
  * - Balão fica visível enquanto o slide está ativo (sem auto-hide).
  * - Balão é deslocado horizontalmente para nunca sair da tela.
+ * - Na chegada de cada slide, shape-morph breve (badge/barra/hex/etc.) e volta ao orbe.
  */
 
 interface Props {
@@ -46,19 +47,6 @@ type SlotName =
   | 'bottom-right'
   | 'bottom-left-mid'
   | 'bottom-right-mid';
-
-const SLOT_ORDER: SlotName[] = [
-  'top-center-outer',
-  'top-left',
-  'top-right',
-  'top-left-mid',
-  'top-right-mid',
-  'bottom-center-outer',
-  'bottom-left',
-  'bottom-right',
-  'bottom-left-mid',
-  'bottom-right-mid',
-];
 
 /**
  * Caixa proibida (card central) e corredores permitidos para o orbe.
@@ -150,65 +138,6 @@ function hashString(s: string): number {
   return Math.abs(h);
 }
 
-/**
- * Zonas seguras por `stepId`. Cada slide declara quais slots pode usar.
- * O orbe rotaciona entre eles conforme o offset da trilha — assim a mesma
- * "capa" pousa em pontos diferentes quando o usuário troca de trilha.
- */
-const STEP_SLOTS: Record<string, SlotName[]> = {
-  cover: ['top-center-outer', 'bottom-center-outer'],
-  limit: ['bottom-left', 'top-right-mid'],
-  'why-agents': ['top-left', 'bottom-right-mid'],
-  architecture: ['top-left-mid', 'bottom-right'],
-  journey: ['top-right', 'bottom-left'],
-  integration: ['top-right-mid', 'bottom-left-mid'],
-  governance: ['top-left', 'bottom-right'],
-  roadmap: ['bottom-left-mid', 'top-right'],
-  'tecnologia-que-age': ['top-left', 'bottom-right'],
-  closing: ['top-center-outer', 'bottom-center-outer'],
-  capacities: ['top-left', 'bottom-right-mid'],
-  pathways: ['top-right', 'bottom-left-mid'],
-  'agents-flow': ['top-left-mid', 'bottom-right'],
-  results: ['bottom-right', 'top-left'],
-  'highlight-context': ['top-center-outer', 'bottom-center-outer'],
-  'gestao-results': ['bottom-right', 'top-left'],
-};
-
-/** Fallback por tipo de slide quando o `stepId` não tem zona declarada. */
-const KIND_SLOTS: Record<NodeKind, SlotName[]> = {
-  cover: ['top-center-outer', 'bottom-center-outer'],
-  narrative: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
-  highlight: ['top-center-outer', 'bottom-center-outer'],
-  architecture: ['top-left-mid', 'bottom-right'],
-  journey: ['top-right', 'bottom-left'],
-  integration: ['top-right-mid', 'bottom-left-mid'],
-  governance: ['top-left', 'bottom-right'],
-  roadmap: ['bottom-left-mid', 'top-right'],
-  closing: ['top-center-outer', 'bottom-center-outer'],
-  capacities: ['top-left', 'bottom-right-mid'],
-  pathways: ['top-right', 'bottom-left-mid'],
-  'agents-flow': ['top-left-mid', 'bottom-right'],
-  results: ['bottom-right', 'top-left'],
-};
-
-/** Lista de zonas permitidas para o slide atual. */
-function allowedSlotsFor(step: PresentationStep): SlotName[] {
-  return STEP_SLOTS[step.id] ?? KIND_SLOTS[step.kind] ?? SLOT_ORDER;
-}
-
-/** Escolha determinística dentro das zonas permitidas pelo slide. */
-function pickSlot(
-  slotMap: Record<SlotName, Slot>,
-  trackId: string,
-  step: PresentationStep,
-): Slot {
-  const allowed = allowedSlotsFor(step);
-  const trackOffset = hashString(trackId);
-  const idx = (step.index + trackOffset) % allowed.length;
-  const name = allowed[idx] ?? allowed[0]!;
-  return slotMap[name];
-}
-
 /** Fallback curto por tipo de slide. */
 const KIND_WHISPERS: Record<NodeKind, string> = {
   cover: 'Vamos começar por aqui.',
@@ -250,6 +179,155 @@ function pickWhisper(step: PresentationStep): string {
     if (phrase) return phrase;
   }
   return KIND_WHISPERS[step.kind] ?? 'Olha por aqui.';
+}
+
+/** Formas breves na chegada de cada slide (shape-morph). */
+type MorphShape = 'badge' | 'bar' | 'hex' | 'diamond' | 'ring';
+
+const MORPH_ARM_MS = 260;
+const MORPH_HOLD_MS = 680;
+
+const KIND_MORPH_SHAPE: Record<NodeKind, MorphShape> = {
+  cover: 'ring',
+  narrative: 'badge',
+  highlight: 'ring',
+  architecture: 'bar',
+  journey: 'bar',
+  integration: 'hex',
+  governance: 'diamond',
+  roadmap: 'bar',
+  closing: 'ring',
+  capacities: 'badge',
+  pathways: 'diamond',
+  'agents-flow': 'hex',
+  results: 'badge',
+};
+
+const STEP_MORPH_SHAPE: Record<string, MorphShape> = {
+  cover: 'ring',
+  closing: 'ring',
+  'highlight-context': 'ring',
+  architecture: 'bar',
+  journey: 'bar',
+  roadmap: 'bar',
+  integration: 'hex',
+  governance: 'diamond',
+  'agents-flow': 'hex',
+  capacities: 'badge',
+  pathways: 'diamond',
+  results: 'badge',
+  limit: 'hex',
+  'why-agents': 'hex',
+};
+
+/** Forma do morph na chegada — varia por slide e por kind. */
+function arrivalMorphShape(step: PresentationStep): MorphShape {
+  const fixed = STEP_MORPH_SHAPE[step.id];
+  if (fixed) return fixed;
+  if (step.kind === 'narrative') {
+    const pool: MorphShape[] = ['badge', 'bar', 'hex', 'diamond'];
+    return pool[hashString(step.id) % pool.length]!;
+  }
+  return KIND_MORPH_SHAPE[step.kind];
+}
+
+interface MaestroArrivalShapeProps {
+  shape: MorphShape;
+  accent: string;
+}
+
+/** Silhueta luminosa exibida brevemente ao pousar no slide. */
+function MaestroArrivalShape({ shape, accent }: MaestroArrivalShapeProps) {
+  const ease = [0.22, 1, 0.36, 1] as const;
+  const glow = `0 0 28px ${GOLD}aa, 0 0 12px ${accent}88, inset 0 0 20px ${GOLD}33`;
+
+  if (shape === 'hex') {
+    return (
+      <motion.div
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        initial={{ opacity: 0, scale: 0.35, rotate: -18 }}
+        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+        exit={{ opacity: 0, scale: 0.5, rotate: 12 }}
+        transition={{ duration: 0.42, ease }}
+        style={{ width: 108, height: 108 }}
+      >
+        <svg viewBox="0 0 100 100" width="108" height="108" aria-hidden>
+          <polygon
+            points="50,6 90,28 90,72 50,94 10,72 10,28"
+            fill={`${GOLD}28`}
+            stroke={GOLD_BRIGHT}
+            strokeWidth="1.5"
+            style={{ filter: `drop-shadow(0 0 8px ${GOLD}cc)` }}
+          />
+          <polygon
+            points="50,20 76,34 76,66 50,80 24,66 24,34"
+            fill="none"
+            stroke={accent}
+            strokeWidth="0.9"
+            strokeOpacity="0.85"
+          />
+        </svg>
+      </motion.div>
+    );
+  }
+
+  if (shape === 'diamond') {
+    return (
+      <motion.div
+        className="absolute left-1/2 top-1/2"
+        initial={{ opacity: 0, scale: 0.3, rotate: 0, x: '-50%', y: '-50%' }}
+        animate={{ opacity: 1, scale: 1, rotate: 45, x: '-50%', y: '-50%' }}
+        exit={{ opacity: 0, scale: 0.45, rotate: 60 }}
+        transition={{ duration: 0.42, ease }}
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 10,
+          border: `1.5px solid ${GOLD_BRIGHT}`,
+          background: `linear-gradient(135deg, ${GOLD}55 0%, ${accent}33 100%)`,
+          boxShadow: glow,
+        }}
+      />
+    );
+  }
+
+  if (shape === 'ring') {
+    return (
+      <motion.div
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+        initial={{ opacity: 0, scale: 0.4 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.55 }}
+        transition={{ duration: 0.42, ease }}
+        style={{
+          width: 100,
+          height: 100,
+          border: `2px solid ${GOLD_BRIGHT}`,
+          background: `radial-gradient(circle, ${GOLD}44 0%, transparent 62%)`,
+          boxShadow: glow,
+        }}
+      />
+    );
+  }
+
+  const isBar = shape === 'bar';
+  return (
+    <motion.div
+      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+      initial={{ opacity: 0, scale: 0.35 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.5 }}
+      transition={{ duration: 0.42, ease }}
+      style={{
+        width: isBar ? 132 : 112,
+        height: isBar ? 34 : 42,
+        borderRadius: isBar ? 8 : 999,
+        border: `1.5px solid ${GOLD_BRIGHT}`,
+        background: `linear-gradient(135deg, ${GOLD_BRIGHT}55 0%, ${GOLD}44 40%, ${accent}33 100%)`,
+        boxShadow: glow,
+      }}
+    />
+  );
 }
 
 /**
@@ -739,6 +817,26 @@ export function MaestroOrb({ visible }: Props) {
 
   const whisperDuringPilgrimage = pilgrimage === 'off';
 
+  const arrivalShape = useMemo(
+    () => (current ? arrivalMorphShape(current) : 'badge' as MorphShape),
+    [current],
+  );
+
+  const [shapeMorphing, setShapeMorphing] = useState(false);
+  useEffect(() => {
+    if (!visible || !current || reduceMotion || pilgrimageActive) {
+      setShapeMorphing(false);
+      return;
+    }
+    setShapeMorphing(false);
+    const arm = window.setTimeout(() => setShapeMorphing(true), MORPH_ARM_MS);
+    const settle = window.setTimeout(() => setShapeMorphing(false), MORPH_ARM_MS + MORPH_HOLD_MS);
+    return () => {
+      window.clearTimeout(arm);
+      window.clearTimeout(settle);
+    };
+  }, [stepId, visible, current?.id, reduceMotion, pilgrimageActive]);
+
   return (
     <AnimatePresence>
       {visible && (
@@ -779,6 +877,8 @@ export function MaestroOrb({ visible }: Props) {
               bubbleShift={bubbleShift}
               stepId={stepId}
               hideCore={pilgrimage === 'burst'}
+              arrivalShape={arrivalShape}
+              shapeMorphing={shapeMorphing && pilgrimage === 'off'}
             />
             {pilgrimage === 'burst' && (
               <div
@@ -1015,6 +1115,8 @@ interface MaestroVisualProps {
   stepId: string;
   /** Esconde o núcleo do orbe (ex.: durante decomposição radial). */
   hideCore?: boolean;
+  arrivalShape: MorphShape;
+  shapeMorphing: boolean;
 }
 
 function MaestroVisual({
@@ -1027,6 +1129,8 @@ function MaestroVisual({
   bubbleShift,
   stepId,
   hideCore = false,
+  arrivalShape,
+  shapeMorphing,
 }: MaestroVisualProps) {
   return (
     <motion.div className="relative" style={{ width: TOTAL_WIDTH, height: SIZE }}>
@@ -1046,8 +1150,11 @@ function MaestroVisual({
       <motion.div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ width: SIZE, height: SIZE }}
-        animate={{ opacity: hideCore ? 0 : 1, scale: hideCore ? 0.85 : 1 }}
-        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        animate={{
+          opacity: hideCore ? 0 : shapeMorphing ? 0 : 1,
+          scale: hideCore ? 0.85 : shapeMorphing ? 0.92 : 1,
+        }}
+        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       >
         <motion.div
           className="absolute inset-[-40px] rounded-full"
@@ -1346,6 +1453,12 @@ function MaestroVisual({
             />
           ))}
       </motion.div>
+
+      <AnimatePresence>
+        {shapeMorphing && !hideCore && (
+          <MaestroArrivalShape key={`morph-${stepId}-${arrivalShape}`} shape={arrivalShape} accent={accent} />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

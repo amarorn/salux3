@@ -113,7 +113,13 @@ export function IntroScreen() {
       >
         <div className="flex flex-col items-center">
           <motion.div
-            className="relative"
+            className="relative overflow-visible"
+            style={{
+              maskImage:
+                'radial-gradient(ellipse 94% 90% at 50% 48%, #000 62%, transparent 100%)',
+              WebkitMaskImage:
+                'radial-gradient(ellipse 94% 90% at 50% 48%, #000 62%, transparent 100%)',
+            }}
             animate={{
               y: [0, -9, -4, -11, 0],
               rotate: [0, 0.35, -0.25, 0.2, 0],
@@ -127,10 +133,10 @@ export function IntroScreen() {
           >
             <motion.div
               aria-hidden
-              className="pointer-events-none absolute -inset-32 -z-10 rounded-full"
+              className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[min(100vw,560px)] w-[min(100vw,560px)] -translate-x-1/2 -translate-y-1/2 rounded-full"
               style={{
                 background:
-                  'radial-gradient(circle, rgba(74,156,250,0.32), rgba(82,160,239,0.09) 48%, transparent 72%)',
+                  'radial-gradient(circle, rgba(74,156,250,0.28) 0%, rgba(82,160,239,0.08) 42%, transparent 68%)',
               }}
               animate={{
                 opacity: [0.42, 0.78, 0.55, 0.72, 0.42],

@@ -49,7 +49,7 @@ export function PresentationCornerLogo({ visible }: Props) {
                 rotate: traction.rotate,
                 scale: scaleSpring,
               }}
-              className="will-change-transform drop-shadow-[0_12px_28px_-8px_rgba(124,58,237,0.35)]"
+              className="drop-shadow-[0_12px_28px_-8px_rgba(124,58,237,0.35)]"
             >
               {hasEntered ? (
                 <button
