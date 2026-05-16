@@ -555,23 +555,23 @@ function SpeechBubble({ text, accent, placement, reduceMotion, shiftX }: SpeechB
                 top: -5,
                 borderLeft: '6px solid transparent',
                 borderRight: '6px solid transparent',
-                borderBottom: `7px solid rgba(8,12,20,0.95)`,
+                borderBottom: `7px solid rgba(8,12,20,0.5)`,
               }
             : {
                 bottom: -5,
                 borderLeft: '6px solid transparent',
                 borderRight: '6px solid transparent',
-                borderTop: `7px solid rgba(8,12,20,0.95)`,
+                borderTop: `7px solid rgba(8,12,20,0.5)`,
               }),
         }}
       />
 
-      <div
-        className="relative rounded-2xl border px-4 py-2.5 text-[12px] font-medium leading-snug text-white/95"
+      <motion.div
+        className="relative rounded-2xl border px-4 py-2.5 text-[12px] font-medium leading-snug text-white/90 backdrop-blur-md"
         style={{
-          borderColor: `${accent}66`,
-          background: `linear-gradient(135deg, ${accent}1f 0%, rgba(8,12,20,0.95) 100%)`,
-          boxShadow: `0 10px 28px -6px ${accent}55, 0 0 0 1px ${accent}22, inset 0 1px 0 rgba(255,255,255,0.08)`,
+          borderColor: `${accent}44`,
+          background: `linear-gradient(135deg, ${accent}14 0%, rgba(8,12,20,0.42) 100%)`,
+          boxShadow: `0 10px 28px -6px ${accent}33, 0 0 0 1px ${accent}18, inset 0 1px 0 rgba(255,255,255,0.06)`,
           minWidth: 60,
           whiteSpace: 'pre-wrap',
         }}
@@ -586,7 +586,7 @@ function SpeechBubble({ text, accent, placement, reduceMotion, shiftX }: SpeechB
             transition={{ duration: 0.7, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -616,7 +616,20 @@ function MaestroVisual({
   hideCore = false,
 }: MaestroVisualProps) {
   return (
-    <div className="relative" style={{ width: TOTAL_WIDTH, height: SIZE }}>
+    <motion.div className="relative" style={{ width: TOTAL_WIDTH, height: SIZE }}>
+      <AnimatePresence>
+        {showWhisper && whisper && (
+          <SpeechBubble
+            key={`whisper-${stepId}`}
+            text={whisper}
+            accent={accent}
+            placement={whisperPlacement}
+            reduceMotion={reduceMotion}
+            shiftX={bubbleShift}
+          />
+        )}
+      </AnimatePresence>
+
       <motion.div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ width: SIZE, height: SIZE }}
@@ -627,7 +640,7 @@ function MaestroVisual({
           className="absolute inset-[-40px] rounded-full"
           style={{
             background: `radial-gradient(circle, ${GOLD}55 0%, ${GOLD}22 25%, ${accent}11 55%, transparent 75%)`,
-            filter: 'none',
+            filter: 'blur(22px)',
           }}
           animate={
             reduceMotion
@@ -643,7 +656,7 @@ function MaestroVisual({
           className="absolute inset-[-15px] rounded-full"
           style={{
             background: `radial-gradient(circle, ${GOLD_BRIGHT}40 0%, ${GOLD}25 30%, transparent 60%)`,
-            filter: 'none',
+            filter: 'blur(10px)',
           }}
           animate={
             reduceMotion
@@ -743,6 +756,7 @@ function MaestroVisual({
                 stroke={GOLD}
                 strokeWidth="0.5"
                 strokeOpacity="0.32"
+                style={{ filter: 'blur(0.3px)' }}
               />
             );
           })}
@@ -781,7 +795,7 @@ function MaestroVisual({
                 strokeWidth={i % 3 === 0 ? '0.9' : '0.4'}
                 strokeOpacity={i % 3 === 0 ? '0.5' : '0.28'}
                 strokeLinecap="round"
-                style={{ filter: `drop-shadow(0 0 2px ${GOLD}88)` }}
+                style={{ filter: `blur(0.5px) drop-shadow(0 0 2px ${GOLD}88)` }}
               />
             );
           })}
@@ -792,7 +806,7 @@ function MaestroVisual({
           style={{
             inset: 40,
             background: `radial-gradient(circle, ${GOLD_BRIGHT}cc 0%, ${GOLD}88 25%, ${GOLD}44 50%, transparent 80%)`,
-            filter: 'none',
+            filter: 'blur(6px)',
           }}
           animate={
             reduceMotion
@@ -809,7 +823,7 @@ function MaestroVisual({
           style={{
             inset: 58,
             background: `radial-gradient(circle, ${GOLD_BRIGHT}99 0%, ${GOLD}55 50%, transparent 85%)`,
-            filter: 'none',
+            filter: 'blur(3px)',
           }}
           animate={
             reduceMotion
@@ -854,6 +868,6 @@ function MaestroVisual({
             />
           ))}
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
