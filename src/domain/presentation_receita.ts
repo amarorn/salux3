@@ -161,6 +161,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
         content: {
           headline: "Acúmulo",
           cardVisual: "accumulation",
+          valueStagesClickable: false,
           valueStagesLead:
             "Ao longo da jornada assistencial, a conversão do cuidado em receita passa por quatro etapas críticas:",
           valueStagesFlat: true,
@@ -207,6 +208,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
           headline: "Modelo reativo",
           cardVisual: "late-reaction",
           valueStagesFlat: true,
+          valueStagesClickable: false,
           valueStages: [
             {
               number: "✕",
@@ -293,6 +295,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
             "A proteção da receita depende de como a operação funciona como um todo — da origem ao faturamento.\n\nOs 6 pontos que precisam funcionar como base coordenada:",
           valueStagesFlat: true,
           valueStagesGridCols: 3,
+          valueStagesClickable: false,
           valueStages: [
             {
               number: "01",

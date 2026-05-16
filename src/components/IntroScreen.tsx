@@ -109,7 +109,7 @@ export function IntroScreen() {
           O L está aprox. a 63% da largura do logo (à direita do ícone X). */}
       <div
         className="absolute left-1/2 top-1/2 z-10"
-        style={{ transform: 'translate(-63%, -50%)' }}
+        style={{ transform: 'translate(-50%, -50%)' }}
       >
         <div className="flex flex-col items-center">
           <motion.div

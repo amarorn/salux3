@@ -1792,8 +1792,8 @@ export function NarrativeStep({ step, active }: Props) {
               data-no-click-advance
               className={
                 step.content.newsUrls.length >= 3
-                  ? "grid w-full grid-cols-1 gap-3 lg:grid-cols-3"
-                  : "grid w-full grid-cols-1 gap-3 md:grid-cols-2"
+                  ? "grid w-full grid-cols-3 gap-3"
+                  : "grid w-full grid-cols-2 gap-3"
               }
             >
               {step.content.newsUrls.map((url, index) => (

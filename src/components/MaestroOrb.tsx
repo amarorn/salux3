@@ -617,19 +617,6 @@ function MaestroVisual({
 }: MaestroVisualProps) {
   return (
     <div className="relative" style={{ width: TOTAL_WIDTH, height: SIZE }}>
-      <AnimatePresence>
-        {showWhisper && whisper && (
-          <SpeechBubble
-            key={`whisper-${stepId}`}
-            text={whisper}
-            accent={accent}
-            placement={whisperPlacement}
-            reduceMotion={reduceMotion}
-            shiftX={bubbleShift}
-          />
-        )}
-      </AnimatePresence>
-
       <motion.div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ width: SIZE, height: SIZE }}
