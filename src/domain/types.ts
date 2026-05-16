@@ -104,6 +104,8 @@ export interface BannerMedia {
   videoSrc?: string;
   /** Poster do vídeo (também usado como imagem caso o vídeo falhe). */
   posterSrc?: string;
+  /** Mostra o poster no banner; o vídeo só abre ao clicar (lightbox). */
+  playOnClick?: boolean;
 }
 
 export type RoadmapSegment =

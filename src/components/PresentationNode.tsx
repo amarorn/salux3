@@ -179,6 +179,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
             forceWidth,
             bannerVideoSrc: step.content.bannerMedia?.videoSrc,
             bannerVideoPoster: step.content.bannerMedia?.posterSrc,
+            bannerVideoPlayOnClick: step.content.bannerMedia?.playOnClick,
             trackId: currentTrackId,
             omitSidePhoto: step.content.omitSidePhoto,
           }}

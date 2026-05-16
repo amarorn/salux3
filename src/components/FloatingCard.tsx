@@ -1,6 +1,14 @@
-import { createContext, useContext, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
 import clsx from "clsx";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Play } from "lucide-react";
 import { theme } from "@/domain/theme";
 import type { TrackId } from "@/domain/tracks";
 import type { Accent } from "@/domain/types";
@@ -41,6 +49,8 @@ export const FloatingCardContext = createContext<{
   /** Vídeo do banner (loop muted), passado a partir do step content. */
   bannerVideoSrc?: string;
   bannerVideoPoster?: string;
+  /** Poster no banner; vídeo em lightbox ao clicar. */
+  bannerVideoPlayOnClick?: boolean;
   trackId?: TrackId;
   /** Esconde a faixa de foto/vídeo no topo; só o painel de conteúdo. */
   omitSidePhoto?: boolean;
@@ -61,6 +71,8 @@ interface FloatingCardProps {
   bannerVideoSrc?: string;
   /** Poster opcional (imagem antes do vídeo carregar). */
   bannerVideoPoster?: string;
+  /** Poster estático no banner; reproduz o vídeo só ao clicar. */
+  bannerVideoPlayOnClick?: boolean;
   /** Atribui uma foto distinta por slide (`config/assetUrls`). */
   stepId?: string;
   /** Banner com PNG transparente: fundo `#05070d`, sem tratamento “foto cheia”. */
@@ -97,6 +109,7 @@ export function FloatingCard({
   sidePhotoAlt,
   bannerVideoSrc,
   bannerVideoPoster,
+  bannerVideoPlayOnClick,
   stepId,
   bannerTransparentCutout = false,
   bannerLightenBlackMatte = false,
@@ -116,7 +129,23 @@ export function FloatingCard({
   const resolvedWidth = ctx?.forceWidth ?? width;
   const resolvedVideoSrc = bannerVideoSrc ?? ctx?.bannerVideoSrc;
   const resolvedVideoPoster = bannerVideoPoster ?? ctx?.bannerVideoPoster;
+  const resolvedVideoPlayOnClick =
+    bannerVideoPlayOnClick ?? ctx?.bannerVideoPlayOnClick ?? false;
+  const [bannerVideoOpen, setBannerVideoOpen] = useState(false);
   const omitSidePhoto = Boolean(ctx?.omitSidePhoto);
+
+  useEffect(() => {
+    if (!bannerVideoOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setBannerVideoOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [bannerVideoOpen]);
+
+  useEffect(() => {
+    if (!active) setBannerVideoOpen(false);
+  }, [active]);
   const cardTextScale = BASE_CARD_TEXT_SCALE;
   const accentColor = theme.accents[accent];
   const reduceMotion = useReducedMotion();
@@ -196,6 +225,38 @@ export function FloatingCard({
                 </button>
               ))}
             </motion.div>
+          ) : resolvedVideoSrc && resolvedVideoPlayOnClick ? (
+            <button
+              type="button"
+              data-no-click-advance
+              aria-label="Reproduzir vídeo"
+              className="absolute inset-0 cursor-pointer border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              onClick={(e) => {
+                e.stopPropagation();
+                setBannerVideoOpen(true);
+              }}
+            >
+              <CinematicBanner
+                src={resolvedVideoPoster ?? photoSrc ?? CARD_BACKGROUND}
+                alt={photoAlt}
+                accentColor={accentColor.base}
+                active={active}
+                transparentCutout={bannerTransparentCutout}
+                lightenBlackMatte={bannerLightenBlackMatte}
+                plain={bannerUnframed}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/25"
+              >
+                <span
+                  className="flex h-16 w-16 items-center justify-center rounded-full border border-white/25 bg-black/45 shadow-[0_12px_40px_rgba(0,0,0,0.5)] backdrop-blur-sm"
+                  style={{ boxShadow: `0 0 32px ${accentColor.base}44` }}
+                >
+                  <Play className="ml-1 h-7 w-7 text-white" fill="white" />
+                </span>
+              </span>
+            </button>
           ) : resolvedVideoSrc ? (
             <>
               <video
@@ -262,6 +323,17 @@ export function FloatingCard({
           )}
         </motion.div>
       )}
+
+      <AnimatePresence>
+        {bannerVideoOpen && resolvedVideoSrc && (
+          <BannerVideoLightbox
+            videoSrc={resolvedVideoSrc}
+            onClose={() => setBannerVideoOpen(false)}
+            reducedMotion={Boolean(reduceMotion)}
+          />
+        )}
+      </AnimatePresence>
+
       <motion.div
         variants={panelMotion}
         initial={layerInitial}
@@ -433,5 +505,66 @@ export function FloatingCard({
         </div>
       </motion.div>
     </div>
+  );
+}
+
+interface BannerVideoLightboxProps {
+  videoSrc: string;
+  onClose: () => void;
+  reducedMotion: boolean;
+}
+
+function BannerVideoLightbox({
+  videoSrc,
+  onClose,
+  reducedMotion,
+}: BannerVideoLightboxProps) {
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
+    <motion.div
+      data-no-click-advance
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[85] flex items-center justify-center p-6 sm:p-10"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <motion.button
+        type="button"
+        aria-label="Fechar vídeo"
+        className="absolute inset-0 cursor-pointer border-0 bg-black/82 p-0"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+      />
+      <motion.div
+        className="relative z-10 w-full max-w-[min(96vw,1100px)]"
+        initial={reducedMotion ? false : { opacity: 0, scale: 0.96, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={
+          reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: 6 }
+        }
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <video
+          key={videoSrc}
+          src={videoSrc}
+          controls
+          autoPlay
+          playsInline
+          preload="auto"
+          className="max-h-[82vh] w-full rounded-2xl border border-white/15 bg-black shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+        />
+        <p className="mt-4 text-center text-[11px] uppercase tracking-[0.3em] text-white/45">
+          Clique fora para fechar · ESC
+        </p>
+      </motion.div>
+    </motion.div>,
+    document.body,
   );
 }
