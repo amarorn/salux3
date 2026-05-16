@@ -100,7 +100,7 @@ export function EvidenceGaugeCard({
 
   return (
     <motion.div
-      className="relative overflow-hidden rounded-2xl border px-6 py-5"
+      className="presentation-card-chip relative overflow-hidden rounded-2xl border px-6 py-5"
       style={glassPanelStyle(accentColor)}
       initial={reduce ? false : { opacity: 0, y: 14 }}
       animate={active ? { opacity: 1, y: 0 } : reduce ? undefined : { opacity: 0, y: 14 }}

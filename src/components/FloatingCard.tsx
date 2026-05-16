@@ -27,6 +27,11 @@ import {
   CardVisual,
   type CardVisualVariant,
 } from "@/components/visuals/CardVisualVariants";
+import {
+  CARD_EDGE_BANNER,
+  CARD_EDGE_SHELL,
+  cardEdgeDataAttr,
+} from "@/lib/cardEdgeFade";
 
 /** Escala base para melhorar leitura sem perder composição do layout (todas as trilhas). */
 const BASE_CARD_TEXT_SCALE = 1.08;
@@ -209,7 +214,9 @@ export function FloatingCard({
 
   return (
     <div
+      {...cardEdgeDataAttr("shell")}
       className={clsx(
+        CARD_EDGE_SHELL,
         "flex items-stretch",
         bannerUnframed ? "gap-0" : "gap-3",
         resolvedFlip ? "flex-col-reverse" : "flex-col",
@@ -218,18 +225,20 @@ export function FloatingCard({
     >
       {!omitSidePhoto && (
         <motion.div
+          {...cardEdgeDataAttr("banner")}
           variants={skipPhotoMotion ? undefined : photoMotion}
           initial={layerInitial}
           animate={layerAnimate}
           className={clsx(
+            CARD_EDGE_BANNER,
             "relative w-full shrink-0 overflow-hidden",
             bannerUnframed ? "mt-0" : "mt-5 rounded-3xl duration-500 ease-out",
             bannerHeightClass ?? "h-[460px]",
             bannerTransparentCutout && "bg-[#05070d]",
             !bannerUnframed &&
               (active
-                ? "border-white/20 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"
-                : "shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)] group-hover:-translate-y-1 group-hover:border-white/16"),
+                ? "border border-transparent shadow-[0_30px_80px_-24px_rgba(0,0,0,0.7)]"
+                : "border border-transparent shadow-[0_22px_60px_-24px_rgba(0,0,0,0.58)] group-hover:-translate-y-1"),
           )}
         >
           {hasBannerNews ? (
@@ -364,6 +373,16 @@ export function FloatingCard({
               />,
             )
           ) : null}
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-28"
+            style={{
+              background:
+                "linear-gradient(to top, #05070d 0%, rgba(5,7,13,0.72) 42%, transparent 100%)",
+            }}
+            animate={{ opacity: active ? 1 : 0.65 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+          />
         </motion.div>
       )}
 
@@ -390,6 +409,7 @@ export function FloatingCard({
         initial={layerInitial}
         animate={layerAnimate}
         className={clsx(
+          omitSidePhoto && CARD_EDGE_SHELL,
           "relative w-full p-12",
           omitSidePhoto
             ? "min-h-[1100px] rounded-3xl "
@@ -398,11 +418,11 @@ export function FloatingCard({
               : "min-h-[420px]",
           omitSidePhoto &&
             (active
-              ? // ? "border-white/18 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"
-                ""
-              : "shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)]"),
+              ? ""
+              : "shadow-[0_22px_60px_-24px_rgba(0,0,0,0.55)]"),
           className,
         )}
+        {...(omitSidePhoto ? cardEdgeDataAttr("shell") : {})}
       >
         {/* ── Luz cenográfica de fundo ── duas elipses defasadas + plano vinheta.
             Sem borda, sem container — o conteúdo "emerge" da escuridão. */}

@@ -443,7 +443,6 @@ const gestaoResultsStep: PresentationStep = {
     heroImage: {
       src: gestaoSlide9ResultadoUrl,
       alt: 'Rede desorganizada transformada em operação coordenada com hospital no centro',
-      transparentCutout: true,
     },
     bannerUnframed: true,
     bannerHeightClass: 'h-[300px]',

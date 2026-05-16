@@ -75,7 +75,7 @@ export function EvidenceHighlightCard({
 
   return (
     <motion.div
-      className="relative overflow-hidden rounded-2xl border px-6 py-5"
+      className="presentation-card-chip relative overflow-hidden rounded-2xl border px-6 py-5"
       style={glassPanelStyle(accentColor)}
       initial={reduce ? false : { opacity: 0, y: 14 }}
       animate={

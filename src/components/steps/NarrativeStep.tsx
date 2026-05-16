@@ -97,13 +97,13 @@ function valueStageCardGlassStyle(
   const rgb = accentHexToRgbTuple(accentHex);
   const baseA = emphasis ? 0.24 : 0.16;
   const washA = emphasis ? 0.06 : 0.036;
-  const edgeA = emphasis ? 0.55 : 0.38;
+  const edgeA = emphasis ? 0.38 : 0.18;
   return {
-    borderColor: emphasis ? `${accentHex}aa` : `rgba(${rgb},${edgeA})`,
+    borderColor: emphasis ? `rgba(${rgb},${edgeA})` : `rgba(${rgb},${edgeA})`,
     background: `linear-gradient(135deg, rgba(${rgb},${baseA}) 0%, rgba(255,255,255,${washA}) 72%)`,
     boxShadow: emphasis
-      ? `inset 0 1px 0 rgba(255,255,255,0.11), 0 0 0 1px ${accentHex}55`
-      : `inset 0 1px 0 rgba(255,255,255,0.06)`,
+      ? `inset 0 1px 0 rgba(255,255,255,0.1), 0 0 32px -12px rgba(${rgb},0.42)`
+      : `inset 0 1px 0 rgba(255,255,255,0.05), 0 0 24px -16px rgba(${rgb},0.28)`,
   };
 }
 
@@ -559,7 +559,7 @@ export function NarrativeStep({ step, active }: Props) {
         indexInBand,
       );
       const shellClass =
-        "relative flex h-full min-h-[5.5rem] w-full flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-center text-slate-100/90 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out";
+        "presentation-card-chip relative flex h-full min-h-[5.5rem] w-full flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-center text-slate-100/90 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out";
       const focusRingClass = valueStagesClickable
         ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45 disabled:cursor-default disabled:opacity-40"
         : "cursor-default";
@@ -646,6 +646,8 @@ export function NarrativeStep({ step, active }: Props) {
         return (
           <motion.div
             key={`${stage.number}-${stage.label}-${i}`}
+            data-maestro-anchor
+            data-maestro-anchor-priority="1"
             data-no-click-advance
             onPointerDown={(e) => e.stopPropagation()}
             className={`${shellClass} ${focusRingClass}`}
@@ -683,6 +685,8 @@ export function NarrativeStep({ step, active }: Props) {
           }}
           key={`${stage.number}-${stage.label}-${i}`}
           type="button"
+          data-maestro-anchor
+          data-maestro-anchor-priority="1"
           data-no-click-advance
           disabled={!active}
           aria-expanded={focused}
@@ -1255,7 +1259,7 @@ export function NarrativeStep({ step, active }: Props) {
                 return (
                   <motion.div
                     key={side}
-                    className="relative flex-1 overflow-hidden rounded-xl border px-4 py-3.5"
+                    className="presentation-card-chip relative flex-1 overflow-hidden rounded-xl border px-4 py-3.5"
                     style={glassPanelStyle(c.base)}
                     initial={reduceMotion ? false : { opacity: 0, y: 8 }}
                     animate={
@@ -1733,7 +1737,9 @@ export function NarrativeStep({ step, active }: Props) {
           >
             <motion.div
               {...innerMotion}
-              className="relative mx-auto mt-1 w-fit max-w-full overflow-hidden rounded-2xl border px-5 py-4 sm:max-w-2xl"
+              data-maestro-anchor
+              data-maestro-anchor-priority="3"
+              className="presentation-card-quote relative mx-auto mt-1 w-fit max-w-full overflow-hidden rounded-2xl border px-5 py-4 sm:max-w-2xl"
               style={{
                 borderColor: `${attentionAccent.base}55`,
                 background: `linear-gradient(135deg, ${attentionAccent.base}1f 0%, transparent 65%)`,
@@ -1899,7 +1905,9 @@ export function NarrativeStep({ step, active }: Props) {
           >
             <motion.div
               {...innerMotion}
-              className="relative mt-2 overflow-hidden rounded-2xl border px-5 py-4"
+              data-maestro-anchor
+              data-maestro-anchor-priority="2"
+              className="presentation-card-quote relative mt-2 overflow-hidden rounded-2xl border px-5 py-4"
               style={{
                 borderColor: `${accent.base}55`,
                 background: `linear-gradient(135deg, ${accent.base}1c 0%, rgba(255,255,255,0.02) 100%)`,

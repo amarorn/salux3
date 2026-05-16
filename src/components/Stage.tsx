@@ -19,6 +19,7 @@ export function Stage({ children }: StageProps) {
   return (
     <div className="fixed inset-0 overflow-hidden bg-[#05070d]">
       <div
+        id="salux-stage"
         style={{
           width,
           height,

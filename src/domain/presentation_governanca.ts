@@ -7,7 +7,7 @@ import governancaTrilha5TransformacaoOps from '@/assets/presentation/governanca-
 import governancaTrilha5Slide4Intervalo from '@/assets/presentation/governanca-trilha5-slide4-intervalo.png?url';
 import governancaTrilha5Slide5Dashboard from '@/assets/presentation/governanca-trilha5-slide5-dashboard.png?url';
 import governancaTrilha5Slide6Dna from '@/assets/presentation/governanca-trilha5-slide6-dna.png?url';
-import governancaTrilha5Slide7Dna from '@/assets/presentation/governanca-trilha5-slide7-dna.png?url';
+import governancaTrilha5Slide7Maturidade from '@/assets/presentation/governanca-trilha5-slide7-maturidade.png?url';
 import governancaTrilha5Slide8NoticiaIa from '@/assets/presentation/governanca-trilha5-slide8-noticia-ia.png?url';
 import governancaTrilha5Slide9Horizon from '@/assets/presentation/governanca-trilha5-slide9-horizon.png?url';
 import governancaTrilha5Slide10Lobby from '@/assets/presentation/governanca-trilha5-slide10-lobby.png?url';
@@ -327,9 +327,9 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         headline: 'Maturidade agêntica',
         cardVisual: 'ascent',
         heroImage: {
-          src: governancaTrilha5Slide7Dna,
+          src: governancaTrilha5Slide7Maturidade,
           alt:
-            'Holograma de DNA e ícones médicos digitais sobre a mão de profissional de saúde — biotecnologia e saúde digital',
+            '5 esferas representando estágios de maturidade tecnológica: registro manual, sistemas, integrações, automações e era agêntica',
         },
         lead:
           'Os agentes não têm uma função única. Atuam em níveis progressivos de maturidade:',

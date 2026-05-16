@@ -16,6 +16,7 @@ import { PathwaysStep } from './steps/PathwaysStep';
 import { AgentsFlowStep } from './steps/AgentsFlowStep';
 import { ResultsStep } from './steps/ResultsStep';
 import { FloatingCardContext } from './FloatingCard';
+import { CARD_EDGE_SHELL, cardEdgeDataAttr } from '@/lib/cardEdgeFade';
 import { usePresentationStore } from '@/store/presentationStore';
 
 /** Largura unificada para todos os cards de todas as trilhas (independente do tipo do step).
@@ -131,7 +132,9 @@ function CardFlipShell({
           aria-roledescription="Slide"
           aria-current={active ? 'step' : undefined}
           aria-label={stepLabel}
+          {...cardEdgeDataAttr('shell')}
           className={clsx(
+            CARD_EDGE_SHELL,
             'group block text-left outline-none focus-visible:ring-4 focus-visible:ring-violet-300/60',
             unframedBanner ? 'rounded-b-3xl rounded-t-none' : 'rounded-3xl',
           )}
