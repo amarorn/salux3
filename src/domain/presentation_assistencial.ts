@@ -227,8 +227,8 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       heroImage: {
         src: trilha2JornadaUrl,
         alt: "Jornada assistencial conectando recepção, consultório, exames e enfermaria",
-        transparentCutout: true,
       },
+      bannerUnframed: true,
     }),
   )
   .map(
