@@ -1333,6 +1333,8 @@ export function NarrativeStep({ step, active }: Props) {
                         badge={m.badge}
                         prefix={m.prefix}
                         value={m.value}
+                        highlightLabel={m.highlightLabel}
+                        typewriter={m.highlightTypewriter}
                         headline={m.headline}
                         context={m.context}
                         accentColor={accent.base}

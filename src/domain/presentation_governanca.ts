@@ -167,6 +167,7 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
           {
             style: 'highlight',
             badge: 'Dado · Evidência',
+            highlightLabel: 'Prioridade #1',
             value: 1,
             prefix: 'Prioridade',
             headline:
@@ -251,11 +252,10 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         ],
         evidenceMetrics: [
           {
-            style: 'bar',
-            badge: 'Dado · Evidência · HIMSS 2026',
+            style: 'highlight',
+            badge: 'Referência · HIMSS',
+            highlightLabel: '2026',
             value: 2026,
-            unit: '',
-            prefix: '',
             headline:
               'IA agêntica em saúde exige integração, acesso a dados, governança e confiabilidade.',
             context:
@@ -404,10 +404,11 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         ],
         evidenceMetrics: [
           {
-            style: 'bar',
-            badge: 'Dado · Evidência · Deloitte',
+            style: 'highlight',
+            badge: 'Dado · Evidência',
+            highlightLabel: 'Deloitte',
+            highlightTypewriter: true,
             value: 0,
-            unit: '',
             headline:
               'O futuro da saúde exige dados radicalmente interoperáveis, plataformas abertas e seguras e arquitetura preparada.',
             context:

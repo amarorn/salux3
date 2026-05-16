@@ -243,6 +243,10 @@ export interface StepContent {
     context?: string;
     /** Estilo visual: 'bar' | 'gauge' | 'range' | 'highlight' (rótulo em destaque, sem gráfico). */
     style?: "bar" | "gauge" | "range" | "highlight";
+    /** Texto em destaque (ex.: ano "2026" ou "Prioridade #1"); sobrepõe prefix+value no style highlight. */
+    highlightLabel?: string;
+    /** Anima o highlightLabel com efeito de digitação (style highlight). */
+    highlightTypewriter?: boolean;
     /** Valor final do intervalo (apenas para style='range'). Quando definido, exibe "value a rangeEnd". */
     rangeEnd?: number;
     /** Rótulo curto após o número (ex.: "meses"). */
