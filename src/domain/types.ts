@@ -152,6 +152,8 @@ export interface StepContent {
   attentionPhrase?: string;
   /** Trilha de ruptura acumulada: URLs de notícias relacionadas. */
   newsUrls?: string[];
+  /** Notícias no banner superior (em vez da foto padrão); não duplicar em `newsUrls`. */
+  bannerNewsUrls?: string[];
   /** Highlight step: insere visual "camadas acumuladas → base coordenada" antes da frase de atenção. */
   layersToBase?: boolean;
   /** Trilha Operação: headline grande + bullets como chips animados (pain points). */

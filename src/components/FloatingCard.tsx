@@ -79,6 +79,9 @@ interface FloatingCardProps {
   hideWatermarkSvg?: boolean;
   bannerEraStaging?: boolean;
   stepIndex?: number;
+  /** Grelha de capturas de notícia no topo (substitui foto/vídeo do banner). */
+  bannerNewsUrls?: string[];
+  onBannerNewsExpand?: (url: string) => void;
   children: ReactNode;
 }
 
@@ -104,6 +107,8 @@ export function FloatingCard({
   hideWatermarkSvg = false,
   bannerEraStaging = false,
   stepIndex = 0,
+  bannerNewsUrls,
+  onBannerNewsExpand,
   children,
 }: FloatingCardProps) {
   const ctx = useContext(FloatingCardContext);
@@ -127,7 +132,9 @@ export function FloatingCard({
         : "hidden";
   const layerInitial = reduceMotion || skipPhotoMotion ? false : "hidden";
   const preset = stepId ? presentationSidePhotoForStep(stepId) : null;
-  const photoSrc = sidePhotoSrc ?? preset?.src ?? CARD_BACKGROUND;
+  const hasBannerNews = Boolean(bannerNewsUrls && bannerNewsUrls.length > 0);
+  const photoSrc =
+    sidePhotoSrc ?? (hasBannerNews ? undefined : preset?.src ?? CARD_BACKGROUND);
   const photoAlt = sidePhotoAlt ?? preset?.alt ?? "";
 
   return (
@@ -155,12 +162,46 @@ export function FloatingCard({
                 : "shadow-[0_22px_60px_-22px_rgba(0,0,0,0.55)] group-hover:-translate-y-1 group-hover:border-white/16"),
           )}
         >
-          {resolvedVideoSrc ? (
+          {hasBannerNews ? (
+            <motion.div
+              data-no-click-advance
+              className="absolute inset-0 grid grid-cols-3 gap-2 bg-[#05070d] p-2"
+            >
+              {bannerNewsUrls!.map((url, index) => (
+                <button
+                  key={`banner-news-${index}`}
+                  type="button"
+                  data-no-click-advance
+                  aria-label="Expandir imagem"
+                  className={clsx(
+                    "relative h-full min-h-0 w-full overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none",
+                    onBannerNewsExpand &&
+                      "cursor-zoom-in transition-transform duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white/45",
+                  )}
+                  onClick={
+                    onBannerNewsExpand
+                      ? (e) => {
+                          e.stopPropagation();
+                          onBannerNewsExpand(url);
+                        }
+                      : undefined
+                  }
+                >
+                  <img
+                    src={url}
+                    alt=""
+                    draggable={false}
+                    className="pointer-events-none h-full w-full object-cover object-top"
+                  />
+                </button>
+              ))}
+            </motion.div>
+          ) : resolvedVideoSrc ? (
             <>
               <video
                 key={resolvedVideoSrc}
                 src={resolvedVideoSrc}
-                poster={resolvedVideoPoster ?? photoSrc}
+                poster={resolvedVideoPoster ?? photoSrc ?? CARD_BACKGROUND}
                 autoPlay
                 loop
                 muted
@@ -187,7 +228,7 @@ export function FloatingCard({
                 }}
               />
             </>
-          ) : bannerUnframed && bannerEraStaging && stepId ? (
+          ) : bannerUnframed && bannerEraStaging && stepId && photoSrc ? (
             <EraEntryReveal
               stepId={stepId}
               stepIndex={stepIndex}
@@ -207,15 +248,17 @@ export function FloatingCard({
               />
             </EraEntryReveal>
           ) : (
-            <CinematicBanner
-              src={photoSrc}
-              alt={photoAlt}
-              accentColor={accentColor.base}
-              active={active}
-              transparentCutout={bannerTransparentCutout}
-              lightenBlackMatte={bannerLightenBlackMatte}
-              plain={bannerUnframed}
-            />
+            photoSrc ? (
+              <CinematicBanner
+                src={photoSrc}
+                alt={photoAlt}
+                accentColor={accentColor.base}
+                active={active}
+                transparentCutout={bannerTransparentCutout}
+                lightenBlackMatte={bannerLightenBlackMatte}
+                plain={bannerUnframed}
+              />
+            ) : null
           )}
         </motion.div>
       )}

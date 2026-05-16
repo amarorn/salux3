@@ -29,6 +29,13 @@ export function buildNarrativeBandKeys(
       keys.push('valueStagesCardRow');
     }
     for (let i = 0; i < n; i++) keys.push(`valueStagesChunk${i}`);
+    if (
+      content.newsUrls &&
+      content.newsUrls.length > 0 &&
+      !content.bannerNewsUrls?.length
+    ) {
+      keys.push('newsUrls');
+    }
     if (content.attentionPhrase) keys.push('attention');
     return keys;
   }
@@ -91,6 +98,13 @@ export function buildNarrativeBandKeys(
     content.beforeAfter.before.length === content.beforeAfter.after.length
   ) {
     keys.push('beforeAfter');
+  }
+  if (
+    content.newsUrls &&
+    content.newsUrls.length > 0 &&
+    !content.bannerNewsUrls?.length
+  ) {
+    keys.push('newsUrls');
   }
   if (content.attentionPhrase) keys.push('attention');
   if (content.highlightPhrases && content.highlightPhrases.length > 0) keys.push('highlightPhrases');

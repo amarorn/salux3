@@ -1,6 +1,11 @@
 import type { PresentationStep } from './types';
 import { steps as baseSteps } from './presentation';
-import landingImgCorridorUrl from '@/assets/landing/img-corridor.png?url';
+import gestaoSlide1NoticiaCnn from '@/assets/presentation/gestao-slide1-noticia-cnn.png?url';
+import gestaoSlide1NoticiaSobrasp from '@/assets/presentation/gestao-slide1-noticia-sobrasp.png?url';
+import gestaoSlide1NoticiaDefato from '@/assets/presentation/gestao-slide1-noticia-defato.png?url';
+import gestaoSlide2Ecossistema from '@/assets/presentation/gestao-slide2-ecossistema.png?url';
+import gestaoSlide3FilaRede from '@/assets/presentation/gestao-slide3-fila-rede.png?url';
+import gestaoSlide4Comando from '@/assets/presentation/gestao-slide4-comando.png?url';
 
 export const presentationGestaoMeta = {
   title: 'Gestão da operação em saúde',
@@ -41,6 +46,11 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
           { number: '⚖️', label: 'Judicialização crescendo' },
           { number: '🔁', label: 'Decisões dependentes de controles paralelos' },
         ],
+        bannerNewsUrls: [
+          gestaoSlide1NoticiaCnn,
+          gestaoSlide1NoticiaSobrasp,
+          gestaoSlide1NoticiaDefato,
+        ],
         attentionPhrase:
           'O desafio não é atender mais. É coordenar melhor o que a rede já precisa sustentar.',
       },
@@ -63,8 +73,8 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
         attentionPhrase:
           'A rede cresce em demanda e complexidade. A coordenação não cresce na mesma proporção.',
         heroImage: {
-          src: landingImgCorridorUrl,
-          alt: 'Corredor hospitalar',
+          src: gestaoSlide2Ecossistema,
+          alt: 'Ecossistema integrado de capacidades na operação em saúde',
         },
         body: 'O que acontece quando isso não é corrigido:',
         bullets: [
@@ -109,6 +119,10 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
         closingQuestionLabel: 'CTA · Pergunta-gatilho',
         closingQuestion:
           'Qual é o % de capacidade instalada que sua rede usa de forma desigual hoje?',
+        heroImage: {
+          src: gestaoSlide3FilaRede,
+          alt: 'Fila e pressão na rede de saúde — demanda versus capacidade de coordenação',
+        },
         bullets: [],
       },
     };
@@ -154,6 +168,10 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
         },
         attentionPhrase:
           'A mudança não está em registrar mais. Está em enxergar melhor, na hora certa, com o recurso certo.',
+        heroImage: {
+          src: gestaoSlide4Comando,
+          alt: 'Sala de comando com painéis de filas, ocupação e alertas da rede',
+        },
         bullets: [],
       },
     };

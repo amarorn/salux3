@@ -365,7 +365,9 @@ export function NarrativeStep({ step, active }: Props) {
 
   const stageRefs = useRef<(HTMLElement | null)[]>([]);
   const roadStageRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const expandImage = Boolean(step.content.newsUrls?.length);
+  const expandImage = Boolean(
+    step.content.newsUrls?.length || step.content.bannerNewsUrls?.length,
+  );
 
   // Fecha o balão e reseta o tracer quando o slide deixa de estar ativo
   useEffect(() => {
@@ -1085,6 +1087,8 @@ export function NarrativeStep({ step, active }: Props) {
       hideWatermarkSvg={Boolean(step.content.hideFloatingWatermarkSvg)}
       bannerEraStaging={eraStaging}
       stepIndex={step.index}
+      bannerNewsUrls={step.content.bannerNewsUrls}
+      onBannerNewsExpand={handleExpandImage}
       bannerHeightClass={
         step.content.valueStagesRevealSequentialCards ? "h-[300px]" : undefined
       }
@@ -1735,41 +1739,61 @@ export function NarrativeStep({ step, active }: Props) {
                 “{step.content.attentionPhrase}”
               </p>
             </motion.div>
-            {step.content.newsUrls && step.content.newsUrls.length > 0 && (
-              <div
-                data-no-click-advance
-                className="mt-6 grid w-full grid-cols-1 gap-2 md:grid-cols-2"
-              >
-                {step.content.newsUrls.map((url, index) => (
-                  <button
-                    key={`news-url-${index}`}
-                    type="button"
-                    data-no-click-advance
-                    aria-label={expandImage ? "Expandir imagem" : undefined}
-                    className={`relative h-[300px] w-full max-w-[400px] overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none ${
-                      expandImage
-                        ? "cursor-zoom-in transition-transform duration-300 hover:scale-[1.015] focus-visible:ring-2 focus-visible:ring-white/45"
-                        : ""
-                    }`}
-                    onClick={
-                      expandImage
-                        ? (e) => {
-                            e.stopPropagation();
-                            handleExpandImage(url);
-                          }
-                        : undefined
-                    }
-                  >
-                    <img
-                      src={url}
-                      alt=""
-                      draggable={false}
-                      className="pointer-events-none h-full w-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
+          </EraRevealBand>
+        )}
+
+        {step.content.newsUrls && step.content.newsUrls.length > 0 && (
+          <EraRevealBand
+            bandId="newsUrls"
+            bandIndex={b("newsUrls")}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+            className="flex w-full justify-center"
+          >
+            <motion.div
+              {...innerMotion}
+              data-no-click-advance
+              className={
+                step.content.newsUrls.length >= 3
+                  ? "grid w-full grid-cols-1 gap-3 lg:grid-cols-3"
+                  : "grid w-full grid-cols-1 gap-3 md:grid-cols-2"
+              }
+            >
+              {step.content.newsUrls.map((url, index) => (
+                <button
+                  key={`news-url-${index}`}
+                  type="button"
+                  data-no-click-advance
+                  aria-label={expandImage ? "Expandir imagem" : undefined}
+                  className={`relative mx-auto h-[280px] w-full overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none ${
+                    step.content.newsUrls!.length >= 3
+                      ? ""
+                      : "max-w-[400px]"
+                  } ${
+                    expandImage
+                      ? "cursor-zoom-in transition-transform duration-300 hover:scale-[1.015] focus-visible:ring-2 focus-visible:ring-white/45"
+                      : ""
+                  }`}
+                  onClick={
+                    expandImage
+                      ? (e) => {
+                          e.stopPropagation();
+                          handleExpandImage(url);
+                        }
+                      : undefined
+                  }
+                >
+                  <img
+                    src={url}
+                    alt=""
+                    draggable={false}
+                    className="pointer-events-none h-full w-full object-cover object-top"
+                  />
+                </button>
+              ))}
+            </motion.div>
           </EraRevealBand>
         )}
 
