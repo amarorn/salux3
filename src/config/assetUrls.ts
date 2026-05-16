@@ -6,7 +6,6 @@ import landingImgDashboardUrl from "@/assets/landing/trilha-1-slide-4.png?url";
 import landingImgCorridorUrl from "@/assets/landing/img-corridor.png?url";
 import zerodoxPainelUrl from "@/assets/presentation/zerodox-painel-produtividade.png?url";
 import analiseGraficosUrl from "@/assets/presentation/analise-graficos.png?url";
-import medicalGroupUrl from "@/assets/presentation/medicalGroup.png?url";
 import governancaTrilha5BannerTechUrl from "@/assets/presentation/governanca-trilha5-ai-tech.png?url";
 
 /** URL versionada pelo bundler — evita cache agressivo ao substituir ficheiros em `src/assets`. */
@@ -43,7 +42,6 @@ const SIDE_PHOTO_BY_STEP_ID: Record<string, SidePhoto> = {
     src: analiseGraficosUrl,
     alt: "Análise de gráficos e indicadores em tempo real",
   },
-  closing: { src: medicalGroupUrl, alt: "Continuidade do cuidado" },
 };
 
 export function presentationSidePhotoForStep(stepId: string): SidePhoto {

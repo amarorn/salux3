@@ -132,6 +132,7 @@ export function FloatingCard({
   const resolvedVideoPlayOnClick =
     bannerVideoPlayOnClick ?? ctx?.bannerVideoPlayOnClick ?? false;
   const [bannerVideoOpen, setBannerVideoOpen] = useState(false);
+  const [bannerPhotoExpanded, setBannerPhotoExpanded] = useState(false);
   const omitSidePhoto = Boolean(ctx?.omitSidePhoto);
 
   useEffect(() => {
@@ -144,8 +145,20 @@ export function FloatingCard({
   }, [bannerVideoOpen]);
 
   useEffect(() => {
-    if (!active) setBannerVideoOpen(false);
+    if (!active) {
+      setBannerVideoOpen(false);
+      setBannerPhotoExpanded(false);
+    }
   }, [active]);
+
+  useEffect(() => {
+    if (!bannerPhotoExpanded) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setBannerPhotoExpanded(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [bannerPhotoExpanded]);
   const cardTextScale = BASE_CARD_TEXT_SCALE;
   const accentColor = theme.accents[accent];
   const reduceMotion = useReducedMotion();
@@ -165,6 +178,31 @@ export function FloatingCard({
   const photoSrc =
     sidePhotoSrc ?? (hasBannerNews ? undefined : preset?.src ?? CARD_BACKGROUND);
   const photoAlt = sidePhotoAlt ?? preset?.alt ?? "";
+
+  const canExpandBannerPhoto = Boolean(
+    sidePhotoSrc && photoSrc && !hasBannerNews && !resolvedVideoSrc,
+  );
+
+  const wrapBannerPhotoExpand = (node: ReactNode) => {
+    if (!canExpandBannerPhoto) return node;
+    return (
+      <button
+        type="button"
+        data-no-click-advance
+        aria-label="Expandir imagem"
+        className={clsx(
+          "absolute inset-0 z-10 border-0 bg-transparent p-0 outline-none",
+          "cursor-zoom-in transition-transform duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white/45",
+        )}
+        onClick={(e) => {
+          e.stopPropagation();
+          setBannerPhotoExpanded(true);
+        }}
+      >
+        <span className="pointer-events-none absolute inset-0">{node}</span>
+      </button>
+    );
+  };
 
   return (
     <div
@@ -290,26 +328,28 @@ export function FloatingCard({
               />
             </>
           ) : bannerUnframed && bannerEraStaging && stepId && photoSrc ? (
-            <EraEntryReveal
-              stepId={stepId}
-              stepIndex={stepIndex}
-              bandIndex={-1}
-              eraStaging={bannerEraStaging}
-              active={active}
-              className="absolute inset-0"
-            >
-              <CinematicBanner
-                src={photoSrc}
-                alt={photoAlt}
-                accentColor={accentColor.base}
+            wrapBannerPhotoExpand(
+              <EraEntryReveal
+                stepId={stepId}
+                stepIndex={stepIndex}
+                bandIndex={-1}
+                eraStaging={bannerEraStaging}
                 active={active}
-                transparentCutout={bannerTransparentCutout}
-                lightenBlackMatte={bannerLightenBlackMatte}
-                plain
-              />
-            </EraEntryReveal>
-          ) : (
-            photoSrc ? (
+                className="absolute inset-0"
+              >
+                <CinematicBanner
+                  src={photoSrc}
+                  alt={photoAlt}
+                  accentColor={accentColor.base}
+                  active={active}
+                  transparentCutout={bannerTransparentCutout}
+                  lightenBlackMatte={bannerLightenBlackMatte}
+                  plain
+                />
+              </EraEntryReveal>,
+            )
+          ) : photoSrc ? (
+            wrapBannerPhotoExpand(
               <CinematicBanner
                 src={photoSrc}
                 alt={photoAlt}
@@ -318,9 +358,9 @@ export function FloatingCard({
                 transparentCutout={bannerTransparentCutout}
                 lightenBlackMatte={bannerLightenBlackMatte}
                 plain={bannerUnframed}
-              />
-            ) : null
-          )}
+              />,
+            )
+          ) : null}
         </motion.div>
       )}
 
@@ -329,6 +369,14 @@ export function FloatingCard({
           <BannerVideoLightbox
             videoSrc={resolvedVideoSrc}
             onClose={() => setBannerVideoOpen(false)}
+            reducedMotion={Boolean(reduceMotion)}
+          />
+        )}
+        {bannerPhotoExpanded && photoSrc && (
+          <BannerPhotoLightbox
+            src={photoSrc}
+            alt={photoAlt}
+            onClose={() => setBannerPhotoExpanded(false)}
             reducedMotion={Boolean(reduceMotion)}
           />
         )}
@@ -505,6 +553,62 @@ export function FloatingCard({
         </div>
       </motion.div>
     </div>
+  );
+}
+
+interface BannerPhotoLightboxProps {
+  src: string;
+  alt: string;
+  onClose: () => void;
+  reducedMotion: boolean;
+}
+
+function BannerPhotoLightbox({
+  src,
+  alt,
+  onClose,
+  reducedMotion,
+}: BannerPhotoLightboxProps) {
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
+    <motion.div
+      data-no-click-advance
+      role="dialog"
+      aria-modal="true"
+      aria-label="Imagem ampliada"
+      className="fixed inset-0 z-[85] flex items-center justify-center p-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <motion.button
+        type="button"
+        aria-label="Fechar imagem"
+        className="absolute inset-0 cursor-zoom-out border-0 bg-black/80 p-0"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+      />
+      <motion.img
+        src={src}
+        alt={alt || "Imagem ampliada"}
+        className="relative z-10 max-h-[86vh] max-w-[90vw] cursor-zoom-out rounded-2xl border border-white/15 object-contain shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+        initial={reducedMotion ? false : { opacity: 0, scale: 0.94, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={
+          reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }
+        }
+        transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+        onClick={(e) => e.stopPropagation()}
+      />
+      <p className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-center text-[11px] uppercase tracking-[0.3em] text-white/45">
+        Clique para fechar · ESC
+      </p>
+    </motion.div>,
+    document.body,
   );
 }
 

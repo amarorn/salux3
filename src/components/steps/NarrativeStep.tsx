@@ -384,7 +384,6 @@ export function NarrativeStep({ step, active }: Props) {
   }, [active]);
 
   const handleExpandImage = (url: string) => {
-    if (!expandImage) return;
     setExpandedImage(url);
   };
 
@@ -1093,7 +1092,7 @@ export function NarrativeStep({ step, active }: Props) {
       }
       stepIndex={step.index}
       bannerNewsUrls={step.content.bannerNewsUrls}
-      onBannerNewsExpand={handleExpandImage}
+      onBannerNewsExpand={expandImage ? handleExpandImage : undefined}
       bannerHeightClass={
         step.content.bannerHeightClass ??
         (step.content.valueStagesRevealSequentialCards ? "h-[300px]" : undefined)
@@ -1955,6 +1954,7 @@ export function NarrativeStep({ step, active }: Props) {
         {expandedImage && (
           <ExpandedNewsImage
             imageUrl={expandedImage}
+            alt="Imagem ampliada"
             reducedMotion={Boolean(reduceMotion)}
             onClose={handleCloseExpandedImage}
           />
@@ -1966,12 +1966,14 @@ export function NarrativeStep({ step, active }: Props) {
 
 interface ExpandedNewsImageProps {
   imageUrl: string;
+  alt?: string;
   reducedMotion: boolean;
   onClose: () => void;
 }
 
 function ExpandedNewsImage({
   imageUrl,
+  alt = "",
   reducedMotion,
   onClose,
 }: ExpandedNewsImageProps) {
@@ -1996,7 +1998,7 @@ function ExpandedNewsImage({
       />
       <motion.img
         src={imageUrl}
-        alt=""
+        alt={alt}
         className="relative max-h-[86vh] max-w-[90vw] cursor-zoom-out rounded-2xl border border-white/15 object-contain shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
         initial={reducedMotion ? false : { opacity: 0, scale: 0.94, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}

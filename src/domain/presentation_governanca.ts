@@ -4,6 +4,15 @@ import { steps as baseSteps } from './presentation';
 import governancaTrilha5NoticiaIa from '@/assets/presentation/governanca-trilha5-noticia-ia.png?url';
 import governancaTrilha5AiTech from '@/assets/presentation/governanca-trilha5-ai-tech.png?url';
 import governancaTrilha5TransformacaoOps from '@/assets/presentation/governanca-trilha5-transformacao-ops.png?url';
+import governancaTrilha5Slide4Intervalo from '@/assets/presentation/governanca-trilha5-slide4-intervalo.png?url';
+import governancaTrilha5Slide5Dashboard from '@/assets/presentation/governanca-trilha5-slide5-dashboard.png?url';
+import governancaTrilha5Slide6Dna from '@/assets/presentation/governanca-trilha5-slide6-dna.png?url';
+import governancaTrilha5Slide7Dna from '@/assets/presentation/governanca-trilha5-slide7-dna.png?url';
+import governancaTrilha5Slide8NoticiaIa from '@/assets/presentation/governanca-trilha5-slide8-noticia-ia.png?url';
+import governancaTrilha5Slide9Horizon from '@/assets/presentation/governanca-trilha5-slide9-horizon.png?url';
+import governancaTrilha5Slide10Lobby from '@/assets/presentation/governanca-trilha5-slide10-lobby.png?url';
+import governancaTrilha5Slide12Executivo from '@/assets/presentation/governanca-trilha5-slide12-executivo.png?url';
+import governancaTrilha5Slide13HospitalRede from '@/assets/presentation/governanca-trilha5-slide13-hospital-rede.png?url';
 import governancaWhyAgentsBannerUrl from '@/assets/presentation/governanca-why-agents-banner.png?url';
 
 export const presentationGovernancaMeta = {
@@ -185,6 +194,11 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
       content: {
         headline: 'Intervalo',
         cardVisual: 'gap',
+        heroImage: {
+          src: governancaTrilha5Slide4Intervalo,
+          alt:
+            'Antes e depois: operação fragmentada com papel e filas versus centro de comando integrado com dados, alertas e dashboards em tempo real',
+        },
         valueStagesFlat: true,
         valueStagesGridCols: 4,
         valueStagesRevealChunkSize: 4,
@@ -213,12 +227,16 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
     return {
       ...s,
       kind: 'narrative',
-      accent: 'rose',
+      accent: 'emerald',
       title: 'Adicionar IA a uma operação fragmentada não resolve a fragmentação.',
       subtitle: 'Automatizar processo ruim apenas escala a ineficiência',
       content: {
         headline: 'Limite da IA isolada',
         cardVisual: 'shatter',
+        heroImage: {
+          src: governancaTrilha5Slide5Dashboard,
+          alt: 'Painel digital futurista com monitoramento de dados, gráficos e indicadores em tempo real',
+        },
         attentionPhrase:
           'Automatizar um processo ruim não cria eficiência. Apenas escala a ineficiência.',
         body: 'Quatro condições que tornam a IA ineficaz:',
@@ -256,13 +274,18 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
     return {
       ...s,
       kind: 'narrative',
-      accent: 'violet',
+      accent: 'cyan',
       title:
         'A era agêntica começa quando a inteligência deixa de ser pontual e passa a coordenar a operação.',
       subtitle: 'Agentes como camada operacional distribuída',
       content: {
         headline: 'Camada operacional',
         cardVisual: 'rhizome',
+        heroImage: {
+          src: governancaTrilha5Slide6Dna,
+          alt:
+            'Holograma de DNA e ícones médicos digitais sobre a mão de profissional de saúde — biotecnologia e saúde digital',
+        },
         lead:
           'Agentes não são assistentes, chatbots ou automações isoladas. São uma camada operacional distribuída, capaz de:',
         valueStagesFlat: true,
@@ -297,13 +320,18 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
     return {
       ...s,
       kind: 'narrative',
-      accent: 'violet',
+      accent: 'amber',
       title:
         'Agentes ampliam a capacidade da operação de enxergar, priorizar e agir.',
       subtitle: 'Cinco níveis progressivos de maturidade agêntica',
       content: {
         headline: 'Maturidade agêntica',
         cardVisual: 'ascent',
+        heroImage: {
+          src: governancaTrilha5Slide7Dna,
+          alt:
+            'Holograma de DNA e ícones médicos digitais sobre a mão de profissional de saúde — biotecnologia e saúde digital',
+        },
         lead:
           'Os agentes não têm uma função única. Atuam em níveis progressivos de maturidade:',
         valueStagesFlat: true,
@@ -349,12 +377,17 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
     return {
       ...s,
       kind: 'narrative',
-      accent: 'violet',
+      accent: 'rose',
       title: 'Agentes precisam de uma operação preparada para agir.',
       subtitle: 'Sem arquitetura, IA vira mais uma camada de complexidade',
       content: {
         headline: 'Base operacional',
         cardVisual: 'pillars',
+        heroImage: {
+          src: governancaTrilha5Slide8NoticiaIa,
+          alt:
+            'Notícia: IA na Saúde — CEO destaca importância de ampliar a segurança de dados (Agência Brasil)',
+        },
         valueStagesLead: 'A base que a era agêntica exige:',
         valueStagesFlat: true,
         valueStagesGridCols: 4,
@@ -399,10 +432,15 @@ const governancaBaseStep: PresentationStep = {
   position: { x: -1320, y: 3320 },
   scale: 1.2,
   kind: 'narrative',
-  accent: 'violet',
+  accent: 'emerald',
   content: {
     headline: 'Base Operacional Salux',
     cardVisual: 'constellation',
+    heroImage: {
+      src: governancaTrilha5Slide9Horizon,
+      alt:
+        'Consulta com holograma Salux Horizon — atenção primária e interface clínica digital',
+    },
     lead:
       'A nova lógica exige uma arquitetura capaz de conectar os principais pontos da operação em saúde:',
     valueStagesFlat: true,
@@ -433,10 +471,15 @@ const governancaTransformStep: PresentationStep = {
   position: { x: 1320, y: 3320 },
   scale: 1.2,
   kind: 'narrative',
-  accent: 'violet',
+  accent: 'cyan',
   content: {
     headline: 'Virada agêntica',
     cardVisual: 'phase',
+    heroImage: {
+      src: governancaTrilha5Slide10Lobby,
+      alt:
+        'Lobby hospitalar moderno com recepção digital, painéis de dados e operação coordenada',
+    },
     beforeAfter: {
       before: [
         'Dados dispersos',
@@ -472,10 +515,11 @@ const governancaValueDimensionsStep: PresentationStep = {
   position: { x: -1320, y: 4480 },
   scale: 1.2,
   kind: 'narrative',
-  accent: 'violet',
+  accent: 'amber',
   content: {
     headline: 'Dimensões de valor',
     cardVisual: 'prism',
+    omitSidePhoto: true,
     valueStagesFlat: true,
     valueStagesGridCols: 2,
     valueStagesRevealChunkSize: 2,
@@ -524,6 +568,11 @@ const governancaArchDifferenceStep: PresentationStep = {
   content: {
     headline: 'Nova base de operação',
     cardVisual: 'lens',
+    heroImage: {
+      src: governancaTrilha5Slide12Executivo,
+      alt:
+        'Executivo analisando painéis de dados e cidade ao fundo — governança e decisão estratégica',
+    },
     lead:
       'A era agêntica não se resume a usar IA. Trata-se de adotar uma nova lógica de operação, onde:',
     valueStagesFlat: true,
@@ -554,6 +603,11 @@ const governancaPassageStep: PresentationStep = {
   content: {
     headline: 'Próximo salto',
     cardVisual: 'portal',
+    heroImage: {
+      src: governancaTrilha5Slide13HospitalRede,
+      alt:
+        'Hospital conectado em rede — ecossistema integrado de saúde com dados, finanças e assistência',
+    },
     lead:
       'Depois da digitalização, o próximo salto será transformar dados, processos e inteligência em capacidade real de execução.',
     attentionPhrase:
@@ -566,7 +620,7 @@ const governancaPassageStep: PresentationStep = {
 
 const _intermediate = governancaSteps as PresentationStep[];
 
-/** Sequência final — insere base (9), transformação (10) e cards 11-13 antes do closing. */
+/** Sequência final — slides 1–8 da base + cards 9–13; sem slide de closing (13 slides no total). */
 export const governancaStepsResolved: PresentationStep[] = (() => {
   const extras: PresentationStep[] = [
     governancaBaseStep,
@@ -576,8 +630,7 @@ export const governancaStepsResolved: PresentationStep[] = (() => {
     governancaPassageStep,
   ];
   const closingIdx = _intermediate.findIndex((s) => s.id === 'closing');
-  if (closingIdx < 0) return [..._intermediate, ...extras].map((s, i) => ({ ...s, index: i }));
-  const before = _intermediate.slice(0, closingIdx);
-  const closing = _intermediate[closingIdx];
-  return [...before, ...extras, closing].map((s, i) => ({ ...s, index: i }));
+  const before =
+    closingIdx >= 0 ? _intermediate.slice(0, closingIdx) : _intermediate;
+  return [...before, ...extras].map((s, i) => ({ ...s, index: i }));
 })();

@@ -118,7 +118,7 @@ export function ClosingStep({ step, active }: Props) {
       cardVisual={step.content.cardVisual}
       hideValueFlow={true}
       bannerUnframed
-      sidePhotoSrc={hero?.src}
+      sidePhotoSrc={hero?.src ?? ""}
       sidePhotoAlt={hero?.alt}
       bannerTransparentCutout={Boolean(hero?.transparentCutout)}
       bannerLightenBlackMatte={Boolean(hero?.lightenBlackMatte)}
