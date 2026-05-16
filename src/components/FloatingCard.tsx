@@ -186,21 +186,24 @@ export function FloatingCard({
   const wrapBannerPhotoExpand = (node: ReactNode) => {
     if (!canExpandBannerPhoto) return node;
     return (
-      <button
-        type="button"
-        data-no-click-advance
-        aria-label="Expandir imagem"
-        className={clsx(
-          "absolute inset-0 z-10 border-0 bg-transparent p-0 outline-none",
-          "cursor-zoom-in transition-transform duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white/45",
-        )}
-        onClick={(e) => {
-          e.stopPropagation();
-          setBannerPhotoExpanded(true);
-        }}
-      >
-        <span className="pointer-events-none absolute inset-0">{node}</span>
-      </button>
+      <motion.div className="absolute inset-0">
+        <motion.div className="absolute inset-0" aria-hidden={false}>
+          {node}
+        </motion.div>
+        <button
+          type="button"
+          data-no-click-advance
+          aria-label="Expandir imagem"
+          className={clsx(
+            "absolute inset-0 z-10 border-0 bg-transparent p-0 outline-none",
+            "cursor-zoom-in transition-transform duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white/45",
+          )}
+          onClick={(e) => {
+            e.stopPropagation();
+            setBannerPhotoExpanded(true);
+          }}
+        />
+      </motion.div>
     );
   };
 
@@ -592,10 +595,8 @@ function BannerPhotoLightbox({
           onClose();
         }}
       />
-      <motion.img
-        src={src}
-        alt={alt || "Imagem ampliada"}
-        className="relative z-10 max-h-[86vh] max-w-[90vw] cursor-zoom-out rounded-2xl border border-white/15 object-contain shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+      <motion.div
+        className="relative z-10 max-h-[86vh] max-w-[90vw] cursor-zoom-out rounded-2xl border border-white/15 bg-[#0a101c] p-3 shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
         initial={reducedMotion ? false : { opacity: 0, scale: 0.94, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={
@@ -603,7 +604,15 @@ function BannerPhotoLightbox({
         }
         transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
         onClick={(e) => e.stopPropagation()}
-      />
+      >
+        <motion.img
+          src={src}
+          alt={alt || "Imagem ampliada"}
+          className="max-h-[calc(86vh-1.5rem)] max-w-[calc(90vw-1.5rem)] object-contain"
+          initial={false}
+          animate={{ opacity: 1 }}
+        />
+      </motion.div>
       <p className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-center text-[11px] uppercase tracking-[0.3em] text-white/45">
         Clique para fechar · ESC
       </p>

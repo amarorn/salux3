@@ -146,7 +146,6 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
           src: governancaWhyAgentsBannerUrl,
           alt:
             'Ilustração de saúde digital: telemóvel com ícone clínico e estetoscópio azul sobre fundo escuro',
-          lightenBlackMatte: true,
         },
         bannerUnframed: true,
         hideFloatingWatermarkSvg: true,
