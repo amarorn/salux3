@@ -6,7 +6,7 @@ import gestaoSlide1NoticiaDefato from '@/assets/presentation/gestao-slide1-notic
 import gestaoSlide2Ecossistema from '@/assets/presentation/gestao-slide2-ecossistema.png?url';
 import gestaoSlide3FilaRede from '@/assets/presentation/gestao-slide3-fila-rede.png?url';
 import gestaoSlide4Comando from '@/assets/presentation/gestao-slide4-comando.png?url';
-import careHeroUrl from '@/assets/intro/care-hero.jpg?url';
+import gestaoSemTituloPosterUrl from '@/assets/intro/gestao-sem-titulo-poster.jpg?url';
 
 export const presentationGestaoMeta = {
   title: 'Gestão da operação em saúde',
@@ -313,7 +313,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
         cardVisual: 'relay',
         bannerMedia: {
           videoSrc: '/intro/gestao-sem-titulo.mp4',
-          posterSrc: careHeroUrl,
+          posterSrc: gestaoSemTituloPosterUrl,
           playOnClick: true,
         },
         contrastPair: {
