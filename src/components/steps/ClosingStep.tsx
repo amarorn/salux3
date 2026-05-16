@@ -115,6 +115,7 @@ export function ClosingStep({ step, active }: Props) {
       width={benefits.length >= 4 ? 820 : 580}
       cardVisual={step.content.cardVisual}
       hideValueFlow={true}
+      bannerUnframed
     >
       <motion.div
         className="flex flex-col gap-6"
