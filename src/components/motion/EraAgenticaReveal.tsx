@@ -101,9 +101,11 @@ function presetIndex(
 export function EraDrift({
   seed,
   children,
+  stretch = false,
 }: {
   seed: string;
   children: ReactNode;
+  stretch?: boolean;
 }) {
   const reduce = useReducedMotion();
   if (reduce) return <>{children}</>;
@@ -111,7 +113,7 @@ export function EraDrift({
   const dur = 8.8 + (h % 7) * 0.35;
   return (
     <motion.div
-      className="relative"
+      className={`relative${stretch ? " h-full w-full" : ""}`}
       animate={{
         y: [0, -2.2, 0.9, -1.1, 0],
         x: [0, 1.2, -0.9, 0.6, 0],
@@ -164,7 +166,7 @@ export function EraEntryReveal({
       style={{ transformOrigin: "50% 20%", perspective: 900 }}
       className={className}
     >
-      <EraDrift seed={`${stepId}:entry:${bandIndex}`}>{children}</EraDrift>
+      <EraDrift seed={`${stepId}:entry:${bandIndex}`} stretch>{children}</EraDrift>
     </motion.div>
   );
 }
