@@ -268,6 +268,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
         src: trilha2RedeUrl,
         alt: "Rede assistencial conectada a um centro de comando clínico",
       },
+      bannerUnframed: true,
     }),
   )
   .map(
