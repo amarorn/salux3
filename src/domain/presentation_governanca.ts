@@ -82,10 +82,6 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         valueStagesFlat: true,
         valueStagesGridCols: 5,
         /** Blocos de cor: 2 × ciano, 2 × âmbar, 1 × roxo (Era agêntica). */
-        valueStagesRevealChunkSize: 1,
-        valueStagesRevealSequentialCards: true,
-        valueStagesRevealFirstOnClick: true,
-        valueStagesRevealOneAtATime: true,
         valueStages: [
           {
             number: '01',
