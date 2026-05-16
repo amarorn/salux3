@@ -124,6 +124,51 @@ export function EraDrift({
   );
 }
 
+/** Entrada ao ativar o slide (ex.: banner solto), com o mesmo preset das faixas. */
+export function EraEntryReveal({
+  stepId,
+  stepIndex,
+  bandIndex,
+  eraStaging,
+  active,
+  className,
+  children,
+}: {
+  stepId: string;
+  stepIndex: number;
+  bandIndex: number;
+  eraStaging: boolean;
+  active: boolean;
+  className?: string;
+  children: ReactNode;
+}) {
+  const reduce = useReducedMotion();
+  if (!eraStaging) {
+    return <div className={className}>{children}</div>;
+  }
+  if (!active) {
+    if (reduce) return <div className={className}>{children}</div>;
+    return (
+      <EraDrift seed={`${stepId}:entry:idle`}>
+        <div className={className}>{children}</div>
+      </EraDrift>
+    );
+  }
+  const preset = REVEAL_PRESETS[presetIndex(stepId, stepIndex, bandIndex)]!;
+  return (
+    <motion.div
+      key={`${stepId}-entry-${bandIndex}`}
+      initial={reduce ? false : preset.initial}
+      animate={reduce ? { opacity: 1 } : preset.animate}
+      transition={reduce ? { duration: 0 } : preset.transition}
+      style={{ transformOrigin: "50% 20%", perspective: 900 }}
+      className={className}
+    >
+      <EraDrift seed={`${stepId}:entry:${bandIndex}`}>{children}</EraDrift>
+    </motion.div>
+  );
+}
+
 interface EraRevealBandProps {
   bandId: string;
   bandIndex: number;

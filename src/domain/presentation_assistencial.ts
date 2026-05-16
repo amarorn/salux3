@@ -362,10 +362,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       attentionPhrase:
         "O limite não está na ausência de tecnologia. Está na ausência de uma base capaz de transformar informação dispersa em clareza clínica e ação coordenada.",
       bullets: [],
-      heroImage: {
-        src: trilha2IntegracaoUrl,
-        alt: "Integração da rede assistencial em torno de um centro de operações clínicas",
-      },
+      omitSidePhoto: true,
     }),
   )
   .map(

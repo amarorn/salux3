@@ -144,6 +144,7 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         lead: 'Mesmo com mais sistemas, dados e automações, instituições ainda convivem com:',
         valueStagesFlat: true,
         valueStagesGridCols: 4,
+        valueStagesRevealChunkSize: 4,
         valueStages: [
           { number: '⚠', label: 'Perdas de receita' },
           { number: '⚠', label: 'Retrabalho' },
@@ -186,6 +187,7 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         cardVisual: 'gap',
         valueStagesFlat: true,
         valueStagesGridCols: 4,
+        valueStagesRevealChunkSize: 4,
         valueStages: [
           { number: '○', label: 'O dado existe', description: 'Mas não chega no tempo certo.' },
           { number: '○', label: 'O alerta existe', description: 'Mas não prioriza.' },
@@ -222,6 +224,7 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         body: 'Quatro condições que tornam a IA ineficaz:',
         valueStagesFlat: true,
         valueStagesGridCols: 2,
+        valueStagesRevealChunkSize: 2,
         valueStages: [
           { number: '✕', label: 'Dados isolados', description: 'A IA não enxerga o todo.' },
           { number: '✕', label: 'Processos mal desenhados', description: 'A automação acelera o erro.' },
@@ -264,6 +267,7 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
           'Agentes não são assistentes, chatbots ou automações isoladas. São uma camada operacional distribuída, capaz de:',
         valueStagesFlat: true,
         valueStagesGridCols: 3,
+        valueStagesRevealChunkSize: 3,
         valueStages: [
           { number: '→', label: 'Interpretar contexto' },
           { number: '→', label: 'Identificar riscos' },
@@ -304,6 +308,7 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
           'Os agentes não têm uma função única. Atuam em níveis progressivos de maturidade:',
         valueStagesFlat: true,
         valueStagesGridCols: 3,
+        valueStagesRevealChunkSize: 3,
         valueStages: [
           {
             number: '01',
@@ -353,6 +358,7 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         valueStagesLead: 'A base que a era agêntica exige:',
         valueStagesFlat: true,
         valueStagesGridCols: 4,
+        valueStagesRevealChunkSize: 4,
         valueStages: [
           { number: '🔒', label: 'Dados governados' },
           { number: '🔗', label: 'Interoperabilidade real' },
@@ -401,6 +407,7 @@ const governancaBaseStep: PresentationStep = {
       'A nova lógica exige uma arquitetura capaz de conectar os principais pontos da operação em saúde:',
     valueStagesFlat: true,
     valueStagesGridCols: 4,
+    valueStagesRevealChunkSize: 4,
     valueStages: [
       { number: '◆', label: 'Assistência' },
       { number: '◆', label: 'Receita' },
@@ -471,6 +478,7 @@ const governancaValueDimensionsStep: PresentationStep = {
     cardVisual: 'prism',
     valueStagesFlat: true,
     valueStagesGridCols: 2,
+    valueStagesRevealChunkSize: 2,
     valueStagesShowDescription: true,
     valueStages: [
       {
@@ -520,6 +528,7 @@ const governancaArchDifferenceStep: PresentationStep = {
       'A era agêntica não se resume a usar IA. Trata-se de adotar uma nova lógica de operação, onde:',
     valueStagesFlat: true,
     valueStagesGridCols: 2,
+    valueStagesRevealChunkSize: 2,
     valueStages: [
       { number: '✕', label: 'Ter IA é insuficiente.' },
       { number: '✕', label: 'Ter agentes isolados é insuficiente.' },

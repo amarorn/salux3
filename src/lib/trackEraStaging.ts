@@ -1,6 +1,6 @@
 import type { TrackId } from "@/domain/tracks";
 
-/** Trilhas com `EraRevealBand` + fases por clique (Receita, Assistência, Operação e Governança). */
+/** Trilhas com `EraRevealBand` + fases por clique (Receita–Gestão e Governança). */
 export function trackUsesEraStagedReveal(
   trackId: TrackId | undefined,
 ): boolean {
@@ -8,6 +8,7 @@ export function trackUsesEraStagedReveal(
     trackId === "era-agentica" ||
     trackId === "operacoes" ||
     trackId === "assistencial" ||
+    trackId === "dados" ||
     trackId === "governanca"
   );
 }

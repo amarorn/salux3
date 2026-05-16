@@ -13,6 +13,7 @@ import {
   INTRO_ASSIST_COVER_URL,
   presentationSidePhotoForStep,
 } from "@/config/assetUrls";
+import { EraEntryReveal } from "@/components/motion/EraAgenticaReveal";
 import { CinematicBanner } from "@/components/visuals/CinematicBanner";
 import {
   CardVisual,
@@ -76,6 +77,8 @@ interface FloatingCardProps {
   bannerUnframed?: boolean;
   /** Esconde o arco SVG sobre o painel de texto. */
   hideWatermarkSvg?: boolean;
+  bannerEraStaging?: boolean;
+  stepIndex?: number;
   children: ReactNode;
 }
 
@@ -99,6 +102,8 @@ export function FloatingCard({
   bannerHeightClass,
   bannerUnframed = false,
   hideWatermarkSvg = false,
+  bannerEraStaging = false,
+  stepIndex = 0,
   children,
 }: FloatingCardProps) {
   const ctx = useContext(FloatingCardContext);
@@ -112,8 +117,15 @@ export function FloatingCard({
   const reduceMotion = useReducedMotion();
   const photoMotion = getPhotoColumnVariants(resolvedFlip);
   const panelMotion = getContentPanelVariants(resolvedFlip);
-  const layerAnimate = reduceMotion ? "visible" : active ? "visible" : "hidden";
-  const layerInitial = reduceMotion ? false : "hidden";
+  const skipPhotoMotion = bannerUnframed && bannerEraStaging;
+  const layerAnimate = reduceMotion
+    ? "visible"
+    : skipPhotoMotion
+      ? undefined
+      : active
+        ? "visible"
+        : "hidden";
+  const layerInitial = reduceMotion || skipPhotoMotion ? false : "hidden";
   const preset = stepId ? presentationSidePhotoForStep(stepId) : null;
   const photoSrc = sidePhotoSrc ?? preset?.src ?? CARD_BACKGROUND;
   const photoAlt = sidePhotoAlt ?? preset?.alt ?? "";
@@ -129,7 +141,7 @@ export function FloatingCard({
     >
       {!omitSidePhoto && (
         <motion.div
-          variants={photoMotion}
+          variants={skipPhotoMotion ? undefined : photoMotion}
           initial={layerInitial}
           animate={layerAnimate}
           className={clsx(
@@ -175,6 +187,25 @@ export function FloatingCard({
                 }}
               />
             </>
+          ) : bannerUnframed && bannerEraStaging && stepId ? (
+            <EraEntryReveal
+              stepId={stepId}
+              stepIndex={stepIndex}
+              bandIndex={-1}
+              eraStaging={bannerEraStaging}
+              active={active}
+              className="absolute inset-0"
+            >
+              <CinematicBanner
+                src={photoSrc}
+                alt={photoAlt}
+                accentColor={accentColor.base}
+                active={active}
+                transparentCutout={bannerTransparentCutout}
+                lightenBlackMatte={bannerLightenBlackMatte}
+                plain
+              />
+            </EraEntryReveal>
           ) : (
             <CinematicBanner
               src={photoSrc}

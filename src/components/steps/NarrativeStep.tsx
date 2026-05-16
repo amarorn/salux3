@@ -1083,6 +1083,8 @@ export function NarrativeStep({ step, active }: Props) {
       hideValueFlow={true}
       bannerUnframed={Boolean(step.content.bannerUnframed)}
       hideWatermarkSvg={Boolean(step.content.hideFloatingWatermarkSvg)}
+      bannerEraStaging={eraStaging}
+      stepIndex={step.index}
       bannerHeightClass={
         step.content.valueStagesRevealSequentialCards ? "h-[300px]" : undefined
       }

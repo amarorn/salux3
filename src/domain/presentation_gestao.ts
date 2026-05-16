@@ -32,6 +32,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
         lead: 'Sua rede reconhece algum destes sinais?',
         valueStagesFlat: true,
         valueStagesGridCols: 3,
+        valueStagesRevealChunkSize: 3,
         valueStages: [
           { number: '📋', label: 'Filas regulatórias crescentes' },
           { number: '🔗', label: 'Gargalos entre níveis assistenciais' },
@@ -174,6 +175,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
           'Não se trata de informatizar mais uma etapa. Trata-se de fazer todos os elementos da rede funcionarem com a mesma lógica de execução.\n\nOs 8 pontos de uma rede coordenada:',
         valueStagesFlat: true,
         valueStagesGridCols: 4,
+        valueStagesRevealChunkSize: 4,
         valueStages: [
           { number: '01', label: 'Entrada na rede' },
           { number: '02', label: 'Regulação do acesso' },
@@ -337,6 +339,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
         valueStagesLead: 'Use este slide para aprofundar a dor específica do visitante:',
         valueStagesFlat: true,
         valueStagesGridCols: 3,
+        valueStagesRevealChunkSize: 3,
         valueStages: [
           { number: '🚦', label: 'Fila / Regulação', description: '→ Salux + INITIA + Agentes' },
           { number: '📈', label: 'Leitura da rede', description: '→ Salux + INITIA' },
@@ -371,6 +374,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
           'Esse movimento pode começar pelo ponto onde sua rede hoje mais perde coordenação.',
         valueStagesFlat: true,
         valueStagesGridCols: 3,
+        valueStagesRevealChunkSize: 3,
         valueStages: [
           { number: '→', label: 'Pressão em decisão.' },
           { number: '→', label: 'Decisão em execução.' },
@@ -407,6 +411,7 @@ const gestaoResultsStep: PresentationStep = {
       'Com uma base coordenada, a rede deixa de depender apenas de esforço contínuo de compensação.',
     valueStagesFlat: true,
     valueStagesGridCols: 3,
+    valueStagesRevealChunkSize: 3,
     valueStages: [
       { number: '✓', label: 'Mais previsibilidade sobre demanda e capacidade' },
       { number: '✓', label: 'Mais priorização baseada em risco clínico real' },
