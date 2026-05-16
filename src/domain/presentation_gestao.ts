@@ -7,6 +7,7 @@ import gestaoSlide2Ecossistema from '@/assets/presentation/gestao-slide2-ecossis
 import gestaoSlide3FilaRede from '@/assets/presentation/gestao-slide3-fila-rede.png?url';
 import gestaoSlide4Comando from '@/assets/presentation/gestao-slide4-comando.png?url';
 import gestaoSemTituloPosterUrl from '@/assets/intro/gestao-sem-titulo-poster.jpg?url';
+import gestao8PosterUrl from '@/assets/intro/gestao-8-poster.jpg?url';
 
 export const presentationGestaoMeta = {
   title: 'Gestão da operação em saúde',
@@ -359,7 +360,11 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
       content: {
         headline: 'Pontos de entrada',
         cardVisual: 'spiral',
-        valueStagesLead: 'Use este slide para aprofundar a dor específica do visitante:',
+        bannerMedia: {
+          videoSrc: '/intro/gestao-8.mp4',
+          posterSrc: gestao8PosterUrl,
+          playOnClick: true,
+        },
         valueStagesFlat: true,
         valueStagesGridCols: 3,
         valueStagesRevealChunkSize: 3,
@@ -373,7 +378,6 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
           { number: '🏥', label: 'Áreas críticas', description: '→ VisionPilot / AGCOM + SkyMed' },
           { number: '💰', label: 'Controle econômico', description: '→ TI Hospitalar' },
         ],
-        closingQuestionLabel: 'CTA · Pergunta-gatilho',
         closingQuestion: 'Qual desses pontos está gerando mais pressão na sua rede agora?',
         bullets: [],
         roadmapTransform: false,
@@ -391,6 +395,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
       content: {
         headline: 'Sua rede está sendo coordenada como sistema — ou administrada por partes?',
         cardVisual: 'shield',
+        omitSidePhoto: true,
         body:
           'A nova fase da saúde pública não será definida por quem digitalizou mais processos.\nSerá definida por quem conseguir coordenar informação, capacidade instalada, regulação e cuidado em uma lógica única de execução.',
         attentionPhrase:
