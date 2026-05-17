@@ -10,6 +10,8 @@ interface KpiCardsProps {
   active: boolean;
   reducedMotion: boolean;
   accentColor: string;
+  /** Textos dos KPIs em branco (bordas/glow mantêm o acento). */
+  textWhite?: boolean;
 }
 
 function formatBR(value: number, decimals: number) {
@@ -24,6 +26,7 @@ export function KpiCards({
   active,
   reducedMotion,
   accentColor,
+  textWhite = false,
 }: KpiCardsProps) {
   const container = {
     hidden: {},
@@ -59,6 +62,7 @@ export function KpiCards({
             accentColor={accentColor}
             active={active}
             reducedMotion={reducedMotion}
+            textWhite={textWhite}
           />
         </motion.div>
       ))}
@@ -71,9 +75,16 @@ interface KpiCardProps {
   accentColor: string;
   active: boolean;
   reducedMotion: boolean;
+  textWhite?: boolean;
 }
 
-function KpiCard({ item, accentColor, active, reducedMotion }: KpiCardProps) {
+function KpiCard({
+  item,
+  accentColor,
+  active,
+  reducedMotion,
+  textWhite = false,
+}: KpiCardProps) {
   const decimals = item.decimals ?? 0;
   const target = item.value;
   const [display, setDisplay] = useState(reducedMotion || !active ? target : 0);
@@ -132,10 +143,14 @@ function KpiCard({ item, accentColor, active, reducedMotion }: KpiCardProps) {
             className={clsx(
               "font-display text-[1.15rem] font-bold tabular-nums leading-none tracking-tight",
             )}
-            style={{
-              color: accentColor,
-              textShadow: `0 0 10px ${accentColor}88`,
-            }}
+            style={
+              textWhite
+                ? { color: "#ffffff" }
+                : {
+                    color: accentColor,
+                    textShadow: `0 0 10px ${accentColor}88`,
+                  }
+            }
           >
             {formatBR(display, decimals)}
             {unit && (
@@ -149,13 +164,21 @@ function KpiCard({ item, accentColor, active, reducedMotion }: KpiCardProps) {
         <div className="min-w-0 flex-1">
           {item.label && (
             <p
-              className="text-[10px] font-semibold uppercase tracking-[0.28em]"
-              style={{ color: accentColor, opacity: 0.85 }}
+              className={clsx(
+                "text-[10px] font-semibold uppercase tracking-[0.28em]",
+                textWhite && "text-white",
+              )}
+              style={textWhite ? undefined : { color: accentColor, opacity: 0.85 }}
             >
               {item.label}
             </p>
           )}
-          <p className="mt-1 text-[13px] font-medium leading-snug text-slate-200/85">
+          <p
+            className={clsx(
+              "mt-1 text-[13px] font-medium leading-snug",
+              textWhite ? "text-white/95" : "text-slate-200/85",
+            )}
+          >
             {item.suffix}
           </p>
           {typeof item.delta === "number" && (
@@ -168,7 +191,9 @@ function KpiCard({ item, accentColor, active, reducedMotion }: KpiCardProps) {
                 {item.delta >= 0 ? "▲" : "▼"}{" "}
                 {formatBR(Math.abs(item.delta), 1)} {deltaUnit}
               </span>
-              <span className="text-slate-400/70">vs período anterior</span>
+              <span className={textWhite ? "text-white/60" : "text-slate-400/70"}>
+                vs período anterior
+              </span>
             </p>
           )}
         </div>

@@ -45,6 +45,13 @@ export interface EvidenceCard {
   metric?: string;
 }
 
+export interface NewsItem {
+  imageUrl: string;
+  articleUrl: string;
+  title?: string;
+  source?: string;
+}
+
 export interface ContrastItem {
   /** Rótulo curto em caps (ex.: "VISÍVEL"). */
   label: string;
@@ -74,6 +81,8 @@ export interface ValueStage {
   description?: string;
   /** URL do mídia associada (ex.: vídeo ou imagem). */
   mediaUrl?: string;
+  /** Matéria exibida ao clicar no box (imagem + link externo). */
+  news?: NewsItem;
 }
 
 export interface NodePosition {
@@ -154,6 +163,8 @@ export interface StepContent {
   attentionPhrase?: string;
   /** Cor da caixa `attentionPhrase` (default: accent do slide). */
   attentionAccent?: Accent;
+  /** Matéria com imagem, link e metadados (revelação sequencial + prévia). */
+  newsItems?: NewsItem[];
   /** Trilha de ruptura acumulada: URLs de notícias relacionadas. */
   newsUrls?: string[];
   /** Notícias no banner superior (em vez da foto padrão); não duplicar em `newsUrls`. */
@@ -180,6 +191,10 @@ export interface StepContent {
   closingQuestion?: string;
   /** Rótulo curto exibido acima da pergunta de fechamento (ex.: "CTA / PERGUNTA-GATILHO"). */
   closingQuestionLabel?: string;
+  /** Mantém `closingQuestion` sem o botão "Ir para o formulário". */
+  hideContactForm?: boolean;
+  /** KPIs, métricas e chips de etapas em branco (números e rótulos). */
+  allTextWhite?: boolean;
   /** Frases curtas a serem renderizadas como blocos de destaque verde (suporte/release). */
   highlightPhrases?: string[];
   /** Card de evidência com glow e métrica. */

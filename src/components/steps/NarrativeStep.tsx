@@ -31,6 +31,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import clsx from "clsx";
 import { resolveContactFormUrl } from "@/config/contact";
 
 const FORM_BUTTON_CLASS =
@@ -51,6 +52,10 @@ import { theme } from "@/domain/theme";
 import { AnimatedRiskCurve } from "../visuals/AnimatedRiskCurve";
 import { AnimatedNarrativeMetrics } from "../visuals/AnimatedNarrativeMetrics";
 import { KpiCards } from "../visuals/KpiCards";
+import {
+  NewsArticlePreview,
+  NewsEvidenceReveal,
+} from "../visuals/NewsEvidenceReveal";
 import { EvidenceMetricCard } from "../visuals/EvidenceMetricCard";
 import { EvidenceHighlightCard } from "../visuals/EvidenceHighlightCard";
 import { EvidenceGaugeCard } from "../visuals/EvidenceGaugeCard";
@@ -280,6 +285,7 @@ export function NarrativeStep({ step, active }: Props) {
   const attentionAccent = step.content.attentionAccent
     ? theme.accents[step.content.attentionAccent]
     : accent;
+  const allTextWhite = Boolean(step.content.allTextWhite);
   const formUrl = resolveContactFormUrl();
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
@@ -465,43 +471,53 @@ export function NarrativeStep({ step, active }: Props) {
     const valueStagesLeadBlock =
       step.content.valueStagesLead ? (
         <p
-          className="mx-auto w-full max-w-prose whitespace-pre-line text-center text-[1.05rem] leading-relaxed text-slate-100/95"
+          className={clsx(
+            "mx-auto w-full max-w-prose whitespace-pre-line text-center text-[1.05rem] leading-relaxed",
+            allTextWhite ? "text-white" : "text-slate-100/95",
+          )}
           style={{ textShadow: `0 0 18px ${accent.base}1f` }}
         >
           {step.content.valueStagesLead}
         </p>
       ) : null;
 
+    const spotlightStage =
+      valueStageSpotlight !== null ? vs[valueStageSpotlight] : undefined;
     const expandedPortal = (
       <AnimatePresence>
         {active &&
           valueStagesClickable &&
-          valueStageSpotlight !== null &&
-          vs[valueStageSpotlight] !== undefined && (
+          spotlightStage !== undefined &&
+          (spotlightStage.news ? (
+            <NewsArticlePreview
+              key={`stage-news-${valueStageSpotlight}`}
+              item={spotlightStage.news}
+              accentColor={
+                accentPaletteForValueStage(step.accent, spotlightStage).base
+              }
+              reducedMotion={Boolean(reduceMotion)}
+              onClose={() => setValueStageSpotlight(null)}
+            />
+          ) : (
             <ExpandedCardPortal
               key={`stage-expanded-${valueStageSpotlight}`}
-              text={vs[valueStageSpotlight]!.label}
+              text={spotlightStage.label}
               accentColor={
-                accentPaletteForValueStage(
-                  step.accent,
-                  vs[valueStageSpotlight]!,
-                ).base
+                accentPaletteForValueStage(step.accent, spotlightStage).base
               }
               reducedMotion={Boolean(reduceMotion)}
               origin={
                 (step.content.valueStagesRoad
-                  ? roadStageRefs.current[valueStageSpotlight]
-                  : stageRefs.current[valueStageSpotlight]) ?? null
+                  ? roadStageRefs.current[valueStageSpotlight!]
+                  : stageRefs.current[valueStageSpotlight!]) ?? null
               }
               onClose={() => setValueStageSpotlight(null)}
-              prefix={vs[valueStageSpotlight]!.number}
-              description={
-                vs[valueStageSpotlight]!.description || undefined
-              }
-              imageSrc={vs[valueStageSpotlight]?.mediaUrl}
-              imageAlt={vs[valueStageSpotlight]?.label}
+              prefix={spotlightStage.number}
+              description={spotlightStage.description || undefined}
+              imageSrc={spotlightStage.mediaUrl}
+              imageAlt={spotlightStage.label}
             />
-          )}
+          ))}
       </AnimatePresence>
     );
 
@@ -541,12 +557,14 @@ export function NarrativeStep({ step, active }: Props) {
       indexInBand: number,
     ) => {
       const stagePal = accentPaletteForValueStage(step.accent, stage);
-      const dimmed =
+      const stageExpandable =
         valueStagesClickable &&
+        Boolean(stage.news || stage.mediaUrl || stage.description);
+      const dimmed =
+        stageExpandable &&
         valueStageSpotlight !== null &&
         valueStageSpotlight !== i;
-      const focused =
-        valueStagesClickable && valueStageSpotlight === i;
+      const focused = stageExpandable && valueStageSpotlight === i;
       const enterDelay =
         active && valueStageSpotlight === null
           ? chunked
@@ -576,7 +594,7 @@ export function NarrativeStep({ step, active }: Props) {
           <div className="flex items-baseline justify-center gap-1.5 text-center">
             <motion.span
               className="font-display inline-block text-[1.03rem] font-bold tabular-nums"
-              style={{ color: stagePal.base }}
+              style={{ color: allTextWhite ? "#ffffff" : stagePal.base }}
               initial={reduceMotion ? false : { opacity: 0, y: 10 }}
               animate={
                 !active
@@ -615,34 +633,54 @@ export function NarrativeStep({ step, active }: Props) {
               {stage.number}
             </motion.span>
             <span
-              className="text-[11px] font-semibold uppercase tracking-[0.22em]"
-              style={{ color: stagePal.base, opacity: 0.9 }}
+              className={clsx(
+                "text-[11px] font-semibold uppercase tracking-[0.22em]",
+                allTextWhite && "text-white",
+              )}
+              style={
+                allTextWhite ? undefined : { color: stagePal.base, opacity: 0.9 }
+              }
             >
               {stage.label}
             </span>
           </div>
           {stage.description && step.content.valueStagesShowDescription && (
-            <p className="mt-2 text-center text-[0.94rem] leading-relaxed text-slate-100/90">
+            <p
+              className={clsx(
+                "mt-2 text-center text-[0.94rem] leading-relaxed",
+                allTextWhite ? "text-white/95" : "text-slate-100/90",
+              )}
+            >
               {stage.description}
             </p>
           )}
           {stage.description && !step.content.valueStagesShowDescription && (
-            <p className="mt-2 text-center text-[0.96rem] leading-relaxed text-slate-100/92">
+            <p
+              className={clsx(
+                "mt-2 text-center text-[0.96rem] leading-relaxed",
+                allTextWhite ? "text-white/95" : "text-slate-100/92",
+              )}
+            >
               {stage.mediaUrl && <>(Vídeo)</>}
             </p>
           )}
-          {valueStagesClickable ? (
+          {stageExpandable ? (
             <span
-              className="mt-2 block text-[10px] font-semibold uppercase tracking-[0.2em]"
-              style={{ color: stagePal.base, opacity: 0.42 }}
+              className={clsx(
+                "mt-2 block text-[10px] font-semibold uppercase tracking-[0.2em]",
+                allTextWhite && "text-white/45",
+              )}
+              style={
+                allTextWhite ? undefined : { color: stagePal.base, opacity: 0.42 }
+              }
             >
-              Clique para ampliar
+              {stage.news ? "Clique para ver a matéria" : "Clique para ampliar"}
             </span>
           ) : null}
         </>
       );
 
-      if (!valueStagesClickable) {
+      if (!stageExpandable) {
         return (
           <motion.div
             key={`${stage.number}-${stage.label}-${i}`}
@@ -650,7 +688,7 @@ export function NarrativeStep({ step, active }: Props) {
             data-maestro-anchor-priority="1"
             data-no-click-advance
             onPointerDown={(e) => e.stopPropagation()}
-            className={`${shellClass} ${focusRingClass}`}
+            className={`${shellClass} cursor-default`}
             style={{
               zIndex: 1,
               ...valueStageCardGlassStyle(stagePal.base, false),
@@ -1099,7 +1137,10 @@ export function NarrativeStep({ step, active }: Props) {
       >
         <motion.p
           {...innerMotion}
-          className="presentation-ppt-body mx-auto w-full max-w-prose whitespace-pre-line text-center text-slate-100/95"
+          className={clsx(
+            "presentation-ppt-body mx-auto w-full max-w-prose whitespace-pre-line text-center",
+            allTextWhite ? "text-white" : "text-slate-100/95",
+          )}
         >
           {step.content.body}
         </motion.p>
@@ -1184,6 +1225,7 @@ export function NarrativeStep({ step, active }: Props) {
                   active={active}
                   reducedMotion={Boolean(reduceMotion)}
                   accentColor={accent.base}
+                  textWhite={allTextWhite}
                 />
               ) : (
                 <AnimatedNarrativeMetrics
@@ -1191,6 +1233,7 @@ export function NarrativeStep({ step, active }: Props) {
                   active={active}
                   reducedMotion={Boolean(reduceMotion)}
                   accentColor={accent.base}
+                  textWhite={allTextWhite}
                 />
               )}
             </motion.div>
@@ -1209,7 +1252,10 @@ export function NarrativeStep({ step, active }: Props) {
           >
             <motion.p
               {...innerMotion}
-              className="presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center text-slate-100/95"
+              className={clsx(
+                "presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center",
+                allTextWhite ? "text-white" : "text-slate-100/95",
+              )}
             >
               {step.content.lead}
             </motion.p>
@@ -1293,8 +1339,11 @@ export function NarrativeStep({ step, active }: Props) {
                         </span>
                       )}
                       <span
-                        className="text-[10px] font-semibold uppercase tracking-[0.32em]"
-                        style={{ color: c.base }}
+                        className={clsx(
+                          "text-[10px] font-semibold uppercase tracking-[0.32em]",
+                          allTextWhite && "text-white",
+                        )}
+                        style={allTextWhite ? undefined : { color: c.base }}
                       >
                         {it.label}
                       </span>
@@ -1383,6 +1432,7 @@ export function NarrativeStep({ step, active }: Props) {
                       accentColor={accent.base}
                       active={active}
                       delay={i * 0.45}
+                      textWhite={allTextWhite}
                     />
                   );
                 })}
@@ -1675,12 +1725,24 @@ export function NarrativeStep({ step, active }: Props) {
                         }}
                       >
                         <span
-                          className="block text-[11px] font-semibold uppercase tracking-[0.26em]"
-                          style={{ color: rose.base, opacity: 0.9 }}
+                          className={clsx(
+                            "block text-[11px] font-semibold uppercase tracking-[0.26em]",
+                            allTextWhite && "text-white",
+                          )}
+                          style={
+                            allTextWhite
+                              ? undefined
+                              : { color: rose.base, opacity: 0.9 }
+                          }
                         >
                           DE →
                         </span>
-                        <p className="mt-0.5 text-[0.98rem] leading-relaxed text-slate-100/92">
+                        <p
+                          className={clsx(
+                            "mt-0.5 text-[0.98rem] leading-relaxed",
+                            allTextWhite ? "text-white/95" : "text-slate-100/92",
+                          )}
+                        >
                           {from}
                         </p>
                       </div>
@@ -1700,8 +1762,15 @@ export function NarrativeStep({ step, active }: Props) {
                           }}
                         />
                         <span
-                          className="block text-[11px] font-semibold uppercase tracking-[0.26em]"
-                          style={{ color: emerald.base, opacity: 0.95 }}
+                          className={clsx(
+                            "block text-[11px] font-semibold uppercase tracking-[0.26em]",
+                            allTextWhite && "text-white",
+                          )}
+                          style={
+                            allTextWhite
+                              ? undefined
+                              : { color: emerald.base, opacity: 0.95 }
+                          }
                         >
                           PARA →
                         </span>
@@ -1770,20 +1839,36 @@ export function NarrativeStep({ step, active }: Props) {
                   repeat: Infinity,
                 }}
               />
-              <p
-                className="relative whitespace-pre-line px-3 text-center text-[clamp(1.05rem,2.4vw,1.22rem)] font-medium italic leading-relaxed"
-                style={{
-                  color: attentionAccent.base,
-                  textShadow: `0 0 24px ${attentionAccent.base}33`,
-                }}
-              >
+              <p className="relative whitespace-pre-line px-3 text-center text-[clamp(1.05rem,2.4vw,1.22rem)] font-medium italic leading-relaxed text-white">
                 “{step.content.attentionPhrase}”
               </p>
             </motion.div>
           </EraRevealBand>
         )}
 
-        {step.content.newsUrls && step.content.newsUrls.length > 0 && (
+        {step.content.newsItems && step.content.newsItems.length > 0 && (
+          <EraRevealBand
+            bandId="newsItems"
+            bandIndex={b("newsItems")}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+            className="flex w-full justify-center"
+          >
+            <motion.div {...innerMotion} className="w-full">
+              <NewsEvidenceReveal
+                items={step.content.newsItems}
+                active={active}
+                accentColor={accent.base}
+              />
+            </motion.div>
+          </EraRevealBand>
+        )}
+
+        {step.content.newsUrls &&
+          step.content.newsUrls.length > 0 &&
+          !step.content.newsItems?.length && (
           <EraRevealBand
             bandId="newsUrls"
             bandIndex={b("newsUrls")}
@@ -1937,7 +2022,7 @@ export function NarrativeStep({ step, active }: Props) {
           </EraRevealBand>
         )}
 
-        {step.content.closingQuestion && (
+        {step.content.closingQuestion && !step.content.hideContactForm && (
           <EraRevealBand
             bandId="contactCta"
             bandIndex={b("contactCta")}

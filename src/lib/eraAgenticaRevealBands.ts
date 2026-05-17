@@ -29,10 +29,14 @@ export function buildNarrativeBandKeys(
       keys.push('valueStagesCardRow');
     }
     for (let i = 0; i < n; i++) keys.push(`valueStagesChunk${i}`);
+    if (content.newsItems && content.newsItems.length > 0) {
+      keys.push('newsItems');
+    }
     if (
       content.newsUrls &&
       content.newsUrls.length > 0 &&
-      !content.bannerNewsUrls?.length
+      !content.bannerNewsUrls?.length &&
+      !content.newsItems?.length
     ) {
       keys.push('newsUrls');
     }
@@ -100,10 +104,14 @@ export function buildNarrativeBandKeys(
   ) {
     keys.push('beforeAfter');
   }
+  if (content.newsItems && content.newsItems.length > 0) {
+    keys.push('newsItems');
+  }
   if (
     content.newsUrls &&
     content.newsUrls.length > 0 &&
-    !content.bannerNewsUrls?.length
+    !content.bannerNewsUrls?.length &&
+    !content.newsItems?.length
   ) {
     keys.push('newsUrls');
   }
@@ -113,7 +121,7 @@ export function buildNarrativeBandKeys(
   if (content.closingHighlight) keys.push('closingHighlight');
   if (content.closingQuestion) {
     keys.push('closingQuestion');
-    keys.push('contactCta');
+    if (!content.hideContactForm) keys.push('contactCta');
   }
   if (content.visual?.type === 'risk-curve') keys.push('riskCurve');
   return keys;
@@ -124,6 +132,15 @@ export function buildCoverBandKeys(content: StepContent): string[] {
   if (content.lead) keys.push('lead');
   if (content.contrastPair) keys.push('contrastPair');
   if (content.body) keys.push('body');
+  if (content.newsItems && content.newsItems.length > 0) keys.push('newsItems');
+  if (
+    content.newsUrls &&
+    content.newsUrls.length > 0 &&
+    !content.bannerNewsUrls?.length &&
+    !content.newsItems?.length
+  ) {
+    keys.push('newsUrls');
+  }
   if (content.attentionPhrase) keys.push('attention');
   return keys;
 }

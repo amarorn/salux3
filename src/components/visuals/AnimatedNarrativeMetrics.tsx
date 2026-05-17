@@ -15,9 +15,16 @@ interface Props {
   active: boolean;
   reducedMotion: boolean;
   accentColor: string;
+  textWhite?: boolean;
 }
 
-export function AnimatedNarrativeMetrics({ items, active, reducedMotion, accentColor }: Props) {
+export function AnimatedNarrativeMetrics({
+  items,
+  active,
+  reducedMotion,
+  accentColor,
+  textWhite = false,
+}: Props) {
   return (
     <div className="flex flex-col gap-3">
       {items.map((item, i) => (
@@ -27,6 +34,7 @@ export function AnimatedNarrativeMetrics({ items, active, reducedMotion, accentC
           active={active}
           reducedMotion={reducedMotion}
           accentColor={accentColor}
+          textWhite={textWhite}
           staggerDelay={i * 0.14}
         />
       ))}
@@ -39,12 +47,14 @@ function AnimatedMetricLine({
   active,
   reducedMotion,
   accentColor,
+  textWhite = false,
   staggerDelay,
 }: {
   metric: NarrativeMetric;
   active: boolean;
   reducedMotion: boolean;
   accentColor: string;
+  textWhite?: boolean;
   staggerDelay: number;
 }) {
   const decimals = metric.decimals ?? 0;
@@ -84,15 +94,24 @@ function AnimatedMetricLine({
               'relative font-display text-[1.65rem] font-bold tabular-nums leading-none tracking-tight md:text-[1.9rem]',
               !reducedMotion && 'narrative-metric-value',
             )}
-            style={{
-              color: accentColor,
-              textShadow: `0 0 22px rgba(${hexToRgb(accentColor)}, 0.45), 0 0 48px rgba(${hexToRgb(accentColor)}, 0.22), 0 2px 14px rgba(0,0,0,0.5)`,
-            }}
+            style={
+              textWhite
+                ? { color: "#ffffff" }
+                : {
+                    color: accentColor,
+                    textShadow: `0 0 22px rgba(${hexToRgb(accentColor)}, 0.45), 0 0 48px rgba(${hexToRgb(accentColor)}, 0.22), 0 2px 14px rgba(0,0,0,0.5)`,
+                  }
+            }
           >
             {formatBR(display, decimals)}%
           </span>
         </span>
-        <span className="min-w-0 flex-1 text-[15px] font-medium leading-snug text-slate-400">
+        <span
+          className={clsx(
+            "min-w-0 flex-1 text-[15px] font-medium leading-snug",
+            textWhite ? "text-white/95" : "text-slate-400",
+          )}
+        >
           {metric.suffix}
         </span>
       </p>

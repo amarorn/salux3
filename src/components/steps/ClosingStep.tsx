@@ -322,13 +322,7 @@ export function ClosingStep({ step, active }: Props) {
                   boxShadow: `0 0 14px ${accent.base}`,
                 }}
               />
-              <p
-                className="relative pl-3 text-[clamp(1.12rem,2.5vw,1.35rem)] font-medium italic leading-relaxed"
-                style={{
-                  color: accent.base,
-                  textShadow: `0 0 24px ${accent.base}33`,
-                }}
-              >
+              <p className="relative pl-3 text-[clamp(1.12rem,2.5vw,1.35rem)] font-medium italic leading-relaxed text-white">
                 “{step.content.attentionPhrase}”
               </p>
             </motion.div>

@@ -84,6 +84,10 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
         content: {
           headline: "Abertura",
           cardVisual: "reveal",
+          bannerMedia: {
+            videoSrc: "/intro/predicao-glosa-ciclo-receita-3.mp4",
+            playOnClick: false,
+          },
           contrastPair: {
             left: {
               label: "Visível",
@@ -118,6 +122,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
           headline: "Diagnóstico",
           omitSidePhoto: true,
           cardVisual: "pattern",
+          allTextWhite: true,
           metrics: [
             {
               value: 14.6,
@@ -161,6 +166,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
         content: {
           headline: "Acúmulo",
           cardVisual: "accumulation",
+          allTextWhite: true,
           valueStagesClickable: false,
           valueStagesLead:
             "Ao longo da jornada assistencial, a conversão do cuidado em receita passa por quatro etapas críticas:",
@@ -232,6 +238,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
           closingQuestionLabel: "CTA · Pergunta-gatilho",
           closingQuestion:
             "Quanto da receita da sua operação é resultado de correção — e quanto vem de fluxo estruturado?",
+          hideContactForm: true,
         },
       };
     }
@@ -246,8 +253,15 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
         subtitle: "Da recuperação no final à proteção ao longo da jornada",
         content: {
           headline: "Virada de lógica",
-          omitSidePhoto: true,
           cardVisual: "transform",
+          heroImage: {
+            src: "/intro/trilha1_slide5.png",
+            alt: "Comparação sem agentes versus com agentes na proteção da receita",
+            transparentCutout: true,
+          },
+          bannerUnframed: true,
+          hideFloatingWatermarkSvg: true,
+          bannerHeightClass: "h-[320px]",
           contrastPair: {
             left: {
               label: "Antes",
@@ -289,8 +303,14 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
         subtitle: "Os 6 pontos que precisam funcionar como base coordenada",
         content: {
           headline: "Base coordenada",
-          omitSidePhoto: true,
           cardVisual: "mesh",
+          heroImage: {
+            src: "/intro/trilha1_slide6.svg",
+            alt: "Seis pontos coordenados da proteção da receita",
+          },
+          bannerUnframed: true,
+          hideFloatingWatermarkSvg: true,
+          bannerHeightClass: "h-[300px]",
           valueStagesLead:
             "A proteção da receita depende de como a operação funciona como um todo — da origem ao faturamento.\n\nOs 6 pontos que precisam funcionar como base coordenada:",
           valueStagesFlat: true,
@@ -410,8 +430,15 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
           "Sem agentes × Com agentes (Maria) — antecipação em vez de retrabalho",
         content: {
           headline: "Agentes",
-          omitSidePhoto: true,
           cardVisual: "radar",
+          heroImage: {
+            src: "/intro/trilha1_slide8.png",
+            alt: "Comparação sem agentes versus com agentes Maria na operação",
+            transparentCutout: true,
+          },
+          bannerUnframed: true,
+          hideFloatingWatermarkSvg: true,
+          bannerHeightClass: "h-[320px]",
           contrastPair: {
             left: {
               label: "Sem agentes",

@@ -13,6 +13,7 @@ interface Props {
   accentColor: string;
   active: boolean;
   delay?: number;
+  textWhite?: boolean;
 }
 
 function formatBR(value: number, decimals: number) {
@@ -33,7 +34,9 @@ export function EvidenceMetricCard({
   accentColor,
   active,
   delay = 0,
+  textWhite = false,
 }: Props) {
+  const metricColor = textWhite ? '#ffffff' : accentColor;
   const reduce = useReducedMotion();
   const [display, setDisplay] = useState(reduce || !active ? value : 0);
 
@@ -96,7 +99,7 @@ export function EvidenceMetricCard({
           <motion.span
             aria-hidden
             className="inline-flex h-5 w-5 items-center justify-center rounded text-[12px]"
-            style={{ color: accentColor }}
+            style={{ color: metricColor }}
             initial={reduce ? false : { opacity: 0, scale: 0 }}
             animate={
               active ? { opacity: 1, scale: 1 } : reduce ? undefined : { opacity: 0, scale: 0 }
@@ -107,7 +110,7 @@ export function EvidenceMetricCard({
           </motion.span>
           <span
             className="text-[10px] font-semibold uppercase tracking-[0.32em]"
-            style={{ color: accentColor, opacity: 0.95 }}
+            style={{ color: metricColor, opacity: textWhite ? 1 : 0.95 }}
           >
             {badge}
           </span>
@@ -131,11 +134,13 @@ export function EvidenceMetricCard({
         <motion.span
           className="font-display tabular-nums leading-none"
           style={{
-            color: accentColor,
+            color: metricColor,
             fontSize: 'clamp(2.8rem, 7vw, 4.2rem)',
             fontWeight: 800,
             letterSpacing: '-0.03em',
-            textShadow: `0 0 28px ${accentColor}88, 0 0 60px ${accentColor}44`,
+            textShadow: textWhite
+              ? '0 0 28px rgba(255,255,255,0.35)'
+              : `0 0 28px ${accentColor}88, 0 0 60px ${accentColor}44`,
           }}
           initial={reduce ? false : { opacity: 0, filter: 'none', y: 6 }}
           animate={
@@ -150,7 +155,7 @@ export function EvidenceMetricCard({
           {formatBR(display, decimals)}
           <span
             className="ml-0.5 text-[0.55em] font-bold opacity-75"
-            style={{ color: accentColor }}
+            style={{ color: metricColor }}
           >
             {unit}
           </span>
@@ -218,7 +223,11 @@ export function EvidenceMetricCard({
 
       {context && (
         <motion.p
-          className="mt-2 text-[0.86rem] italic leading-snug text-slate-300/85"
+          className={
+            textWhite
+              ? 'mt-2 text-[0.86rem] italic leading-snug text-white/80'
+              : 'mt-2 text-[0.86rem] italic leading-snug text-slate-300/85'
+          }
           initial={reduce ? false : { opacity: 0 }}
           animate={active ? { opacity: 1 } : reduce ? undefined : { opacity: 0 }}
           transition={{ duration: 0.6, delay: 1.2 + delay }}
