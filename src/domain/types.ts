@@ -205,6 +205,12 @@ export interface StepContent {
   evidenceCard?: EvidenceCard;
   /** Frase de fechamento de tela em destaque ciano (call-out final do card). */
   closingHighlight?: string;
+  /** Palavras no título/corpo/bullets que abrem imagem ao clicar (match no texto). */
+  clickableWordMedia?: {
+    word: string;
+    imageSrc: string;
+    imageAlt?: string;
+  }[];
   /** Card 8 — capacidades centrais e de sustentação. */
   capacityGroups?: CapacityGroup[];
   /** Faixa com capturas de produto (substitui slide de “pontos de entrada”). */

@@ -77,6 +77,23 @@ const highlightContextStep: PresentationStep = {
       "Os agentes não substituem a equipe. Ampliam a capacidade de leitura, priorização e decisão ao longo da jornada.",
     closingHighlight:
       "A tecnologia deixa de apenas registrar o cuidado — e passa a sustentar continuidade, visibilidade e capacidade real de decisão.",
+    clickableWordMedia: [
+      {
+        word: "INITIA",
+        imageSrc: "/intro/TELA_INICIAL_INITIA.png",
+        imageAlt: "Tela inicial INITIA",
+      },
+      {
+        word: "admissão",
+        imageSrc: "/intro/assistencial-prontuario-ambulatorial.png",
+        imageAlt: "Prontuário ambulatorial",
+      },
+      {
+        word: "prontuário",
+        imageSrc: "/intro/assistencial-evolucao-fia.png",
+        imageAlt: "Evolução do paciente FIA",
+      },
+    ],
   },
 };
 
@@ -370,6 +387,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       closingQuestionLabel: "CTA · Pergunta-gatilho",
       closingQuestion:
         "Em qual ponto da jornada o cuidado perde mais continuidade na sua instituição?",
+      hideContactForm: true,
       bullets: [],
     }),
   )
@@ -468,6 +486,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
                 "Exame, laudo e contexto conectados à linha do cuidado.",
               tagline:
                 "Diagnóstico como infraestrutura crítica da jornada — não serviço apartado.",
+              productImage: "/intro/assistencial-diagnostico-integrado.mp4",
             },
             {
               name: "Cuidado conectado",
@@ -482,6 +501,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
               description:
                 "Registro anestésico estruturado e rastreabilidade contínua.",
               tagline: "O risco acompanhado enquanto o cuidado acontece.",
+              productImage: "/intro/assistencial-areas-criticas.mp4",
             },
           ],
         },
@@ -495,6 +515,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
               description:
                 "Documentação que sustenta rastreabilidade, conformidade e continuidade.",
               tagline: "Deixa de ser ponto de fragilidade.",
+              productImage: "/intro/receita-cap/governanca-documental.mp4",
             },
             {
               name: "Força de trabalho",
@@ -502,14 +523,15 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
               description:
                 "Escala, cobertura e disponibilidade alinhadas ao risco e ao fluxo assistencial.",
               tagline: "Equipe como capacidade coordenada.",
-              productImage: "/intro/assistencial-forca-trabalho.png",
+              productImage: "/intro/receita-cap/forca-trabalho.png",
             },
             {
-              name: "Inteligência operacional",
+              name: "Inteligência em tempo real",
               // subtitle: "VisionPilot",
               description:
                 "Fluxos físicos, ocupação e sinais do ambiente acompanhados em tempo real.",
               tagline: "O risco que não aparece no prontuário.",
+              productImage: "/intro/receita-cap/inteligencia-tempo-real.png",
             },
           ],
         },
@@ -523,6 +545,11 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       headline:
         "O cuidado deixa de depender de reconstrução. E passa a ter continuidade real.",
       cardVisual: "bloom",
+      heroImage: {
+        src: "/intro/TELA_INICIAL_INITIA.png",
+        alt: "Tela inicial INITIA — plataforma Salux",
+      },
+      bannerPhotoExpandable: false,
       body: "Com uma base coordenada, a jornada deixa de depender de esforço individual de compensação.",
       valueStagesFlat: true,
       valueStagesGridCols: 3,

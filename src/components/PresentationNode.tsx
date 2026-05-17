@@ -32,6 +32,8 @@ interface PresentationNodeProps {
   active: boolean;
   /** Quando true, slides que não estão ativos ficam mais baixos em opacidade (efeito “fader” na trilha). */
   dimNonActive?: boolean;
+  /** Slide único centralizado no palco (sem coordenadas espaciais nem câmera). */
+  centered?: boolean;
 }
 
 function StepBody({ step, active }: PresentationNodeProps) {
@@ -143,7 +145,12 @@ function CardFlipShell({
   );
 }
 
-function PresentationNodeComponent({ step, active, dimNonActive = true }: PresentationNodeProps) {
+function PresentationNodeComponent({
+  step,
+  active,
+  dimNonActive = true,
+  centered = false,
+}: PresentationNodeProps) {
   const flipPhoto = useMemo(() => flipFromId(step.id), [step.id]);
   const stepLabel = `Etapa ${step.index + 1}: ${step.title}`;
   const reducedMotion = useReducedMotion();
@@ -151,6 +158,45 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
   const viewport = useViewportSize();
   const forceWidth = cardWidthForViewport(viewport.width);
   const currentTrackId = usePresentationStore((s) => s.currentTrackId);
+
+  const cardTree = (
+    <FloatingCardContext.Provider
+      value={{
+        flipPhoto,
+        forceWidth,
+        bannerVideoSrc: step.content.bannerMedia?.videoSrc,
+        bannerVideoPoster: step.content.bannerMedia?.posterSrc,
+        bannerVideoPlayOnClick: step.content.bannerMedia?.playOnClick,
+        trackId: currentTrackId,
+        omitSidePhoto: step.content.omitSidePhoto,
+        stageViewport: viewport,
+        bannerPhotoExpandable: step.content.bannerPhotoExpandable,
+      }}
+    >
+      <CardFlipShell
+        active={active}
+        flipPhoto={flipPhoto}
+        stepLabel={stepLabel}
+        unframedBanner={Boolean(step.content.bannerUnframed)}
+      >
+        <StepBody step={step} active={active} />
+      </CardFlipShell>
+    </FloatingCardContext.Provider>
+  );
+
+  if (centered) {
+    return (
+      <motion.div
+        className="relative w-full min-w-0 max-w-full"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {cardTree}
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -190,23 +236,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
           delay: (step.index % 5) * 0.6,
         }}
       >
-        <FloatingCardContext.Provider
-          value={{
-            flipPhoto,
-            forceWidth,
-            bannerVideoSrc: step.content.bannerMedia?.videoSrc,
-            bannerVideoPoster: step.content.bannerMedia?.posterSrc,
-            bannerVideoPlayOnClick: step.content.bannerMedia?.playOnClick,
-            trackId: currentTrackId,
-            omitSidePhoto: step.content.omitSidePhoto,
-            stageViewport: viewport,
-            bannerPhotoExpandable: step.content.bannerPhotoExpandable,
-          }}
-        >
-          <CardFlipShell active={active} flipPhoto={flipPhoto} stepLabel={stepLabel} unframedBanner={Boolean(step.content.bannerUnframed)}>
-            <StepBody step={step} active={active} />
-          </CardFlipShell>
-        </FloatingCardContext.Provider>
+        {cardTree}
       </motion.div>
     </motion.div>
   );

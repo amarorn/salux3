@@ -24,10 +24,12 @@ export function bannerHeightForViewport(viewportHeight: number): number {
 export function cameraFitScale(stepScale: number, viewport: ViewportSize): number {
   const cardW = cardWidthForViewport(viewport.width) * CARD_TEXT_SCALE;
   const cardH = cardMaxHeightForViewport(viewport.height);
+  const bannerH = bannerHeightForViewport(viewport.height);
+  const estimatedCardH = bannerH + cardH * 0.55;
 
   return Math.min(
     stepScale,
     (viewport.width * STAGE_SAFE) / cardW,
-    (viewport.height * STAGE_SAFE) / cardH,
+    (viewport.height * STAGE_SAFE) / estimatedCardH,
   );
 }

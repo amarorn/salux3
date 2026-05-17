@@ -33,6 +33,7 @@ import {
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 import { resolveContactFormUrl } from "@/config/contact";
+import { renderTextWithClickableWords } from "./InlineMediaTrigger";
 
 const FORM_BUTTON_CLASS =
   "pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full border border-violet-400/35 bg-violet-500/10 px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-violet-200 shadow-[0_18px_48px_-22px_rgba(124,58,237,0.55)] transition-[border-color,background-color,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-violet-400/55 hover:bg-violet-500/18";
@@ -1074,6 +1075,8 @@ export function NarrativeStep({ step, active }: Props) {
       step.content.valueStages.length > 0,
   );
 
+  const clickableWordMedia = step.content.clickableWordMedia ?? [];
+
   const titleBand =
     painPoints && step.content.headline ? (
       <EraRevealBand
@@ -1132,7 +1135,13 @@ export function NarrativeStep({ step, active }: Props) {
                 : "presentation-ppt-title max-w-[24ch] text-[clamp(1.8rem,4vw,2.55rem)]"
             }
           >
-            {step.title}
+            {clickableWordMedia.length > 0
+              ? renderTextWithClickableWords(
+                  step.title,
+                  clickableWordMedia,
+                  accent.base,
+                )
+              : step.title}
           </h2>
         </motion.div>
       </EraRevealBand>
@@ -1156,7 +1165,13 @@ export function NarrativeStep({ step, active }: Props) {
             allTextWhite ? "text-white" : "text-slate-100/95",
           )}
         >
-          {step.content.body}
+          {clickableWordMedia.length > 0
+            ? renderTextWithClickableWords(
+                step.content.body!,
+                clickableWordMedia,
+                accent.base,
+              )
+            : step.content.body}
         </motion.p>
       </EraRevealBand>
     ) : null;
@@ -1758,7 +1773,13 @@ export function NarrativeStep({ step, active }: Props) {
                       }}
                     />
                     <span className="whitespace-pre-line text-center">
-                      {bullet}
+                      {clickableWordMedia.length > 0
+                        ? renderTextWithClickableWords(
+                            bullet,
+                            clickableWordMedia,
+                            accent.base,
+                          )
+                        : bullet}
                     </span>
                   </li>
                 ))}

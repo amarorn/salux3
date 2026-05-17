@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { ActivationPulse } from './ActivationPulse';
+import { AnimatePresence } from 'framer-motion';
 import { CameraController } from './CameraController';
+import { CenteredStageFrame } from './CenteredStageFrame';
 import { ConnectionLines } from './ConnectionLines';
 import { PresentationNode } from './PresentationNode';
-import { theme } from '@/domain/theme';
 import { usePresentationNavigation } from '@/hooks/usePresentationNavigation';
 import { useViewportSize } from '@/hooks/useViewportSize';
 import { useCurrentPresentation } from '@/hooks/useCurrentPresentation';
@@ -32,24 +32,31 @@ export function PresentationCanvas({ externalBackground = false }: { externalBac
         </>
       )}
 
-      <CameraController step={current} isOverview={isOverview} viewport={viewport}>
-        <ConnectionLines activeStepId={current.id} isOverview={isOverview} />
-        {steps.map((step) => (
-          <PresentationNode
-            key={step.id}
-            step={step}
-            active={step.id === current.id && !isOverview}
-            dimNonActive={!isOverview}
-          />
-        ))}
-        {!isOverview && (
-          <ActivationPulse
-            key={current.id}
-            position={current.position}
-            color={theme.accents[current.accent].base}
-          />
-        )}
-      </CameraController>
+      {isOverview ? (
+        <CameraController step={current} isOverview viewport={viewport}>
+          <ConnectionLines activeStepId={current.id} isOverview />
+          {steps.map((step) => (
+            <PresentationNode
+              key={step.id}
+              step={step}
+              active={step.id === current.id}
+              dimNonActive={false}
+            />
+          ))}
+        </CameraController>
+      ) : (
+        <CenteredStageFrame step={current} viewport={viewport}>
+          <AnimatePresence mode="wait">
+            <PresentationNode
+              key={current.id}
+              step={current}
+              active
+              dimNonActive={false}
+              centered
+            />
+          </AnimatePresence>
+        </CenteredStageFrame>
+      )}
     </div>
   );
 }
