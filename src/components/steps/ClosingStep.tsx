@@ -35,20 +35,19 @@ const CLOSING_CTA_ASSEMBLY_DELAY = 1.55;
 const CLOSING_CTA_CHAR_STAGGER = 0.036;
 
 const CLOSING_LOGO_SIZE = 200;
+const CLOSING_MAESTRO_GAP = 72;
 
 function ClosingFormCta({
   href,
   external,
   active,
   reduceMotion,
-  accentColor,
   afterLogoFlight,
 }: {
   href: string;
   external: boolean;
   active: boolean;
   reduceMotion: boolean | null;
-  accentColor: string;
   afterLogoFlight: boolean;
 }) {
   const assemblyDelay =
@@ -161,10 +160,6 @@ function ClosingFormCta({
     </>
   );
 
-  const style = {
-    textShadow: `0 0 32px ${accentColor}88, 0 0 64px ${accentColor}44`,
-  } as const;
-
   if (external) {
     return (
       <a
@@ -174,7 +169,6 @@ function ClosingFormCta({
         rel="noopener noreferrer"
         onClick={(e) => e.stopPropagation()}
         className={linkClass}
-        style={style}
         aria-label={CLOSING_FORM_CTA_LABEL}
       >
         {content}
@@ -188,7 +182,6 @@ function ClosingFormCta({
       to={href}
       onClick={(e) => e.stopPropagation()}
       className={linkClass}
-      style={style}
       aria-label={CLOSING_FORM_CTA_LABEL}
     >
       {content}
@@ -227,64 +220,23 @@ function ClosingLogoDescent({
     >
       <motion.div
         {...innerMotion}
-        className="relative flex h-[min(14rem,28vh)] w-full min-w-[280px] items-center justify-center gap-6 overflow-visible md:gap-10"
+        className="relative flex h-[min(14rem,28vh)] w-full items-center justify-center overflow-visible"
         aria-hidden
       >
-        <ClosingMaestroCompanion
-          accent={accentColor}
-          active={active}
-          reduceMotion={Boolean(reduceMotion)}
-        />
-
-        <motion.div
+        <div
           className="relative flex items-center justify-center"
           style={{ width: CLOSING_LOGO_SIZE, height: CLOSING_LOGO_SIZE }}
         >
-        {motionOn && (
-          <>
-            <motion.span
-              className="pointer-events-none absolute rounded-full"
-              style={{
-                width: CLOSING_LOGO_SIZE * 1.35,
-                height: CLOSING_LOGO_SIZE * 1.35,
-                background: `radial-gradient(circle, ${accentColor}55 0%, ${accentColor}22 42%, transparent 72%)`,
-              }}
-              initial={{ opacity: 0, scale: 0.4 }}
-              animate={
-                active
-                  ? { opacity: [0.35, 0.75, 0.35], scale: [1, 1.35, 1] }
-                  : undefined
-              }
-              transition={{
-                duration: 2.8,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1.2,
-              }}
+          <motion.div
+            className="absolute top-1/2 z-[2] -translate-y-1/2"
+            style={{ right: `calc(100% + ${CLOSING_MAESTRO_GAP}px)` }}
+          >
+            <ClosingMaestroCompanion
+              accent={accentColor}
+              active={active}
+              reduceMotion={Boolean(reduceMotion)}
             />
-            <motion.span
-              className="pointer-events-none absolute rounded-full border"
-              style={{
-                width: CLOSING_LOGO_SIZE * 1.55,
-                height: CLOSING_LOGO_SIZE * 1.55,
-                borderColor: `${accentColor}44`,
-                boxShadow: `0 0 60px ${accentColor}66, inset 0 0 40px ${accentColor}22`,
-              }}
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={
-                active
-                  ? { opacity: [0.25, 0.65, 0.25], scale: [1, 1.12, 1], rotate: 360 }
-                  : undefined
-              }
-              transition={{
-                opacity: { duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 1.4 },
-                scale: { duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 1.4 },
-                rotate: { duration: 24, repeat: Infinity, ease: "linear" },
-              }}
-            />
-          </>
-        )}
-
+          </motion.div>
         <motion.div
           className="relative z-[1] flex items-center justify-center"
           initial={
@@ -314,9 +266,6 @@ function ClosingLogoDescent({
                   filter: { duration: 1.1, delay: 0.2 },
                 }
           }
-          style={{
-            filter: `drop-shadow(0 0 64px ${accentColor}) drop-shadow(0 0 120px ${accentColor}88) drop-shadow(0 16px 40px rgba(0,0,0,0.55))`,
-          }}
         >
           <motion.div
             animate={
@@ -339,11 +288,11 @@ function ClosingLogoDescent({
               symbolOnly
               animate={motionOn}
               idle={active}
-              effects={{ shimmer: true, glowRing: true, aberration: true }}
+              effects={{ shimmer: true, glowRing: false, aberration: true }}
             />
           </motion.div>
         </motion.div>
-        </motion.div>
+        </div>
       </motion.div>
     </EraRevealBand>
   );
@@ -369,6 +318,7 @@ export function ClosingStep({ step, active }: Props) {
   );
 
   const accent = theme.accents[step.accent];
+  const allTextWhite = Boolean(step.content.allTextWhite);
   const benefits = step.content.valueStages ?? [];
   const [selectedBenefit, setSelectedBenefit] = useState<number | null>(null);
   const benefitRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -476,7 +426,11 @@ export function ClosingStep({ step, active }: Props) {
           >
             <motion.p
               {...innerMotion}
-              className="presentation-ppt-body text-[1.05rem] leading-relaxed text-slate-100/96 whitespace-pre-line"
+              className={
+                allTextWhite
+                  ? "presentation-ppt-body text-[1.05rem] leading-relaxed text-white whitespace-pre-line"
+                  : "presentation-ppt-body text-[1.05rem] leading-relaxed text-slate-100/96 whitespace-pre-line"
+              }
             >
               {step.content.body}
             </motion.p>
@@ -574,18 +528,38 @@ export function ClosingStep({ step, active }: Props) {
                         <span
                           aria-hidden
                           className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md text-[12px] font-bold"
-                          style={{
-                            background: accent.base,
-                            color: "#0b0f1a",
-                            boxShadow: `0 0 14px ${accent.base}66`,
-                          }}
+                          style={
+                            allTextWhite
+                              ? {
+                                  background: "rgba(255,255,255,0.92)",
+                                  color: "#0b0f1a",
+                                  boxShadow: "0 0 14px rgba(255,255,255,0.35)",
+                                }
+                              : {
+                                  background: accent.base,
+                                  color: "#0b0f1a",
+                                  boxShadow: `0 0 14px ${accent.base}66`,
+                                }
+                          }
                         >
                           {row.number || "✓"}
                         </span>
-                        <p className="text-[1rem] font-medium leading-relaxed text-white/95">
+                        <p
+                          className={
+                            allTextWhite
+                              ? "text-[1rem] font-medium leading-relaxed text-white"
+                              : "text-[1rem] font-medium leading-relaxed text-white/95"
+                          }
+                        >
                           {row.label}
                           {row.description && (
-                            <span className="block text-[0.96rem] font-normal text-slate-100/88">
+                            <span
+                              className={
+                                allTextWhite
+                                  ? "block text-[0.96rem] font-normal text-white/90"
+                                  : "block text-[0.96rem] font-normal text-slate-100/88"
+                              }
+                            >
                               {row.description}
                             </span>
                           )}
@@ -745,7 +719,6 @@ export function ClosingStep({ step, active }: Props) {
                   }
                   active={active}
                   reduceMotion={reduceMotion}
-                  accentColor={accent.base}
                   afterLogoFlight={Boolean(step.content.closingLogoFlight)}
                 />
               </motion.div>

@@ -4,8 +4,7 @@ import { usePresentationStore } from '@/store/presentationStore';
 import { useCurrentPresentation } from '@/hooks/useCurrentPresentation';
 import { theme } from '@/domain/theme';
 import { dimensionsForStageAspect } from '@/domain/stageAspect';
-import type { MaestroElementTarget } from '@/lib/maestroAnchor';
-import { clampSlotToCorridor, pickMaestroAnchor } from '@/lib/maestroAnchor';
+import { clampSlotToCorridor } from '@/lib/maestroAnchor';
 import type { NodeKind } from '@/domain/types';
 
 /**
@@ -13,8 +12,7 @@ import type { NodeKind } from '@/domain/types';
  *
  * Comportamento:
  * - Posição diferente em cada slide (permutação determinística sobre estações seguras).
- * - Na chegada de cada slide, assinala um elemento (`data-maestro-anchor`) com eco
- *   luminoso na silhueta dele; o orbe permanece nos corredores, nunca sobre o texto.
+ * - O orbe permanece nos corredores do palco, nunca sobre o texto.
  */
 
 interface Props {
@@ -118,42 +116,6 @@ function hashString(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
   return Math.abs(h);
-}
-
-const MORPH_MEASURE_MS = 320;
-const MORPH_HOLD_MS = 720;
-
-/** Eco luminoso na silhueta do elemento escolhido na tela. */
-function MaestroElementEcho({
-  target,
-  accent,
-}: {
-  target: MaestroElementTarget;
-  accent: string;
-}) {
-  const ease = [0.22, 1, 0.36, 1] as const;
-  const glow = `0 0 28px ${GOLD}aa, 0 0 14px ${accent}88, inset 0 0 24px ${GOLD}33`;
-
-  return (
-    <motion.div
-      aria-hidden
-      className="pointer-events-none absolute left-1/2 top-1/2"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.94 }}
-      transition={{ duration: 0.45, ease }}
-      style={{
-        width: target.width,
-        height: target.height,
-        marginLeft: -target.width / 2,
-        marginTop: -target.height / 2,
-        borderRadius: target.borderRadius,
-        border: `1.5px solid ${GOLD_BRIGHT}`,
-        background: `linear-gradient(135deg, ${GOLD}44 0%, ${accent}22 55%, transparent 100%)`,
-        boxShadow: glow,
-      }}
-    />
-  );
 }
 
 /** Slides em que o Maestro voa ao centro do palco e decompõe em fragmentos para cada ponta. */
@@ -600,44 +562,6 @@ export function MaestroOrb({ visible }: Props) {
     return () => window.clearTimeout(t);
   }, [pilgrimage]);
 
-  const [morphTarget, setMorphTarget] = useState<MaestroElementTarget | null>(null);
-  const [shapeMorphing, setShapeMorphing] = useState(false);
-
-  useEffect(() => {
-    if (!visible || !current || reduceMotion || pilgrimageActive) {
-      setShapeMorphing(false);
-      setMorphTarget(null);
-      return;
-    }
-    setShapeMorphing(false);
-    setMorphTarget(null);
-
-    const measureTimer = window.setTimeout(() => {
-      const root = document.getElementById('salux-stage');
-      if (!root) return;
-      const target = pickMaestroAnchor(
-        root,
-        stage.width,
-        stage.height,
-        stepId,
-        ORB_HALF,
-      );
-      if (!target) return;
-      setMorphTarget(target);
-      setShapeMorphing(true);
-    }, MORPH_MEASURE_MS);
-
-    const settle = window.setTimeout(() => {
-      setShapeMorphing(false);
-      setMorphTarget(null);
-    }, MORPH_MEASURE_MS + MORPH_HOLD_MS);
-
-    return () => {
-      window.clearTimeout(measureTimer);
-      window.clearTimeout(settle);
-    };
-  }, [stepId, visible, current?.id, reduceMotion, pilgrimageActive, stage.width, stage.height]);
-
   const targetSlot =
     pilgrimage === 'fly' || pilgrimage === 'burst' ? stageCenter : slot;
 
@@ -651,28 +575,6 @@ export function MaestroOrb({ visible }: Props) {
     <AnimatePresence>
       {visible && (
         <>
-          <AnimatePresence>
-            {shapeMorphing && morphTarget && pilgrimage === 'off' && (
-              <motion.div
-                key={`maestro-echo-${stepId}`}
-                aria-hidden
-                className="pointer-events-none absolute z-[28] select-none"
-                style={{ top: 0, left: 0 }}
-                initial={{ opacity: 0, x: morphTarget.cx, y: morphTarget.cy, scale: 0.92 }}
-                animate={{ opacity: 1, x: morphTarget.cx, y: morphTarget.cy, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.94 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <motion.div
-                  className="relative -translate-x-1/2 -translate-y-1/2"
-                  style={{ width: 0, height: 0 }}
-                >
-                  <MaestroElementEcho target={morphTarget} accent={accent} />
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           <motion.div
             key="maestro"
             className="pointer-events-none absolute z-30 select-none"
@@ -689,7 +591,7 @@ export function MaestroOrb({ visible }: Props) {
           >
             <motion.div
               animate={
-                reduceMotion || pilgrimage !== 'off' || shapeMorphing
+                reduceMotion || pilgrimage !== 'off'
                   ? undefined
                   : {
                       x: [0, 4, -3, 5, -2, 0],

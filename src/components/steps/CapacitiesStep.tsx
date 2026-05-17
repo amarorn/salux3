@@ -42,6 +42,7 @@ const TONE_COLORS: Record<
 
 export function CapacitiesStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
+  const allTextWhite = Boolean(step.content.allTextWhite);
   const reduce = useReducedMotion();
   const cardCtx = useContext(FloatingCardContext);
   const flipPhoto = cardCtx?.flipPhoto ?? false;
@@ -136,6 +137,7 @@ export function CapacitiesStep({ step, active }: Props) {
       )}
       width={760}
       badge={step.title}
+      allTextWhite={allTextWhite}
       cardVisual={step.content.cardVisual}
       hideValueFlow={Boolean(step.content.hideValueFlow)}
     >
@@ -176,7 +178,11 @@ export function CapacitiesStep({ step, active }: Props) {
           >
             <motion.p
               {...innerMotion}
-              className="presentation-ppt-body text-center text-[1.08rem] leading-relaxed text-slate-100/100 whitespace-pre-line"
+              className={
+                allTextWhite
+                  ? "presentation-ppt-body text-center text-[1.08rem] leading-relaxed text-white whitespace-pre-line"
+                  : "presentation-ppt-body text-center text-[1.08rem] leading-relaxed text-slate-100/100 whitespace-pre-line"
+              }
             >
               {step.content.body}
             </motion.p>
@@ -202,22 +208,40 @@ export function CapacitiesStep({ step, active }: Props) {
                 <header className="flex items-center gap-3">
                   <span
                     className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em]"
-                    style={{
-                      borderColor: `${TONE_COLORS[group.tone].ring}66`,
-                      background: `${TONE_COLORS[group.tone].ring}1a`,
-                      color: TONE_COLORS[group.tone].ring,
-                    }}
+                    style={
+                      allTextWhite
+                        ? {
+                            borderColor: "rgba(255,255,255,0.35)",
+                            background: "rgba(255,255,255,0.08)",
+                            color: "#ffffff",
+                          }
+                        : {
+                            borderColor: `${TONE_COLORS[group.tone].ring}66`,
+                            background: `${TONE_COLORS[group.tone].ring}1a`,
+                            color: TONE_COLORS[group.tone].ring,
+                          }
+                    }
                   >
                     <span
                       className="h-1.5 w-1.5 rounded-full"
                       style={{
-                        background: TONE_COLORS[group.tone].ring,
-                        boxShadow: `0 0 10px ${TONE_COLORS[group.tone].ring}`,
+                        background: allTextWhite
+                          ? "#ffffff"
+                          : TONE_COLORS[group.tone].ring,
+                        boxShadow: allTextWhite
+                          ? "0 0 10px rgba(255,255,255,0.45)"
+                          : `0 0 10px ${TONE_COLORS[group.tone].ring}`,
                       }}
                     />
                     {TONE_COLORS[group.tone].chip}
                   </span>
-                  <h3 className="text-[1.04rem] font-semibold text-white/90">
+                  <h3
+                    className={
+                      allTextWhite
+                        ? "text-[1.04rem] font-semibold text-white"
+                        : "text-[1.04rem] font-semibold text-white/90"
+                    }
+                  >
                     {group.title}
                   </h3>
                   <span
@@ -236,6 +260,7 @@ export function CapacitiesStep({ step, active }: Props) {
                         key={it.name}
                         item={it}
                         ring={TONE_COLORS[group.tone].ring}
+                        textWhite={allTextWhite}
                         delay={gi * 0.1 + i * 0.06}
                         reduce={Boolean(reduce)}
                         active={active}
@@ -308,6 +333,7 @@ export function CapacitiesStep({ step, active }: Props) {
 function CapacityCard({
   item,
   ring,
+  textWhite = false,
   delay,
   reduce,
   active,
@@ -318,6 +344,7 @@ function CapacityCard({
 }: {
   item: CapacityItem;
   ring: string;
+  textWhite?: boolean;
   delay: number;
   reduce: boolean;
   active: boolean;
@@ -411,8 +438,12 @@ function CapacityCard({
           </p>
         )} */}
         <p
-          className="mt-1 text-[1rem] font-semibold italic leading-relaxed"
-          style={{ color: ring }}
+          className={
+            textWhite
+              ? "mt-1 text-[1rem] font-semibold italic leading-relaxed text-white/95"
+              : "mt-1 text-[1rem] font-semibold italic leading-relaxed"
+          }
+          style={textWhite ? undefined : { color: ring }}
         >
           {item.tagline}
         </p>

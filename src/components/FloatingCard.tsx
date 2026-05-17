@@ -99,6 +99,8 @@ interface FloatingCardProps {
   /** Grelha de capturas de notícia no topo (substitui foto/vídeo do banner). */
   bannerNewsUrls?: string[];
   onBannerNewsExpand?: (url: string) => void;
+  /** Texto do badge e rótulos do card em branco (trilhas com fundo escuro). */
+  allTextWhite?: boolean;
   children: ReactNode;
 }
 
@@ -127,6 +129,7 @@ export function FloatingCard({
   stepIndex = 0,
   bannerNewsUrls,
   onBannerNewsExpand,
+  allTextWhite = false,
   children,
 }: FloatingCardProps) {
   const ctx = useContext(FloatingCardContext);
@@ -538,19 +541,32 @@ export function FloatingCard({
                 <span
                   className={clsx(
                     "inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] transition-[box-shadow] duration-500",
+                    allTextWhite && "text-white",
                   )}
-                  style={{
-                    background: `${accentColor.base}1a`,
-                    color: accentColor.base,
-                    border: `1px solid ${accentColor.base}55`,
-                    boxShadow: active
-                      ? `0 0 18px ${accentColor.base}40, inset 0 1px 0 rgba(255,255,255,0.08)`
-                      : undefined,
-                  }}
+                  style={
+                    allTextWhite
+                      ? {
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.35)",
+                          boxShadow: active
+                            ? "0 0 18px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.08)"
+                            : undefined,
+                        }
+                      : {
+                          background: `${accentColor.base}1a`,
+                          color: accentColor.base,
+                          border: `1px solid ${accentColor.base}55`,
+                          boxShadow: active
+                            ? `0 0 18px ${accentColor.base}40, inset 0 1px 0 rgba(255,255,255,0.08)`
+                            : undefined,
+                        }
+                  }
                 >
                   <span
                     className="h-1 w-1 rounded-full"
-                    style={{ background: accentColor.base }}
+                    style={{
+                      background: allTextWhite ? "#ffffff" : accentColor.base,
+                    }}
                   />
                   {badge}
                 </span>
