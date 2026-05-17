@@ -237,7 +237,6 @@ export function FloatingCard({
             "relative w-full shrink-0 overflow-hidden",
             bannerUnframed ? "mt-0" : "mt-5 rounded-3xl duration-500 ease-out",
             bannerHeightClass ?? "h-[460px]",
-            bannerTransparentCutout && "bg-[#05070d]",
             !bannerUnframed &&
               (active
                 ? "border border-transparent shadow-[0_30px_80px_-24px_rgba(0,0,0,0.7)]"
@@ -376,16 +375,18 @@ export function FloatingCard({
               />,
             )
           ) : null}
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-28"
-            style={{
-              background:
-                "linear-gradient(to top, #05070d 0%, rgba(5,7,13,0.72) 42%, transparent 100%)",
-            }}
-            animate={{ opacity: active ? 1 : 0.65 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-          />
+          {!bannerTransparentCutout && (
+            <motion.div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-28"
+              style={{
+                background:
+                  "linear-gradient(to top, #05070d 0%, rgba(5,7,13,0.72) 42%, transparent 100%)",
+              }}
+              animate={{ opacity: active ? 1 : 0.65 }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+            />
+          )}
         </motion.div>
       )}
 
