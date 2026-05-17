@@ -189,6 +189,8 @@ export interface StepContent {
   painPointsBalloonTitle?: string;
   /** Pergunta de fechamento destacada ao final do card (CTA reflexivo). */
   closingQuestion?: string;
+  /** Oculta o botão "Ir para o formulário" mesmo quando closingQuestion está definida. */
+  hideFormButton?: boolean;
   /** Rótulo curto exibido acima da pergunta de fechamento (ex.: "CTA / PERGUNTA-GATILHO"). */
   closingQuestionLabel?: string;
   /** Mantém `closingQuestion` sem o botão "Ir para o formulário". */

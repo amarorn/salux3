@@ -10,3 +10,8 @@ dist-ssr
 .idea
 .vscode
 *.tsbuildinfo
+
+# Vídeos locais (arquivo grande — não versionar)
+public/videos/*.mp4
+public/videos/**/*.mp4
+
