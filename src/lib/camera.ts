@@ -1,10 +1,22 @@
 import type { CameraState, PresentationStep, ViewportSize } from '@/domain/types';
-import { cameraFitScale } from '@/lib/presentationLayout';
 
 const NODE_PADDING = 480;
 
+/**
+ * Largura/altura máxima estimada do conteúdo de um step (FloatingCard:
+ * painel + foto; mais parágrafos + linha de cartões pode exceder ~1520px). Usado para impedir que `step.scale`
+ * deixe o conteúdo maior que o palco em telas verticais.
+ */
+const MAX_STEP_CONTENT_WIDTH = 1024;
+const MAX_STEP_CONTENT_HEIGHT = 1520;
+const SAFE_MARGIN = 0.92;
+
 export function cameraForStep(step: PresentationStep, viewport: ViewportSize): CameraState {
-  const fitScale = cameraFitScale(step.scale, viewport);
+  const fitScale = Math.min(
+    step.scale,
+    (viewport.width * SAFE_MARGIN) / MAX_STEP_CONTENT_WIDTH,
+    (viewport.height * SAFE_MARGIN) / MAX_STEP_CONTENT_HEIGHT,
+  );
   return {
     scale: fitScale,
     x: viewport.width / 2 - step.position.x * fitScale,
