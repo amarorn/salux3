@@ -175,7 +175,23 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
         delay: step.index * 0.04,
       }}
     >
-      <div style={{ transform: 'translate(-50%, -50%)' }}>
+      <motion.div
+        style={{ x: '-50%', y: '-50%', willChange: 'transform' }}
+        animate={
+          reducedMotion
+            ? undefined
+            : {
+                translateY: ['-50%', 'calc(-50% - 10px)', '-50%', 'calc(-50% + 8px)', '-50%'],
+                rotate: [0, 0.35, 0, -0.3, 0],
+              }
+        }
+        transition={{
+          duration: 11 + (step.index % 3) * 1.3,
+          ease: 'easeInOut',
+          repeat: Infinity,
+          delay: (step.index % 5) * 0.6,
+        }}
+      >
         <FloatingCardContext.Provider
           value={{
             flipPhoto,
@@ -191,7 +207,7 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
             <StepBody step={step} active={active} />
           </CardFlipShell>
         </FloatingCardContext.Provider>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }

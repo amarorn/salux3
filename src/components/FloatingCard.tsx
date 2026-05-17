@@ -415,15 +415,13 @@ export function FloatingCard({
         className={clsx(
           omitSidePhoto && CARD_EDGE_SHELL,
           "relative w-full p-12",
+          "flex flex-col justify-end",
+          "rounded-3xl",
           omitSidePhoto
-            ? "min-h-[1100px] rounded-3xl "
+            ? "min-h-[1100px]"
             : bannerHeightClass
-              ? "min-h-[360px]"
-              : "min-h-[420px]",
-          omitSidePhoto &&
-            (active
-              ? ""
-              : "shadow-[0_22px_60px_-24px_rgba(0,0,0,0.55)]"),
+              ? "min-h-[220px]"
+              : "min-h-[200px]",
           className,
         )}
         {...(omitSidePhoto ? cardEdgeDataAttr("shell") : {})}
@@ -437,9 +435,8 @@ export function FloatingCard({
             // expande além das bordas do conteúdo, sem forma fixa
             inset: "-12% -10% -18% -10%",
             background: `
-              radial-gradient(58% 42% at 28% 18%, ${accentColor.base}28 0%, transparent 70%),
-              radial-gradient(68% 48% at 78% 72%, ${accentColor.base}18 0%, transparent 75%),
-              radial-gradient(70% 55% at 50% 45%, rgba(13,16,24,0.85) 0%, rgba(6,8,14,0.55) 60%, transparent 100%)
+              radial-gradient(58% 42% at 28% 18%, ${accentColor.base}1f 0%, transparent 70%),
+              radial-gradient(68% 48% at 78% 72%, ${accentColor.base}14 0%, transparent 75%)
             `,
             filter: "none",
             opacity: active ? 1 : 0.55,
