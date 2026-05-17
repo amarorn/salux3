@@ -231,7 +231,7 @@ function valueStagesColCount(count: number, gridCols?: number): number {
 
 function valueStagesGridColumns(count: number, gridCols?: number): string {
   const cols = valueStagesColCount(count, gridCols);
-  return `repeat(${cols}, minmax(10rem, 11rem))`;
+  return `repeat(${cols}, minmax(0, 1fr))`;
 }
 
 function valueStageOrphanGridPlacement(
@@ -987,7 +987,7 @@ export function NarrativeStep({ step, active }: Props) {
                   <div className="flex w-full shrink-0 justify-center px-1">
                     <motion.div
                       data-no-click-advance
-                      className="relative isolate z-10 grid w-max max-w-full auto-rows-fr justify-items-stretch gap-2.5"
+                      className="relative isolate z-10 grid w-full max-w-full auto-rows-fr justify-items-stretch gap-2.5"
                       style={{
                         gridTemplateColumns: valueStagesGridColumns(
                           slice.length,
@@ -1041,7 +1041,7 @@ export function NarrativeStep({ step, active }: Props) {
             <div className="flex w-full shrink-0 justify-center px-1">
               <motion.div
                 data-no-click-advance
-                className="relative isolate z-10 grid w-max max-w-full auto-rows-fr justify-items-stretch gap-2.5"
+                className="relative isolate z-10 grid w-full max-w-full auto-rows-fr justify-items-stretch gap-2.5"
                 style={{
                   gridTemplateColumns: valueStagesGridColumns(
                     vs.length,

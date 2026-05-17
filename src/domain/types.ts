@@ -228,6 +228,8 @@ export interface StepContent {
   hideFloatingWatermarkSvg?: boolean;
   /** Vídeo no banner do card (substitui a foto lateral). */
   bannerMedia?: BannerMedia;
+  /** Quando `false`, a imagem do banner não abre lightbox ao clicar. Default: expansível. */
+  bannerPhotoExpandable?: boolean;
   /** Par de contraste (ex.: visível × despercebido) usado na capa. */
   contrastPair?: ContrastPair;
   /** Texto curto exibido logo abaixo do título (lead) — usado em capa e steps narrativos. */

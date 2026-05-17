@@ -17,12 +17,9 @@ import { AgentsFlowStep } from './steps/AgentsFlowStep';
 import { ResultsStep } from './steps/ResultsStep';
 import { FloatingCardContext } from './FloatingCard';
 import { CARD_EDGE_SHELL, cardEdgeDataAttr } from '@/lib/cardEdgeFade';
+import { cardWidthForViewport } from '@/lib/presentationLayout';
+import { useViewportSize } from '@/hooks/useViewportSize';
 import { usePresentationStore } from '@/store/presentationStore';
-
-/** Largura unificada para todos os cards de todas as trilhas (independente do tipo do step).
- *  Layout vertical: foto como banner no topo, conteúdo abaixo.
- *  Stage 1080×1920 — 920px ≈ 85% da largura, dando respiração lateral. */
-const UNIFIED_CARD_WIDTH = 920;
 
 function flipFromId(id: string): boolean {
   let h = 0;
@@ -151,7 +148,8 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
   const stepLabel = `Etapa ${step.index + 1}: ${step.title}`;
   const reducedMotion = useReducedMotion();
   const faded = dimNonActive && !active;
-  const forceWidth = UNIFIED_CARD_WIDTH;
+  const viewport = useViewportSize();
+  const forceWidth = cardWidthForViewport(viewport.width);
   const currentTrackId = usePresentationStore((s) => s.currentTrackId);
 
   return (
@@ -201,6 +199,8 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
             bannerVideoPlayOnClick: step.content.bannerMedia?.playOnClick,
             trackId: currentTrackId,
             omitSidePhoto: step.content.omitSidePhoto,
+            stageViewport: viewport,
+            bannerPhotoExpandable: step.content.bannerPhotoExpandable,
           }}
         >
           <CardFlipShell active={active} flipPhoto={flipPhoto} stepLabel={stepLabel} unframedBanner={Boolean(step.content.bannerUnframed)}>

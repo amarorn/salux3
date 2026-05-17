@@ -89,6 +89,10 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
           accent: "emerald" as const,
           title: "Onde o risco assistencial começa a se formar?",
           subtitle: "Assistência",
+          content: {
+            ...s.content,
+            omitSidePhoto: true,
+          },
         }
       : s,
   )
@@ -213,6 +217,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       cardVisual: "fragment",
       allTextWhite: true,
       valueStagesShowDescription: true,
+      valueStagesClickable: false,
       valueStagesLead:
         "Na maioria das vezes, o risco se forma em rupturas pequenas — que ninguém percebe isoladamente:",
       valueStagesFlat: true,
@@ -551,6 +556,14 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
  * Insere o card de transição (`highlight-context`) imediatamente antes do
  * `closing` e re-indexa o array para manter `step.index` sequencial.
  */
+function withNonExpandableBannerPhoto(step: PresentationStep): PresentationStep {
+  if (!step.content.heroImage) return step;
+  return {
+    ...step,
+    content: { ...step.content, bannerPhotoExpandable: false },
+  };
+}
+
 export const assistencialSteps: PresentationStep[] = (() => {
   const closingIdx = assistencialBaseSteps.findIndex((s) => s.id === "closing");
   if (closingIdx < 0) return assistencialBaseSteps;
@@ -559,7 +572,9 @@ export const assistencialSteps: PresentationStep[] = (() => {
     highlightContextStep,
     ...assistencialBaseSteps.slice(closingIdx),
   ];
-  return next.map((step, index) => ({ ...step, index }));
+  return next
+    .map((step, index) => ({ ...step, index }))
+    .map(withNonExpandableBannerPhoto);
 })();
 
 export const assistencialStepsById: Record<string, PresentationStep> =

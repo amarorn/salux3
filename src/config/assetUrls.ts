@@ -24,7 +24,6 @@ export interface SidePhoto {
 }
 
 const SIDE_PHOTO_BY_STEP_ID: Record<string, SidePhoto> = {
-  cover: { src: assistCoverUrl, alt: "Capa da apresentação" },
   limit: {
     src: governancaTrilha5BannerTechUrl,
     alt: "IA, dados e operação em saúde",
@@ -39,8 +38,9 @@ const SIDE_PHOTO_BY_STEP_ID: Record<string, SidePhoto> = {
   },
 };
 
-export function presentationSidePhotoForStep(stepId: string): SidePhoto {
-  return (
-    SIDE_PHOTO_BY_STEP_ID[stepId] ?? { src: INTRO_ASSIST_COVER_URL, alt: "" }
-  );
+export function presentationSidePhotoForStep(stepId: string): SidePhoto | null {
+  const preset = SIDE_PHOTO_BY_STEP_ID[stepId];
+  if (preset) return preset;
+  if (stepId === "cover") return null;
+  return { src: INTRO_ASSIST_COVER_URL, alt: "" };
 }
