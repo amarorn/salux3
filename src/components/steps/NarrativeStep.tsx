@@ -286,6 +286,9 @@ export function NarrativeStep({ step, active }: Props) {
     ? theme.accents[step.content.attentionAccent]
     : accent;
   const allTextWhite = Boolean(step.content.allTextWhite);
+  const ctaFormSlide = Boolean(
+    step.content.ctaFormSlide && step.content.closingQuestion,
+  );
   const formUrl = resolveContactFormUrl();
   const reduceMotion = useReducedMotion();
   const flipPhoto = useContext(FloatingCardContext)?.flipPhoto ?? false;
@@ -1146,6 +1149,94 @@ export function NarrativeStep({ step, active }: Props) {
         </motion.p>
       </EraRevealBand>
     ) : null;
+
+  const contactFormCta = (
+    <EraRevealBand
+      bandId="contactCta"
+      bandIndex={b("contactCta")}
+      stepId={step.id}
+      stepIndex={step.index}
+      eraStaging={eraStaging}
+      active={active}
+      className="flex w-full justify-center"
+    >
+      <motion.div
+        {...innerMotion}
+        data-no-click-advance
+        className="flex flex-col items-center justify-center"
+      >
+        {formUrl.startsWith("http") || formUrl.startsWith("mailto:") ? (
+          <a
+            data-no-click-advance
+            href={formUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className={FORM_BUTTON_CLASS}
+          >
+            Ir para o formulário
+            <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+          </a>
+        ) : (
+          <Link
+            data-no-click-advance
+            to={formUrl}
+            onClick={(e) => e.stopPropagation()}
+            className={FORM_BUTTON_CLASS}
+          >
+            Ir para o formulário
+            <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+          </Link>
+        )}
+      </motion.div>
+    </EraRevealBand>
+  );
+
+  if (ctaFormSlide) {
+    return (
+      <FloatingCard
+        accent={step.accent}
+        active={active}
+        stepId={step.id}
+        cardVisual={step.content.cardVisual}
+        hideValueFlow={true}
+        hideWatermarkSvg={Boolean(step.content.hideFloatingWatermarkSvg)}
+        stepIndex={step.index}
+        width={920}
+        badge={step.content.headline ?? String(step.index + 1).padStart(2, "0")}
+      >
+        <motion.div
+          className="flex min-h-[min(58vh,500px)] w-full flex-1 flex-col items-center justify-end gap-8 pb-2 pt-10"
+          variants={outerContainer}
+          initial={reduceMotion ? false : "hidden"}
+          animate={active ? "visible" : "hidden"}
+        >
+          <EraRevealBand
+            bandId="closingQuestion"
+            bandIndex={b("closingQuestion")}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+            className="flex w-full justify-center px-2"
+          >
+            <motion.h2
+              {...innerMotion}
+              data-maestro-anchor
+              data-maestro-anchor-priority="3"
+              className="presentation-ppt-title mx-auto max-w-[34ch] text-center text-[clamp(1.65rem,3.4vw,2.65rem)] leading-[1.12] text-white"
+              style={{
+                textShadow: `0 0 36px ${accent.base}66, 0 0 72px ${accent.base}33`,
+              }}
+            >
+              {step.content.closingQuestion}
+            </motion.h2>
+          </EraRevealBand>
+          {!step.content.hideContactForm && contactFormCta}
+        </motion.div>
+      </FloatingCard>
+    );
+  }
 
   return (
     <FloatingCard

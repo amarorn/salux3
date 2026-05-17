@@ -17,62 +17,7 @@ function cloneSteps(steps: PresentationStep[]): PresentationStep[] {
   }));
 }
 
-/**
- * Slide extra (entre `roadmap` e `closing`) — "A tecnologia que age".
- * Marca a virada: identificar → priorizar → agir.
- */
-const tecnologiaQueAgeStep: PresentationStep = {
-  id: "tecnologia-que-age",
-  index: 8,
-  title: "O ponto de entrada pode variar. A resposta precisa ser coordenada.",
-  subtitle: "Pontos de entrada da operação na proteção da receita",
-  position: { x: 560, y: -1480 },
-  scale: 1.25,
-  kind: "narrative",
-  accent: "cyan",
-  content: {
-    headline: "Pontos de entrada",
-    omitSidePhoto: true,
-    cardVisual: "entry-points",
-    valueStagesFlat: true,
-    valueStagesGridCols: 3,
-    valueStages: [
-      {
-        number: "📋",
-        label: "Glosa / Faturamento",
-        description: "→ Plataforma Salux (Ciclo de Receita)",
-      },
-      {
-        number: "📄",
-        label: "Documentação",
-        description: "→ ZeroDox",
-        mediaUrl: "/intro/zerodox.mp4",
-      },
-      {
-        number: "🏥",
-        label: "Centro cirúrgico",
-        description: "→ SkyMed + VisionPilot",
-        mediaUrl: "/intro/skymed.mp4",
-      },
-      { number: "👥", label: "Equipe / Custo", description: "→ StarGrid" },
-      {
-        number: "🎥",
-        label: "Operação em tempo real",
-        description: "→ AGCOM / VisionPilot",
-      },
-      {
-        number: "🎯",
-        label: "Antecipação de risco",
-        description: "→ Maria (Agentes)",
-      },
-    ],
-    closingQuestionLabel: "CTA · Pergunta-gatilho",
-    closingQuestion:
-      "Qual desses pontos está gerando mais perda invisível na sua operação hoje?",
-  },
-};
-
-/** Trilha Receita: 10 slides — diagnóstico econômico, jornada e ecossistema Salux. */
+/** Trilha Receita: 9 slides — diagnóstico econômico, jornada e ecossistema Salux. */
 const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
   (s): PresentationStep => {
     // SLIDE 1 — Capa
@@ -376,12 +321,14 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
                   description:
                     "Base estruturada que reduz retrabalho na origem.",
                   tagline: "A consistência da operação começa aqui.",
+                  productImage: "/intro/receita-cap/base-operacional.png",
                 },
                 {
                   name: "Ciclo de receita",
                   description:
                     "Acompanhamento do fluxo que reduz perda ao longo da jornada.",
                   tagline: "A glosa deixa de ser descoberta no final.",
+                  productImage: "/intro/gestao-sem-titulo.mp4",
                 },
                 {
                   name: "Governança documental",
@@ -389,6 +336,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
                     "Documentação estruturada que sustenta receita e reduz glosa.",
                   tagline:
                     "O valor deixa de ser questionado e passa a ser comprovado.",
+                  productImage: "/intro/receita-cap/governanca-documental.mp4",
                 },
               ],
             },
@@ -400,17 +348,20 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
                   name: "Força de trabalho",
                   description: "Reduz custo invisível e aumenta produtividade.",
                   tagline: "Escala e alocação deixam de ser ruído.",
+                  productImage: "/intro/receita-cap/forca-trabalho.png",
                 },
                 {
                   name: "Centro cirúrgico",
                   description:
                     "Registro anestésico estruturado e leitura da operação em tempo real.",
                   tagline: "Alta complexidade exige controle constante.",
+                  productImage: "/intro/receita-cap/centro-cirurgico.mp4",
                 },
                 {
                   name: "Inteligência em tempo real",
                   description: "A operação deixa de ser analisada depois.",
                   tagline: "Passa a ser acompanhada enquanto acontece.",
+                  productImage: "/intro/receita-cap/inteligencia-tempo-real.png",
                 },
               ],
             },
@@ -465,7 +416,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
       };
     }
 
-    // SLIDE 10 — Encerramento: a perda deixa de ser invisível
+    // SLIDE 9 — Encerramento: a perda deixa de ser invisível
     if (s.id === "closing") {
       return {
         ...s,
@@ -514,11 +465,11 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
           ],
           attentionPhrase:
             "A diferença não está em ter tecnologia. Está na capacidade de operar com ela.",
-          closingQuestionLabel: "CTA · Pergunta-gatilho",
           closingQuestion:
-            "Podemos mapear juntos onde a sua operação está perdendo valor hoje? Marque uma conversa com nosso time.",
+            "Se você soubesse exatamente onde a receita está vazando agora, o que mudaria na sua operação amanhã?",
           closingHighlight:
             "Ecossistema Salux · A base para uma nova forma de operar a saúde.",
+          closingLogoFlight: true,
         },
       };
     }
@@ -527,13 +478,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
   },
 );
 
-// Insere o novo slide (slide 9) imediatamente antes do `closing`
-export const receitaSteps: PresentationStep[] = (() => {
-  const closingIdx = baseMapped.findIndex((s) => s.id === "closing");
-  const before = baseMapped.slice(0, closingIdx);
-  const closing = baseMapped.slice(closingIdx);
-  return [...before, tecnologiaQueAgeStep, ...closing].map((s, i) => ({
-    ...s,
-    index: i,
-  }));
-})();
+export const receitaSteps: PresentationStep[] = baseMapped.map((s, i) => ({
+  ...s,
+  index: i,
+}));

@@ -3,6 +3,7 @@ import { IntroScreen } from "./components/IntroScreen";
 import { PresentationCanvas } from "./components/PresentationCanvas";
 import { useKeyboardNavigation } from "./hooks/useKeyboardNavigation";
 import { usePresentationClickAdvance } from "./hooks/usePresentationClickAdvance";
+import { useCurrentPresentation } from "./hooks/useCurrentPresentation";
 import { usePresentationStore } from "./store/presentationStore";
 import { IntroBackground } from "./components/intro/IntroBackground";
 import { PresentationCornerLogo } from "./components/PresentationCornerLogo";
@@ -18,10 +19,17 @@ export function PresentationApp() {
   usePresentationClickAdvance();
   const hasEntered = usePresentationStore((s) => s.hasEntered);
   const showCornerLogo = usePresentationStore((s) => s.showCornerLogo);
+  const currentStepId = usePresentationStore((s) => s.currentStepId);
   const transitionPhase = usePresentationStore((s) => s.transitionPhase);
   const finishTransition = usePresentationStore((s) => s.finishTransition);
+  const { steps } = useCurrentPresentation();
+  const closingLogoFlight = Boolean(
+    steps.find((s) => s.id === currentStepId)?.content.closingLogoFlight,
+  );
   const cornerLogoVisible =
-    (showCornerLogo || hasEntered) && transitionPhase !== "morphing";
+    (showCornerLogo || hasEntered) &&
+    transitionPhase !== "morphing" &&
+    !closingLogoFlight;
 
   return (
     <Stage>
@@ -29,7 +37,9 @@ export function PresentationApp() {
         <IntroBackground />
 
         <PresentationCornerLogo visible={cornerLogoVisible} />
-        <MaestroOrb visible={transitionPhase !== "morphing"} />
+        <MaestroOrb
+          visible={transitionPhase !== "morphing" && !closingLogoFlight}
+        />
 
         <AnimatePresence>
           {transitionPhase === "idle" && !hasEntered && (

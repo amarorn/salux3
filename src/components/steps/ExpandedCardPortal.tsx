@@ -9,6 +9,10 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 
+function isVideoMediaSrc(src: string): boolean {
+  return /\.(mp4|webm|mov|mkv)(\?|#|$)/i.test(src);
+}
+
 export function renderExpandedCardPrefixContent(prefix: string): ReactNode {
   const p = prefix.trim();
   if (/^\d{1,2}$/.test(p)) {
@@ -56,6 +60,8 @@ export function ExpandedCardPortal({
 }: ExpandedCardPortalProps) {
   if (typeof document === "undefined") return null;
 
+  const isVideo = imageSrc ? isVideoMediaSrc(imageSrc) : false;
+
   return createPortal(
     <motion.div
       data-no-click-advance
@@ -83,7 +89,9 @@ export function ExpandedCardPortal({
       <motion.div
         role="dialog"
         aria-modal="true"
-        className="relative w-full max-w-[min(92vw,560px)] cursor-pointer overflow-hidden rounded-3xl border px-9 py-9"
+        className={`relative w-full cursor-pointer overflow-hidden rounded-3xl border px-9 py-9 ${
+          imageSrc ? "max-w-[min(96vw,920px)]" : "max-w-[min(92vw,560px)]"
+        }`}
         style={{
           borderColor: `${accentColor}66`,
           background: `linear-gradient(145deg, ${accentColor}1e 0%, rgba(11,15,24,0.97) 100%)`,
@@ -127,17 +135,30 @@ export function ExpandedCardPortal({
 
         {imageSrc && (
           <motion.div
-            className="relative mb-5 overflow-hidden rounded-2xl border"
+            className="relative mb-5 overflow-hidden rounded-2xl border bg-[#0a0c12]"
             style={{ borderColor: `${accentColor}44` }}
             initial={reducedMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.12 }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <img
-              src={imageSrc}
-              alt={imageAlt ?? text}
-              className="max-h-[220px] w-full object-cover object-top"
-            />
+            {isVideo ? (
+              <video
+                src={imageSrc}
+                className="max-h-[min(58vh,520px)] w-full object-contain"
+                controls
+                autoPlay
+                muted
+                playsInline
+                loop
+              />
+            ) : (
+              <img
+                src={imageSrc}
+                alt={imageAlt ?? text}
+                className="max-h-[min(58vh,520px)] w-full object-contain object-top"
+              />
+            )}
           </motion.div>
         )}
 

@@ -193,6 +193,10 @@ export interface StepContent {
   closingQuestionLabel?: string;
   /** Mantém `closingQuestion` sem o botão "Ir para o formulário". */
   hideContactForm?: boolean;
+  /** Slide só com pergunta (fonte do título) na parte inferior + CTA do formulário. */
+  ctaFormSlide?: boolean;
+  /** Encerramento: logo desce do topo para o centro da faixa inferior do card. */
+  closingLogoFlight?: boolean;
   /** KPIs, métricas e chips de etapas em branco (números e rótulos). */
   allTextWhite?: boolean;
   /** Frases curtas a serem renderizadas como blocos de destaque verde (suporte/release). */

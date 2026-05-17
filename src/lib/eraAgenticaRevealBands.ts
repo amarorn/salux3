@@ -14,6 +14,12 @@ export function buildNarrativeBandKeys(
   painPoints: boolean,
   useBalloon: boolean,
 ): string[] {
+  if (content.ctaFormSlide && content.closingQuestion) {
+    const keys = ['closingQuestion'];
+    if (!content.hideContactForm) keys.push('contactCta');
+    return keys;
+  }
+
   const exclusiveCards =
     Boolean(content.valueStagesRevealSequentialCards) &&
     Boolean(content.valueStages?.length) &&
@@ -162,7 +168,9 @@ export function buildClosingBandKeys(stepContent: StepContent): string[] {
   if (stepContent.valueStages && stepContent.valueStages.length > 0) keys.push('benefits');
   if (stepContent.attentionPhrase) keys.push('attention');
   if (stepContent.highlightPhrases && stepContent.highlightPhrases.length > 0) keys.push('highlights');
-  keys.push('cta');
   if (stepContent.closingHighlight) keys.push('closingHighlight');
+  if (stepContent.closingQuestion) keys.push('closingQuestion');
+  if (stepContent.closingLogoFlight) keys.push('closingLogo');
+  keys.push('cta');
   return keys;
 }
