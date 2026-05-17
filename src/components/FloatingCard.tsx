@@ -71,10 +71,14 @@ function AutoFitContent({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div ref={outerRef} className="relative flex h-full w-full items-end justify-center">
+    <div ref={outerRef} className="relative flex h-full w-full items-center justify-center">
       <div
         ref={innerRef}
-        style={{ transform: `scale(${scale})`, transformOrigin: "bottom center", width: "100%" }}
+        style={{
+          transform: `scale(${scale})`,
+          transformOrigin: "center center",
+          width: "100%",
+        }}
       >
         {children}
       </div>
@@ -489,7 +493,7 @@ export function FloatingCard({
         className={clsx(
           omitSidePhoto && CARD_EDGE_SHELL,
           "relative min-h-0 w-full flex-1 overflow-hidden p-8 sm:p-12",
-          "flex flex-col justify-end",
+          "flex flex-col",
           "rounded-3xl",
           omitSidePhoto
             ? "min-h-[min(420px,55vh)]"
