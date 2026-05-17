@@ -429,7 +429,7 @@ export function ClosingHighlight({ text, active }: { text: string; active: boole
       initial={reduce ? false : { opacity: 0, y: 8 }}
       animate={active ? { opacity: 1, y: 0 } : reduce ? undefined : { opacity: 0, y: 8 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.7 }}
-      className="relative mt-2 overflow-hidden rounded-2xl border px-5 py-4"
+      className="relative w-full overflow-hidden rounded-2xl border px-5 py-4"
       style={{
         borderColor: `${CYAN}55`,
         background: `linear-gradient(135deg, ${CYAN}1c 0%, rgba(127,214,255,0.04) 100%)`,
@@ -444,7 +444,7 @@ export function ClosingHighlight({ text, active }: { text: string; active: boole
         transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
       />
       <p
-        className="text-[1.1rem] font-semibold leading-snug text-white"
+        className="text-center text-[1.05rem] font-semibold leading-snug text-white sm:text-[1.1rem]"
         style={{ textShadow: `0 0 22px ${CYAN}55` }}
       >
         {text}

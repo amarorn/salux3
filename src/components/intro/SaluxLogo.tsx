@@ -23,6 +23,8 @@ interface SaluxLogoProps {
   animate?: boolean;
   /** apenas o símbolo (8 pétalas), sem wordmark/tagline */
   symbolOnly?: boolean;
+  /** apenas o wordmark SALUX, sem símbolo nem tagline */
+  wordmarkOnly?: boolean;
   /** mantém o símbolo em micro-movimento contínuo (rotate + scale + tilt 3D) após a montagem */
   idle?: boolean;
   /** saída suave por fade (substitui o antigo `explode`) */
@@ -96,6 +98,7 @@ export function SaluxLogo({
   monochrome = false,
   animate = true,
   symbolOnly = false,
+  wordmarkOnly = false,
   idle = true,
   exiting = false,
   effects,
@@ -125,11 +128,11 @@ export function SaluxLogo({
   const assembledOnceRef = useRef(false);
 
   useEffect(() => {
-    if (!animate || reduceMotion) {
+    if (!animate || reduceMotion || wordmarkOnly) {
       setAssembled(true);
       assembledOnceRef.current = true;
     }
-  }, [animate, reduceMotion]);
+  }, [animate, reduceMotion, wordmarkOnly]);
 
   const markBurstAssembled = () => {
     if (assembledOnceRef.current) return;
@@ -139,7 +142,17 @@ export function SaluxLogo({
 
   // viewBox e dimensões do símbolo (versão symbolOnly = só pétalas)
   const symbolViewBox = "0 30 200 220";
+  const wordmarkViewBox = "215 35 500 130";
   const fullViewBox = "0 0 707.02 234.72";
+
+  const showSymbol = !wordmarkOnly;
+  const showWordmark = wordmarkOnly || !symbolOnly;
+  const showTagline = !symbolOnly && !wordmarkOnly;
+  const logoViewBox = wordmarkOnly
+    ? wordmarkViewBox
+    : symbolOnly
+      ? symbolViewBox
+      : fullViewBox;
 
   const symbolGradientDefs = (
     <>
@@ -395,7 +408,7 @@ export function SaluxLogo({
     return (
       <motion.svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox={symbolOnly ? symbolViewBox : fullViewBox}
+        viewBox={logoViewBox}
         width={width}
         className={className}
         aria-label="Salux"
@@ -408,14 +421,15 @@ export function SaluxLogo({
         }}
       >
         <defs>{symbolGradientDefs}</defs>
-        {SALUX_SYMBOL_PATHS.map((p, i) => (
-          <path key={i} d={p.d} fill={fillForPetal(p.cls)} />
-        ))}
-        {!symbolOnly &&
+        {showSymbol &&
+          SALUX_SYMBOL_PATHS.map((p, i) => (
+            <path key={i} d={p.d} fill={fillForPetal(p.cls)} />
+          ))}
+        {showWordmark &&
           WORDMARK_PATHS.map((d, i) => (
             <path key={`wm-${i}`} d={d} fill={wordmarkFill} />
           ))}
-        {!symbolOnly &&
+        {showTagline &&
           TAGLINE_PATHS.map((d, i) => (
             <path key={`tg-${i}`} d={d} fill={taglineFill} />
           ))}
@@ -463,7 +477,7 @@ export function SaluxLogo({
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          viewBox={symbolOnly ? symbolViewBox : fullViewBox}
+          viewBox={logoViewBox}
           width={width}
           aria-label="Salux"
           role="img"
@@ -475,9 +489,9 @@ export function SaluxLogo({
             {sheenMask}
           </defs>
 
-          {symbolGroupTree}
+          {showSymbol && symbolGroupTree}
 
-          {!symbolOnly && (
+          {showWordmark && (
             <motion.g
               initial={wantBurst ? { opacity: 0, y: 16 } : false}
               animate={exiting ? { opacity: 0, y: 8 } : { opacity: 1, y: 0 }}
@@ -485,11 +499,14 @@ export function SaluxLogo({
                 exiting
                   ? { duration: LOGO_TIMING.exitDuration, ease: "easeOut" }
                   : {
-                      delay: LOGO_TIMING.wordmarkDelay,
+                      delay: wordmarkOnly ? 0 : LOGO_TIMING.wordmarkDelay,
                       duration: 0.7,
                       ease: EASE_SETTLE,
                     }
               }
+              onAnimationComplete={() => {
+                if (!exiting && wordmarkOnly && onComplete) onComplete();
+              }}
             >
               {WORDMARK_PATHS.map((d, i) => (
                 <motion.path
@@ -504,9 +521,10 @@ export function SaluxLogo({
                     exiting
                       ? { duration: LOGO_TIMING.exitDuration, ease: "easeOut" }
                       : {
-                          delay:
-                            LOGO_TIMING.wordmarkDelay +
-                            i * LOGO_TIMING.wordmarkStagger,
+                          delay: wordmarkOnly
+                            ? i * LOGO_TIMING.wordmarkStagger
+                            : LOGO_TIMING.wordmarkDelay +
+                              i * LOGO_TIMING.wordmarkStagger,
                           duration: 0.65,
                           ease: EASE_SETTLE,
                         }
@@ -516,7 +534,7 @@ export function SaluxLogo({
             </motion.g>
           )}
 
-          {!symbolOnly && (
+          {showTagline && (
             <motion.g
               initial={wantBurst ? { opacity: 0, y: 8 } : false}
               animate={exiting ? { opacity: 0 } : { opacity: 0.95, y: 0 }}

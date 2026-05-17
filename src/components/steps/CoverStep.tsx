@@ -8,6 +8,7 @@ import { usePresentationStore } from "@/store/presentationStore";
 import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildCoverBandKeys } from "@/lib/eraAgenticaRevealBands";
 import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
+import { NewsEvidenceReveal } from "@/components/visuals/NewsEvidenceReveal";
 
 interface Props {
   step: PresentationStep;
@@ -95,10 +96,12 @@ export function CoverStep({ step, active }: Props) {
     flipPhoto,
   );
   const hero = step.content.heroImage;
+  const cardCtx = useContext(FloatingCardContext);
   const accent = theme.accents[step.accent];
   const contrast = step.content.contrastPair;
   const attention = step.content.attentionPhrase;
-  const enriched = Boolean(contrast || attention);
+  const hasNews = Boolean(step.content.newsItems?.length);
+  const enriched = Boolean(contrast || attention || hasNews);
   const trackId = useContext(FloatingCardContext)?.trackId;
   const omitBanner = useContext(FloatingCardContext)?.omitSidePhoto ?? false;
   const eraStaging = trackUsesEraStagedReveal(trackId);
@@ -143,11 +146,14 @@ export function CoverStep({ step, active }: Props) {
     <FloatingCard
       accent={step.accent}
       active={active}
-      width={enriched ? 640 : 580}
+      width={hasNews ? 920 : enriched ? 640 : 580}
       height={0}
       stepId={step.id}
       sidePhotoSrc={hero?.src}
       sidePhotoAlt={hero?.alt}
+      bannerVideoSrc={cardCtx?.bannerVideoSrc}
+      bannerVideoPoster={cardCtx?.bannerVideoPoster}
+      bannerVideoPlayOnClick={cardCtx?.bannerVideoPlayOnClick}
       bannerTransparentCutout={Boolean(hero?.transparentCutout)}
       bannerLightenBlackMatte={Boolean(hero?.lightenBlackMatte)}
       hideValueFlow={true}
@@ -252,6 +258,26 @@ export function CoverStep({ step, active }: Props) {
           </EraRevealBand>
         )}
 
+        {step.content.newsItems && step.content.newsItems.length > 0 && (
+          <EraRevealBand
+            bandId="newsItems"
+            bandIndex={b("newsItems")}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+            className="flex w-full justify-center"
+          >
+            <motion.div {...innerMotion} className="w-full">
+              <NewsEvidenceReveal
+                items={step.content.newsItems}
+                active={active}
+                accentColor={accent.base}
+              />
+            </motion.div>
+          </EraRevealBand>
+        )}
+
         {attention && (
           <EraRevealBand
             bandId="attention"
@@ -289,11 +315,9 @@ export function CoverStep({ step, active }: Props) {
                 }}
               />
               <p
-                className="relative px-3 text-center text-[clamp(1.22rem,2.6vw,1.44rem)] italic leading-relaxed"
+                className="relative px-3 text-center text-[clamp(1.22rem,2.6vw,1.44rem)] font-semibold italic leading-relaxed text-white"
                 style={{
-                  color: accent.base,
                   fontFamily: "Inter, system-ui, sans-serif",
-                  fontWeight: "var(--ppt-title-weight)",
                   letterSpacing: "var(--ppt-title-tracking)",
                   lineHeight: 1.08,
                 }}

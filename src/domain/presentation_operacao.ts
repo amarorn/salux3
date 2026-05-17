@@ -40,14 +40,46 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
         content: {
           headline: 'Crescimento que pesa',
           cardVisual: 'converge',
+          allTextWhite: true,
           valueStagesLead: 'Reconhece algum destes pontos de atrito?',
           valueStagesFlat: true,
           valueStagesGridCols: 3,
           valueStagesRevealChunkSize: 3,
           valueStages: [
-            { number: '🏗', label: 'Abertura de nova unidade' },
-            { number: '🔗', label: 'Integrações que precisam ser costuradas a cada nova frente' },
-            { number: '👥', label: 'Equipe que não acompanha a demanda' },
+            {
+              number: '🏗',
+              label: 'Abertura de novas unidades',
+              news: {
+                imageUrl: '/intro/operacao-news/operacao-news-1.jpg',
+                articleUrl:
+                  'https://www.anahp.com.br/noticias/hospitais-reduzem-expansao-por-falta-de-recursos-financeiros/',
+                source: 'ANAHp',
+                title:
+                  'Hospitais reduzem expansão por falta de recursos financeiros',
+              },
+            },
+            {
+              number: '🔗',
+              label: 'Integrações que precisam ser costuradas',
+              news: {
+                imageUrl: '/intro/operacao-news/operacao-news-2.jpg',
+                articleUrl:
+                  'https://www.uai.com.br/app/noticia/mundo-corporativo/2026/03/09/noticia-mundo-corporativo,379154/gestao-hospitalar-avanca-mas-custos-seguem-como-desafio.shtml',
+                source: 'UAI',
+                title:
+                  'Gestão hospitalar avança, mas custos seguem como desafio',
+              },
+            },
+            {
+              number: '👥',
+              label: 'Equipe não acompanha demanda',
+              news: {
+                imageUrl: '/intro/operacao-news/operacao-news-3.jpg',
+                articleUrl: 'https://medicinasa.com.br/saude-desconectada/',
+                source: 'Medicina SA',
+                title: 'Saúde desconectada',
+              },
+            },
             { number: '🔬', label: 'Diagnóstico que vira gargalo' },
             { number: '📉', label: 'Perda de previsibilidade econômica com o crescimento' },
             { number: '🏛', label: 'Expansão física que exige mais estrutura e mais custo' },

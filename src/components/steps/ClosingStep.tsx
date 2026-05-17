@@ -18,6 +18,9 @@ import { FloatingCard, FloatingCardContext } from "../FloatingCard";
 import type { PresentationStep } from "@/domain/types";
 import { theme } from "@/domain/theme";
 import { getCardTextVariants } from "./cardTextMotion";
+import { ClosingMaestroCompanion } from "@/components/MaestroOrb";
+import { SaluxLogo } from "@/components/intro/SaluxLogo";
+import { BURST_VECTORS, EASE_BURST } from "@/components/intro/logoMotion";
 import { ClosingHighlight, HighlightPhraseList } from "./HighlightBlocks";
 import { resolveContactFormUrl } from "@/config/contact";
 import { usePresentationStore } from "@/store/presentationStore";
@@ -26,8 +29,325 @@ import { buildClosingBandKeys } from "@/lib/eraAgenticaRevealBands";
 import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
 import { ExpandedCardPortal } from "./ExpandedCardPortal";
 
-const FORM_BUTTON_CLASS =
-  "pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full border border-violet-400/35 bg-violet-500/10 px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-violet-200 shadow-[0_18px_48px_-22px_rgba(124,58,237,0.55)] transition-[border-color,background-color,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-violet-400/55 hover:bg-violet-500/18";
+const CLOSING_FORM_CTA_LABEL = "Ir para o formulário";
+const CLOSING_FORM_CTA_CHARS = CLOSING_FORM_CTA_LABEL.split("");
+const CLOSING_CTA_ASSEMBLY_DELAY = 1.55;
+const CLOSING_CTA_CHAR_STAGGER = 0.036;
+
+const CLOSING_LOGO_SIZE = 200;
+
+function ClosingFormCta({
+  href,
+  external,
+  active,
+  reduceMotion,
+  accentColor,
+  afterLogoFlight,
+}: {
+  href: string;
+  external: boolean;
+  active: boolean;
+  reduceMotion: boolean | null;
+  accentColor: string;
+  afterLogoFlight: boolean;
+}) {
+  const assemblyDelay =
+    CLOSING_CTA_ASSEMBLY_DELAY + (afterLogoFlight ? 0.45 : 0);
+  const linkClass =
+    "pointer-events-auto group inline-flex min-h-[3.25rem] items-center justify-center gap-4 border-0 bg-transparent px-2 py-3 text-[clamp(1.05rem,2.15vw,1.4rem)] font-semibold uppercase tracking-[0.14em] text-white outline-none transition-[color,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-violet-100 focus-visible:ring-2 focus-visible:ring-violet-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#05070d]";
+
+  const label = (
+    <span
+      className="inline-flex flex-wrap items-center justify-center gap-[0.02em] leading-none"
+      aria-hidden
+    >
+      {CLOSING_FORM_CTA_CHARS.map((char, i) => {
+        const v = BURST_VECTORS[i % BURST_VECTORS.length]!;
+        const isSpace = char === " ";
+        return (
+          <motion.span
+            key={`${i}-${char}`}
+            className={isSpace ? "inline-block w-[0.38em]" : "inline-block"}
+            initial={
+              reduceMotion
+                ? false
+                : {
+                    opacity: 0,
+                    x: v.x * 0.14,
+                    y: v.y * 0.1,
+                    rotate: v.rz * 0.35,
+                    scale: 0.25,
+                    filter: "blur(10px)",
+                  }
+            }
+            animate={
+              active
+                ? {
+                    opacity: 1,
+                    x: 0,
+                    y: 0,
+                    rotate: 0,
+                    scale: 1,
+                    filter: "blur(0px)",
+                  }
+                : reduceMotion
+                  ? undefined
+                  : {
+                      opacity: 0,
+                      x: v.x * 0.14,
+                      y: v.y * 0.1,
+                      rotate: v.rz * 0.35,
+                      scale: 0.25,
+                      filter: "blur(10px)",
+                    }
+            }
+            transition={
+              reduceMotion
+                ? { duration: 0.01 }
+                : {
+                    delay: assemblyDelay + i * CLOSING_CTA_CHAR_STAGGER,
+                    duration: 0.68,
+                    ease: EASE_BURST,
+                  }
+            }
+          >
+            {isSpace ? "\u00a0" : char}
+          </motion.span>
+        );
+      })}
+    </span>
+  );
+
+  const arrow = (
+    <motion.span
+      className="inline-flex shrink-0"
+      initial={
+        reduceMotion
+          ? false
+          : { opacity: 0, x: -28, scale: 0.2, rotate: -40, filter: "blur(8px)" }
+      }
+      animate={
+        active
+          ? { opacity: 1, x: 0, scale: 1, rotate: 0, filter: "blur(0px)" }
+          : reduceMotion
+            ? undefined
+            : { opacity: 0, x: -28, scale: 0.2, rotate: -40, filter: "blur(8px)" }
+      }
+      transition={
+        reduceMotion
+          ? { duration: 0.01 }
+          : {
+              delay:
+                assemblyDelay +
+                CLOSING_FORM_CTA_CHARS.length * CLOSING_CTA_CHAR_STAGGER +
+                0.12,
+              duration: 0.72,
+              ease: EASE_BURST,
+            }
+      }
+    >
+      <ArrowRight
+        className="h-6 w-6 transition-transform duration-300 group-hover:translate-x-1.5 md:h-7 md:w-7"
+        strokeWidth={2.25}
+        aria-hidden
+      />
+    </motion.span>
+  );
+
+  const content = (
+    <>
+      {label}
+      {arrow}
+    </>
+  );
+
+  const style = {
+    textShadow: `0 0 32px ${accentColor}88, 0 0 64px ${accentColor}44`,
+  } as const;
+
+  if (external) {
+    return (
+      <a
+        data-no-click-advance
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+        className={linkClass}
+        style={style}
+        aria-label={CLOSING_FORM_CTA_LABEL}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link
+      data-no-click-advance
+      to={href}
+      onClick={(e) => e.stopPropagation()}
+      className={linkClass}
+      style={style}
+      aria-label={CLOSING_FORM_CTA_LABEL}
+    >
+      {content}
+    </Link>
+  );
+}
+
+function ClosingLogoDescent({
+  active,
+  reduceMotion,
+  accentColor,
+  innerMotion,
+  eraStaging,
+  step,
+  bandIndex,
+}: {
+  active: boolean;
+  reduceMotion: boolean | null;
+  accentColor: string;
+  innerMotion: Record<string, unknown>;
+  eraStaging: boolean;
+  step: PresentationStep;
+  bandIndex: (id: string) => number;
+}) {
+  const motionOn = active && !reduceMotion;
+
+  return (
+    <EraRevealBand
+      bandId="closingLogo"
+      bandIndex={bandIndex("closingLogo")}
+      stepId={step.id}
+      stepIndex={step.index}
+      eraStaging={eraStaging}
+      active={active}
+      className="flex w-full justify-center py-2"
+    >
+      <motion.div
+        {...innerMotion}
+        className="relative flex h-[min(14rem,28vh)] w-full min-w-[280px] items-center justify-center gap-6 overflow-visible md:gap-10"
+        aria-hidden
+      >
+        <ClosingMaestroCompanion
+          accent={accentColor}
+          active={active}
+          reduceMotion={Boolean(reduceMotion)}
+        />
+
+        <motion.div
+          className="relative flex items-center justify-center"
+          style={{ width: CLOSING_LOGO_SIZE, height: CLOSING_LOGO_SIZE }}
+        >
+        {motionOn && (
+          <>
+            <motion.span
+              className="pointer-events-none absolute rounded-full"
+              style={{
+                width: CLOSING_LOGO_SIZE * 1.35,
+                height: CLOSING_LOGO_SIZE * 1.35,
+                background: `radial-gradient(circle, ${accentColor}55 0%, ${accentColor}22 42%, transparent 72%)`,
+              }}
+              initial={{ opacity: 0, scale: 0.4 }}
+              animate={
+                active
+                  ? { opacity: [0.35, 0.75, 0.35], scale: [1, 1.35, 1] }
+                  : undefined
+              }
+              transition={{
+                duration: 2.8,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1.2,
+              }}
+            />
+            <motion.span
+              className="pointer-events-none absolute rounded-full border"
+              style={{
+                width: CLOSING_LOGO_SIZE * 1.55,
+                height: CLOSING_LOGO_SIZE * 1.55,
+                borderColor: `${accentColor}44`,
+                boxShadow: `0 0 60px ${accentColor}66, inset 0 0 40px ${accentColor}22`,
+              }}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={
+                active
+                  ? { opacity: [0.25, 0.65, 0.25], scale: [1, 1.12, 1], rotate: 360 }
+                  : undefined
+              }
+              transition={{
+                opacity: { duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 1.4 },
+                scale: { duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 1.4 },
+                rotate: { duration: 24, repeat: Infinity, ease: "linear" },
+              }}
+            />
+          </>
+        )}
+
+        <motion.div
+          className="relative z-[1] flex items-center justify-center"
+          initial={
+            reduceMotion
+              ? false
+              : { opacity: 0, y: "-44vh", scale: 0.15, filter: "blur(18px)" }
+          }
+          animate={
+            active
+              ? {
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                  filter: "blur(0px)",
+                }
+              : reduceMotion
+                ? undefined
+                : { opacity: 0, y: "-44vh", scale: 0.15, filter: "blur(18px)" }
+          }
+          transition={
+            reduceMotion
+              ? { duration: 0.01 }
+              : {
+                  opacity: { duration: 0.5, delay: 0.1 },
+                  y: { duration: 1.45, ease: [0.12, 1.15, 0.28, 1], delay: 0.08 },
+                  scale: { duration: 1.45, ease: [0.12, 1.15, 0.28, 1], delay: 0.08 },
+                  filter: { duration: 1.1, delay: 0.2 },
+                }
+          }
+          style={{
+            filter: `drop-shadow(0 0 64px ${accentColor}) drop-shadow(0 0 120px ${accentColor}88) drop-shadow(0 16px 40px rgba(0,0,0,0.55))`,
+          }}
+        >
+          <motion.div
+            animate={
+              motionOn
+                ? {
+                    y: [0, -14, 0],
+                    scale: [1, 1.08, 1],
+                  }
+                : undefined
+            }
+            transition={{
+              duration: 4.2,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1.55,
+            }}
+          >
+            <SaluxLogo
+              width={CLOSING_LOGO_SIZE}
+              symbolOnly
+              animate={motionOn}
+              idle={active}
+              effects={{ shimmer: true, glowRing: true, aberration: true }}
+            />
+          </motion.div>
+        </motion.div>
+        </motion.div>
+      </motion.div>
+    </EraRevealBand>
+  );
+}
 
 interface Props {
   step: PresentationStep;
@@ -114,7 +434,7 @@ export function ClosingStep({ step, active }: Props) {
       accent={step.accent}
       active={active}
       stepId={step.id}
-      width={benefits.length >= 4 ? 820 : 580}
+      width={benefits.length >= 4 ? 920 : 640}
       cardVisual={step.content.cardVisual}
       hideValueFlow={true}
       bannerUnframed
@@ -124,7 +444,7 @@ export function ClosingStep({ step, active }: Props) {
       bannerLightenBlackMatte={Boolean(hero?.lightenBlackMatte)}
     >
       <motion.div
-        className="flex flex-col gap-6"
+        className="flex min-h-0 flex-1 flex-col gap-6"
         variants={outerContainer}
         initial={reduceMotion ? false : "hidden"}
         animate={active ? "visible" : "hidden"}
@@ -322,13 +642,7 @@ export function ClosingStep({ step, active }: Props) {
                   boxShadow: `0 0 14px ${accent.base}`,
                 }}
               />
-              <p
-                className="relative pl-3 text-[clamp(1.12rem,2.5vw,1.35rem)] font-medium italic leading-relaxed"
-                style={{
-                  color: accent.base,
-                  textShadow: `0 0 24px ${accent.base}33`,
-                }}
-              >
+              <p className="relative pl-3 text-[clamp(1.12rem,2.5vw,1.35rem)] font-medium italic leading-relaxed text-white">
                 “{step.content.attentionPhrase}”
               </p>
             </motion.div>
@@ -354,62 +668,90 @@ export function ClosingStep({ step, active }: Props) {
             </EraRevealBand>
           )}
 
-        <EraRevealBand
-          bandId="cta"
-          bandIndex={bandIndex("cta")}
-          stepId={step.id}
-          stepIndex={step.index}
-          eraStaging={eraStaging}
-          active={active}
-        >
-          <motion.div
-            {...innerMotion}
-            data-no-click-advance
-            className="mt-2 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
-          >
-            {formUrl.startsWith("http") || formUrl.startsWith("mailto:") ? (
-              <a
-                data-no-click-advance
-                href={formUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className={FORM_BUTTON_CLASS}
-              >
-                Ir para o formulário
-                <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
-              </a>
-            ) : (
-              <Link
-                data-no-click-advance
-                to={formUrl}
-                onClick={(e) => e.stopPropagation()}
-                className={FORM_BUTTON_CLASS}
-              >
-                Ir para o formulário
-                <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
-              </Link>
-            )}
-          </motion.div>
-        </EraRevealBand>
+        <motion.div className="mt-auto flex w-full max-w-[36rem] flex-col items-center gap-4 self-center pt-3 text-center">
+          {step.content.closingHighlight && (
+            <EraRevealBand
+              bandId="closingHighlight"
+              bandIndex={bandIndex("closingHighlight")}
+              stepId={step.id}
+              stepIndex={step.index}
+              eraStaging={eraStaging}
+              active={active}
+              className="w-full"
+            >
+              <motion.div {...innerMotion} className="mx-auto w-full max-w-md">
+                <ClosingHighlight
+                  text={step.content.closingHighlight}
+                  active={active}
+                />
+              </motion.div>
+            </EraRevealBand>
+          )}
 
-        {step.content.closingHighlight && (
-          <EraRevealBand
-            bandId="closingHighlight"
-            bandIndex={bandIndex("closingHighlight")}
-            stepId={step.id}
-            stepIndex={step.index}
-            eraStaging={eraStaging}
-            active={active}
-          >
-            <motion.div {...innerMotion}>
-              <ClosingHighlight
-                text={step.content.closingHighlight}
-                active={active}
-              />
-            </motion.div>
-          </EraRevealBand>
-        )}
+          {step.content.closingQuestion && (
+            <EraRevealBand
+              bandId="closingQuestion"
+              bandIndex={bandIndex("closingQuestion")}
+              stepId={step.id}
+              stepIndex={step.index}
+              eraStaging={eraStaging}
+              active={active}
+              className="flex w-full justify-center px-1"
+            >
+              <motion.h2
+                {...innerMotion}
+                data-maestro-anchor
+                data-maestro-anchor-priority="3"
+                className="presentation-ppt-title mx-auto w-full max-w-[32ch] text-center text-[clamp(1.45rem,3vw,2.35rem)] leading-[1.14] text-white"
+                style={{
+                  textShadow: `0 0 36px ${accent.base}66, 0 0 72px ${accent.base}33`,
+                }}
+              >
+                {step.content.closingQuestion}
+              </motion.h2>
+            </EraRevealBand>
+          )}
+
+          {step.content.closingLogoFlight && (
+            <ClosingLogoDescent
+              active={active}
+              reduceMotion={reduceMotion}
+              accentColor={accent.base}
+              innerMotion={innerMotion}
+              eraStaging={eraStaging}
+              step={step}
+              bandIndex={bandIndex}
+            />
+          )}
+
+          {!step.content.hideContactForm && (
+            <EraRevealBand
+              bandId="cta"
+              bandIndex={bandIndex("cta")}
+              stepId={step.id}
+              stepIndex={step.index}
+              eraStaging={eraStaging}
+              active={active}
+              className="flex w-full justify-center"
+            >
+              <motion.div
+                data-no-click-advance
+                className="flex w-full flex-col items-center justify-center"
+              >
+                <ClosingFormCta
+                  href={formUrl}
+                  external={
+                    formUrl.startsWith("http") || formUrl.startsWith("mailto:")
+                  }
+                  active={active}
+                  reduceMotion={reduceMotion}
+                  accentColor={accent.base}
+                  afterLogoFlight={Boolean(step.content.closingLogoFlight)}
+                />
+              </motion.div>
+            </EraRevealBand>
+          )}
+        </motion.div>
       </motion.div>
     </FloatingCard>
   );

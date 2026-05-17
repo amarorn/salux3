@@ -179,6 +179,30 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
         },
       },
       body: "Em saúde, o risco nem sempre nasce de um evento isolado. Muitas vezes, ele se forma aos poucos — e em silêncio.",
+      newsItems: [
+        {
+          imageUrl: "/intro/assistencial-news/assistencial-news-1.jpg",
+          articleUrl:
+            "https://g1.globo.com/pi/piaui/noticia/2025/06/02/evasao-de-pacientes-e-lesoes-mais-de-9-mil-falhas-na-assistencia-a-saude-sao-registradas-no-pi-diz-levantamento.ghtml",
+          source: "G1 · Piauí",
+          title:
+            "Evasão de pacientes e lesões: mais de 9 mil falhas na assistência à saúde no PI",
+        },
+        {
+          imageUrl: "/intro/assistencial-news/assistencial-news-2.jpg",
+          articleUrl: "https://medicinasa.com.br/eventos-adversos-ibsp/",
+          source: "Medicina SA",
+          title: "Eventos adversos e falhas na assistência — levantamento IBSP",
+        },
+        {
+          imageUrl: "/intro/assistencial-news/assistencial-news-3.jpg",
+          articleUrl:
+            "https://tribunadonorte.com.br/natal/rn-registrou-7-845-falhas-na-assistencia-a-saude-em-2025/",
+          source: "Tribuna do Norte",
+          title:
+            "RN registrou 7.845 falhas na assistência à saúde em 2025",
+        },
+      ],
       attentionPhrase:
         "O problema não é falta de dado. É falta de continuidade.",
     }),
@@ -187,6 +211,8 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
     withContent("limit", {
       headline: "Acúmulo",
       cardVisual: "fragment",
+      allTextWhite: true,
+      valueStagesShowDescription: true,
       valueStagesLead:
         "Na maioria das vezes, o risco se forma em rupturas pequenas — que ninguém percebe isoladamente:",
       valueStagesFlat: true,
@@ -274,6 +300,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
     withContent("architecture", {
       headline: "Evidência",
       cardVisual: "magnet",
+      allTextWhite: true,
       lead: "Esse padrão não é percepção. Aparece nos números:",
       metrics: [],
       bullets: [],
@@ -313,6 +340,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
     withContent("journey", {
       headline: "Jornada",
       cardVisual: "thread",
+      allTextWhite: true,
       omitSidePhoto: true,
       valueStagesClickable: false,
       journeyStages: [],
@@ -344,6 +372,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
     withContent("integration", {
       headline: "Continuidade operacional",
       cardVisual: "crystal",
+      allTextWhite: true,
       lead: "As equipes sabem cuidar. O problema está na forma como a operação está organizada.",
       contrastPair: {
         left: {
@@ -368,6 +397,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
     withContent("governance", {
       headline: "A pergunta mudou.",
       cardVisual: "prism",
+      allTextWhite: true,
       contrastPair: {
         left: {
           label: "Antes",
@@ -424,6 +454,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
               description:
                 "Núcleo que organiza dados, fluxos, registros e contexto clínico.",
               tagline: "O caso deixa de ser reconstruído a cada etapa.",
+              productImage: "/intro/assistencial-base-clinica.png",
             },
             {
               name: "Diagnóstico integrado",
@@ -466,6 +497,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
               description:
                 "Escala, cobertura e disponibilidade alinhadas ao risco e ao fluxo assistencial.",
               tagline: "Equipe como capacidade coordenada.",
+              productImage: "/intro/assistencial-forca-trabalho.png",
             },
             {
               name: "Inteligência operacional",
