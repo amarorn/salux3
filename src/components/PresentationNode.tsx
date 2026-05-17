@@ -17,12 +17,9 @@ import { AgentsFlowStep } from './steps/AgentsFlowStep';
 import { ResultsStep } from './steps/ResultsStep';
 import { FloatingCardContext } from './FloatingCard';
 import { CARD_EDGE_SHELL, cardEdgeDataAttr } from '@/lib/cardEdgeFade';
+import { cardWidthForViewport } from '@/lib/presentationLayout';
+import { useViewportSize } from '@/hooks/useViewportSize';
 import { usePresentationStore } from '@/store/presentationStore';
-
-/** Largura unificada para todos os cards de todas as trilhas (independente do tipo do step).
- *  Layout vertical: foto como banner no topo, conteúdo abaixo.
- *  Stage 1080×1920 — 920px ≈ 85% da largura, dando respiração lateral. */
-const UNIFIED_CARD_WIDTH = 920;
 
 function flipFromId(id: string): boolean {
   let h = 0;
@@ -35,6 +32,8 @@ interface PresentationNodeProps {
   active: boolean;
   /** Quando true, slides que não estão ativos ficam mais baixos em opacidade (efeito “fader” na trilha). */
   dimNonActive?: boolean;
+  /** Slide único centralizado no palco (sem coordenadas espaciais nem câmera). */
+  centered?: boolean;
 }
 
 function StepBody({ step, active }: PresentationNodeProps) {
@@ -146,13 +145,58 @@ function CardFlipShell({
   );
 }
 
-function PresentationNodeComponent({ step, active, dimNonActive = true }: PresentationNodeProps) {
+function PresentationNodeComponent({
+  step,
+  active,
+  dimNonActive = true,
+  centered = false,
+}: PresentationNodeProps) {
   const flipPhoto = useMemo(() => flipFromId(step.id), [step.id]);
   const stepLabel = `Etapa ${step.index + 1}: ${step.title}`;
   const reducedMotion = useReducedMotion();
   const faded = dimNonActive && !active;
-  const forceWidth = UNIFIED_CARD_WIDTH;
+  const viewport = useViewportSize();
+  const forceWidth = cardWidthForViewport(viewport.width);
   const currentTrackId = usePresentationStore((s) => s.currentTrackId);
+
+  const cardTree = (
+    <FloatingCardContext.Provider
+      value={{
+        flipPhoto,
+        forceWidth,
+        bannerVideoSrc: step.content.bannerMedia?.videoSrc,
+        bannerVideoPoster: step.content.bannerMedia?.posterSrc,
+        bannerVideoPlayOnClick: step.content.bannerMedia?.playOnClick,
+        trackId: currentTrackId,
+        omitSidePhoto: step.content.omitSidePhoto,
+        stageViewport: viewport,
+        bannerPhotoExpandable: step.content.bannerPhotoExpandable,
+      }}
+    >
+      <CardFlipShell
+        active={active}
+        flipPhoto={flipPhoto}
+        stepLabel={stepLabel}
+        unframedBanner={Boolean(step.content.bannerUnframed)}
+      >
+        <StepBody step={step} active={active} />
+      </CardFlipShell>
+    </FloatingCardContext.Provider>
+  );
+
+  if (centered) {
+    return (
+      <motion.div
+        className="relative w-full min-w-0 max-w-full"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {cardTree}
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -175,23 +219,25 @@ function PresentationNodeComponent({ step, active, dimNonActive = true }: Presen
         delay: step.index * 0.04,
       }}
     >
-      <div style={{ transform: 'translate(-50%, -50%)' }}>
-        <FloatingCardContext.Provider
-          value={{
-            flipPhoto,
-            forceWidth,
-            bannerVideoSrc: step.content.bannerMedia?.videoSrc,
-            bannerVideoPoster: step.content.bannerMedia?.posterSrc,
-            bannerVideoPlayOnClick: step.content.bannerMedia?.playOnClick,
-            trackId: currentTrackId,
-            omitSidePhoto: step.content.omitSidePhoto,
-          }}
-        >
-          <CardFlipShell active={active} flipPhoto={flipPhoto} stepLabel={stepLabel} unframedBanner={Boolean(step.content.bannerUnframed)}>
-            <StepBody step={step} active={active} />
-          </CardFlipShell>
-        </FloatingCardContext.Provider>
-      </div>
+      <motion.div
+        style={{ x: '-50%', y: '-50%', willChange: 'transform' }}
+        animate={
+          reducedMotion
+            ? undefined
+            : {
+                translateY: ['-50%', 'calc(-50% - 10px)', '-50%', 'calc(-50% + 8px)', '-50%'],
+                rotate: [0, 0.35, 0, -0.3, 0],
+              }
+        }
+        transition={{
+          duration: 11 + (step.index % 3) * 1.3,
+          ease: 'easeInOut',
+          repeat: Infinity,
+          delay: (step.index % 5) * 0.6,
+        }}
+      >
+        {cardTree}
+      </motion.div>
     </motion.div>
   );
 }

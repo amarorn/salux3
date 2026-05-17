@@ -2,6 +2,8 @@ import {
   createContext,
   useContext,
   useEffect,
+  useLayoutEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -32,11 +34,53 @@ import {
   CARD_EDGE_SHELL,
   cardEdgeDataAttr,
 } from "@/lib/cardEdgeFade";
-
-/** Escala base para melhorar leitura sem perder composição do layout (todas as trilhas). */
-const BASE_CARD_TEXT_SCALE = 1.08;
+import {
+  bannerHeightForViewport,
+  CARD_TEXT_SCALE,
+  cardMaxHeightForViewport,
+} from "@/lib/presentationLayout";
+import type { ViewportSize } from "@/domain/types";
 
 const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
+
+/** Reduz proporcionalmente o conteúdo quando excede a altura disponível,
+ * para nada ser cortado dentro do card. */
+function AutoFitContent({ children }: { children: ReactNode }) {
+  const outerRef = useRef<HTMLDivElement | null>(null);
+  const innerRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
+
+  useLayoutEffect(() => {
+    const outer = outerRef.current;
+    const inner = innerRef.current;
+    if (!outer || !inner) return;
+
+    const update = () => {
+      const availableH = outer.clientHeight;
+      const naturalH = inner.scrollHeight;
+      if (availableH <= 0 || naturalH <= 0) return;
+      const next = Math.min(1, availableH / naturalH);
+      setScale((prev) => (Math.abs(prev - next) < 0.002 ? prev : next));
+    };
+
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(outer);
+    ro.observe(inner);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <div ref={outerRef} className="relative flex h-full w-full items-end justify-center">
+      <div
+        ref={innerRef}
+        style={{ transform: `scale(${scale})`, transformOrigin: "bottom center", width: "100%" }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 /** Hash determinístico do `stepId` — usado para gerar valores estáveis
  *  (posição de gradiente radial, id do `linearGradient` SVG, etc). */
@@ -59,6 +103,9 @@ export const FloatingCardContext = createContext<{
   trackId?: TrackId;
   /** Esconde a faixa de foto/vídeo no topo; só o painel de conteúdo. */
   omitSidePhoto?: boolean;
+  stageViewport?: ViewportSize;
+  /** Imagem do banner abre lightbox ao clicar (default: true). */
+  bannerPhotoExpandable?: boolean;
 } | null>(null);
 
 interface FloatingCardProps {
@@ -167,7 +214,14 @@ export function FloatingCard({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [bannerPhotoExpanded]);
-  const cardTextScale = BASE_CARD_TEXT_SCALE;
+  const cardTextScale = CARD_TEXT_SCALE;
+  const stageViewport = ctx?.stageViewport;
+  const cardMaxHeight = stageViewport
+    ? cardMaxHeightForViewport(stageViewport.height)
+    : undefined;
+  const resolvedBannerHeightPx = stageViewport
+    ? bannerHeightForViewport(stageViewport.height)
+    : undefined;
   const accentColor = theme.accents[accent];
   const reduceMotion = useReducedMotion();
   const photoMotion = getPhotoColumnVariants(resolvedFlip);
@@ -184,11 +238,21 @@ export function FloatingCard({
   const preset = stepId ? presentationSidePhotoForStep(stepId) : null;
   const hasBannerNews = Boolean(bannerNewsUrls && bannerNewsUrls.length > 0);
   const photoSrc =
-    sidePhotoSrc ?? (hasBannerNews ? undefined : preset?.src ?? CARD_BACKGROUND);
+    sidePhotoSrc ??
+    (hasBannerNews
+      ? undefined
+      : resolvedVideoSrc
+        ? (resolvedVideoPoster ?? undefined)
+        : (preset?.src ?? CARD_BACKGROUND));
   const photoAlt = sidePhotoAlt ?? preset?.alt ?? "";
 
+  const bannerPhotoExpandable = ctx?.bannerPhotoExpandable !== false;
   const canExpandBannerPhoto = Boolean(
-    sidePhotoSrc && photoSrc && !hasBannerNews && !resolvedVideoSrc,
+    bannerPhotoExpandable &&
+      sidePhotoSrc &&
+      photoSrc &&
+      !hasBannerNews &&
+      !resolvedVideoSrc,
   );
 
   const wrapBannerPhotoExpand = (node: ReactNode) => {
@@ -220,11 +284,14 @@ export function FloatingCard({
       {...cardEdgeDataAttr("shell")}
       className={clsx(
         CARD_EDGE_SHELL,
-        "flex items-stretch",
+        "flex min-h-0 items-stretch overflow-hidden",
         bannerUnframed ? "gap-0" : "gap-3",
         resolvedFlip ? "flex-col-reverse" : "flex-col",
       )}
-      style={{ width: resolvedWidth }}
+      style={{
+        width: resolvedWidth,
+        maxHeight: cardMaxHeight,
+      }}
     >
       {!omitSidePhoto && (
         <motion.div
@@ -236,12 +303,19 @@ export function FloatingCard({
             CARD_EDGE_BANNER,
             "relative w-full shrink-0 overflow-hidden",
             bannerUnframed ? "mt-0" : "mt-5 rounded-3xl duration-500 ease-out",
-            bannerHeightClass ?? "h-[460px]",
+            !bannerHeightClass &&
+              !resolvedBannerHeightPx &&
+              "h-[460px]",
             !bannerUnframed &&
               (active
                 ? "border border-transparent shadow-[0_30px_80px_-24px_rgba(0,0,0,0.7)]"
                 : "border border-transparent shadow-[0_22px_60px_-24px_rgba(0,0,0,0.58)] group-hover:-translate-y-1"),
           )}
+          style={
+            !bannerHeightClass && resolvedBannerHeightPx
+              ? { height: resolvedBannerHeightPx }
+              : undefined
+          }
         >
           {hasBannerNews ? (
             <motion.div
@@ -414,16 +488,14 @@ export function FloatingCard({
         animate={layerAnimate}
         className={clsx(
           omitSidePhoto && CARD_EDGE_SHELL,
-          "relative w-full p-12",
+          "relative min-h-0 w-full flex-1 overflow-hidden p-8 sm:p-12",
+          "flex flex-col justify-end",
+          "rounded-3xl",
           omitSidePhoto
-            ? "min-h-[1100px] rounded-3xl "
+            ? "min-h-[min(420px,55vh)]"
             : bannerHeightClass
-              ? "min-h-[360px]"
-              : "min-h-[420px]",
-          omitSidePhoto &&
-            (active
-              ? ""
-              : "shadow-[0_22px_60px_-24px_rgba(0,0,0,0.55)]"),
+              ? "min-h-[180px]"
+              : "min-h-[160px]",
           className,
         )}
         {...(omitSidePhoto ? cardEdgeDataAttr("shell") : {})}
@@ -437,9 +509,8 @@ export function FloatingCard({
             // expande além das bordas do conteúdo, sem forma fixa
             inset: "-12% -10% -18% -10%",
             background: `
-              radial-gradient(58% 42% at 28% 18%, ${accentColor.base}28 0%, transparent 70%),
-              radial-gradient(68% 48% at 78% 72%, ${accentColor.base}18 0%, transparent 75%),
-              radial-gradient(70% 55% at 50% 45%, rgba(13,16,24,0.85) 0%, rgba(6,8,14,0.55) 60%, transparent 100%)
+              radial-gradient(58% 42% at 28% 18%, ${accentColor.base}1f 0%, transparent 70%),
+              radial-gradient(68% 48% at 78% 72%, ${accentColor.base}14 0%, transparent 75%)
             `,
             filter: "none",
             opacity: active ? 1 : 0.55,
@@ -580,7 +651,9 @@ export function FloatingCard({
                 />
               </div>
             )}
-            <div className="relative flex-1">{children}</div>
+            <div className="relative flex-1 min-h-0">
+              <AutoFitContent>{children}</AutoFitContent>
+            </div>
           </div>
 
           {!hideValueFlow && (

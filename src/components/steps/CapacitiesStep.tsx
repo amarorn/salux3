@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
+import clsx from "clsx";
 import {
   AnimatePresence,
   motion,
@@ -268,8 +269,11 @@ export function CapacitiesStep({ step, active }: Props) {
                         dimmed={
                           selectedCapacity !== null && selectedCapacity !== fi
                         }
-                        onClick={() =>
-                          setSelectedCapacity((s) => (s === fi ? null : fi))
+                        onClick={
+                          it.productImage
+                            ? () =>
+                                setSelectedCapacity((s) => (s === fi ? null : fi))
+                            : undefined
                         }
                         refCallback={(el) => {
                           capacityRefs.current[fi] = el;
@@ -350,17 +354,19 @@ function CapacityCard({
   active: boolean;
   selected: boolean;
   dimmed: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   refCallback: (el: HTMLLIElement | null) => void;
 }) {
+  const expandable = Boolean(item.productImage && onClick);
+
   return (
     <motion.li
       ref={refCallback}
       data-no-click-advance
-      role="button"
-      tabIndex={0}
-      aria-expanded={selected}
-      aria-label={item.name}
+      role={expandable ? "button" : undefined}
+      tabIndex={expandable ? 0 : undefined}
+      aria-expanded={expandable ? selected : undefined}
+      aria-label={expandable ? item.name : undefined}
       initial={reduce ? false : { opacity: 0, y: 12, scale: 0.96, filter: "" }}
       animate={
         !active
@@ -381,22 +387,35 @@ function CapacityCard({
         delay: 0.2 + delay,
       }}
       whileHover={
-        reduce || dimmed
-          ? undefined
-          : { y: -2, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }
+        expandable && !reduce && !dimmed
+          ? { y: -2, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }
+          : undefined
       }
-      whileTap={reduce ? undefined : { scale: 0.96 }}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick();
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-      className="group relative cursor-pointer overflow-hidden rounded-2xl border px-4 py-3 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
+      whileTap={expandable && !reduce ? { scale: 0.96 } : undefined}
+      onClick={
+        expandable
+          ? (e) => {
+              e.stopPropagation();
+              onClick?.();
+            }
+          : undefined
+      }
+      onKeyDown={
+        expandable
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick?.();
+              }
+            }
+          : undefined
+      }
+      className={clsx(
+        "group relative overflow-hidden rounded-2xl border px-4 py-3 outline-none",
+        expandable
+          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
+          : "cursor-default",
+      )}
       style={{
         borderColor: selected ? `${ring}aa` : `${ring}44`,
         background: selected

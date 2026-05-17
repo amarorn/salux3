@@ -205,6 +205,12 @@ export interface StepContent {
   evidenceCard?: EvidenceCard;
   /** Frase de fechamento de tela em destaque ciano (call-out final do card). */
   closingHighlight?: string;
+  /** Palavras no título/corpo/bullets que abrem imagem ao clicar (match no texto). */
+  clickableWordMedia?: {
+    word: string;
+    imageSrc: string;
+    imageAlt?: string;
+  }[];
   /** Card 8 — capacidades centrais e de sustentação. */
   capacityGroups?: CapacityGroup[];
   /** Faixa com capturas de produto (substitui slide de “pontos de entrada”). */
@@ -228,6 +234,8 @@ export interface StepContent {
   hideFloatingWatermarkSvg?: boolean;
   /** Vídeo no banner do card (substitui a foto lateral). */
   bannerMedia?: BannerMedia;
+  /** Quando `false`, a imagem do banner não abre lightbox ao clicar. Default: expansível. */
+  bannerPhotoExpandable?: boolean;
   /** Par de contraste (ex.: visível × despercebido) usado na capa. */
   contrastPair?: ContrastPair;
   /** Texto curto exibido logo abaixo do título (lead) — usado em capa e steps narrativos. */

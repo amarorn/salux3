@@ -1,4 +1,3 @@
-import assistCoverUrl from "@/assets/intro/assist-cover.png?url";
 import careHeroUrl from "@/assets/intro/care-hero.jpg?url";
 import landingPremiumUrl from "@/assets/landing/premium-photo.png?url";
 import landingPhotoClinicUrl from "@/assets/landing/photo-clinic.png?url";
@@ -7,8 +6,8 @@ import landingImgCorridorUrl from "@/assets/landing/img-corridor.png?url";
 import zerodoxPainelUrl from "@/assets/presentation/zerodox-painel-produtividade.png?url";
 import governancaTrilha5BannerTechUrl from "@/assets/presentation/governanca-trilha5-ai-tech.png?url";
 
-/** URL versionada pelo bundler — evita cache agressivo ao substituir ficheiros em `src/assets`. */
-export const INTRO_ASSIST_COVER_URL = assistCoverUrl;
+/** Fallback de banner quando o slide não define foto própria. */
+export const INTRO_ASSIST_COVER_URL = "/intro/TELA_INICIAL_INITIA.png";
 
 export const LANDING_SHOWCASE_URLS = [
   landingPremiumUrl,
@@ -24,7 +23,6 @@ export interface SidePhoto {
 }
 
 const SIDE_PHOTO_BY_STEP_ID: Record<string, SidePhoto> = {
-  cover: { src: assistCoverUrl, alt: "Capa da apresentação" },
   limit: {
     src: governancaTrilha5BannerTechUrl,
     alt: "IA, dados e operação em saúde",
@@ -39,8 +37,9 @@ const SIDE_PHOTO_BY_STEP_ID: Record<string, SidePhoto> = {
   },
 };
 
-export function presentationSidePhotoForStep(stepId: string): SidePhoto {
-  return (
-    SIDE_PHOTO_BY_STEP_ID[stepId] ?? { src: INTRO_ASSIST_COVER_URL, alt: "" }
-  );
+export function presentationSidePhotoForStep(stepId: string): SidePhoto | null {
+  const preset = SIDE_PHOTO_BY_STEP_ID[stepId];
+  if (preset) return preset;
+  if (stepId === "cover" || stepId === "closing") return null;
+  return { src: INTRO_ASSIST_COVER_URL, alt: "Tela inicial INITIA" };
 }

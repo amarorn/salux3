@@ -70,8 +70,7 @@ export function IntroScreen() {
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: 0.22, ease: [0.4, 0, 0.2, 1] } }}
-      className="absolute bottom-0 right-0 z-50 h-full w-full overflow-hidden text-white outline-none"
-      style={{ left: '-1px', top: '1px' }}
+      className="absolute inset-0 z-50 flex h-full w-full flex-col overflow-hidden text-white outline-none"
     >
       {!reduceMotion && <CustomCursor />}
 
@@ -164,9 +163,9 @@ export function IntroScreen() {
         </div>
       </div>
 
-      {/* Seção superior — track cards + marquee */}
+      {/* Seção superior — track cards + marquee (centralizada, responsiva) */}
       <motion.div
-        className="pointer-events-none absolute inset-x-0 top-0 z-10 flex flex-col items-center gap-3 pt-20 sm:pt-24"
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 flex max-h-[46%] flex-col items-center gap-3 overflow-y-auto pt-16 sm:max-h-[50%] sm:pt-20"
         style={{ x: counterParallaxX, y: counterParallaxY }}
       >
         <LoadingBar ready={logoReady} />
@@ -179,7 +178,7 @@ export function IntroScreen() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="pointer-events-auto grid w-full max-w-5xl grid-cols-5 gap-2.5 px-8"
+              className="pointer-events-auto grid w-full max-w-5xl grid-cols-1 gap-2.5 px-4 min-[520px]:grid-cols-2 sm:grid-cols-3 sm:gap-3 sm:px-6 lg:grid-cols-5 lg:px-8"
             >
               {tracks.map((track, i) => (
                 <TrackCard
