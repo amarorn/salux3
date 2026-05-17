@@ -26,12 +26,14 @@ function ContrastColumn({
   reduce,
   delay,
   className,
+  textWhite = false,
 }: {
   item: ContrastItem;
   active: boolean;
   reduce: boolean;
   delay: number;
   className?: string;
+  textWhite?: boolean;
 }) {
   const c = toneColors(item.tone);
   return (
@@ -73,13 +75,23 @@ function ContrastColumn({
         )}
 
         <span
-          className="text-[16px] font-semibold uppercase tracking-[0.32em]"
-          style={{ color: c.base }}
+          className={
+            textWhite
+              ? "text-[16px] font-semibold uppercase tracking-[0.32em] text-white"
+              : "text-[16px] font-semibold uppercase tracking-[0.32em]"
+          }
+          style={textWhite ? undefined : { color: c.base }}
         >
           {item.label}
         </span>
       </div>
-      <p className="text-[0.96rem] leading-snug text-white/92 whitespace-pre-line text-center">
+      <p
+        className={
+          textWhite
+            ? "text-center text-[0.96rem] leading-snug text-white whitespace-pre-line"
+            : "text-center text-[0.96rem] leading-snug text-white/92 whitespace-pre-line"
+        }
+      >
         {item.text}
       </p>
     </motion.div>
@@ -98,6 +110,7 @@ export function CoverStep({ step, active }: Props) {
   const hero = step.content.heroImage;
   const cardCtx = useContext(FloatingCardContext);
   const accent = theme.accents[step.accent];
+  const allTextWhite = Boolean(step.content.allTextWhite);
   const contrast = step.content.contrastPair;
   const attention = step.content.attentionPhrase;
   const hasNews = Boolean(step.content.newsItems?.length);
@@ -228,12 +241,14 @@ export function CoverStep({ step, active }: Props) {
                 active={active}
                 reduce={Boolean(reduceMotion)}
                 delay={0.55}
+                textWhite={allTextWhite}
               />
               <ContrastColumn
                 item={contrast.right}
                 active={active}
                 reduce={Boolean(reduceMotion)}
                 delay={0.7}
+                textWhite={allTextWhite}
               />
             </motion.div>
           </EraRevealBand>
@@ -251,7 +266,11 @@ export function CoverStep({ step, active }: Props) {
           >
             <motion.p
               {...innerMotion}
-              className="presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center"
+              className={
+                allTextWhite
+                  ? "presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center text-white"
+                  : "presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center"
+              }
             >
               {step.content.body}
             </motion.p>

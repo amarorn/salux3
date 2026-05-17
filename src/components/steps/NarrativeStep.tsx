@@ -1087,14 +1087,25 @@ export function NarrativeStep({ step, active }: Props) {
       >
         <motion.div {...innerMotion} className="space-y-3 text-center">
           <span
-            className="block text-[10px] font-semibold uppercase tracking-[0.32em]"
-            style={{ color: accent.base, opacity: 0.85 }}
+            className={clsx(
+              "block text-[10px] font-semibold uppercase tracking-[0.32em]",
+              allTextWhite && "text-white",
+            )}
+            style={
+              allTextWhite
+                ? undefined
+                : { color: accent.base, opacity: 0.85 }
+            }
           >
             {step.title}
           </span>
           <h2
             className="presentation-ppt-title max-w-[20ch] text-[clamp(1.9rem,4.2vw,2.9rem)] leading-[1.08]"
-            style={{ textShadow: `0 0 28px ${accent.base}22` }}
+            style={{
+              textShadow: allTextWhite
+                ? "0 0 28px rgba(255,255,255,0.15)"
+                : `0 0 28px ${accent.base}22`,
+            }}
           >
             {step.content.headline}
           </h2>
@@ -1730,14 +1741,20 @@ export function NarrativeStep({ step, active }: Props) {
                 {step.content.bullets.map((bullet) => (
                   <li
                     key={bullet}
-                    className="text-[0.96rem] leading-relaxed text-slate-200"
+                    className={
+                      allTextWhite
+                        ? "text-[0.96rem] leading-relaxed text-white"
+                        : "text-[0.96rem] leading-relaxed text-slate-200"
+                    }
                   >
                     <span
                       aria-hidden
                       className="mr-2 inline-block h-1.5 w-1.5 translate-y-[-0.15em] rounded-full align-middle"
                       style={{
-                        background: accent.base,
-                        boxShadow: `0 0 8px ${accent.base}88`,
+                        background: allTextWhite ? "#ffffff" : accent.base,
+                        boxShadow: allTextWhite
+                          ? "0 0 8px rgba(255,255,255,0.45)"
+                          : `0 0 8px ${accent.base}88`,
                       }}
                     />
                     <span className="whitespace-pre-line text-center">
@@ -1867,7 +1884,11 @@ export function NarrativeStep({ step, active }: Props) {
                         </span>
                         <p
                           className="mt-0.5 text-[0.96rem] font-medium leading-relaxed text-white/95"
-                          style={{ textShadow: `0 0 18px ${emerald.base}22` }}
+                          style={{
+                            textShadow: allTextWhite
+                              ? "0 0 18px rgba(255,255,255,0.12)"
+                              : `0 0 18px ${emerald.base}22`,
+                          }}
                         >
                           {to}
                         </p>

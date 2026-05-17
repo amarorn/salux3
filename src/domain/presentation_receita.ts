@@ -481,4 +481,5 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
 export const receitaSteps: PresentationStep[] = baseMapped.map((s, i) => ({
   ...s,
   index: i,
+  content: { ...s.content, allTextWhite: true },
 }));
