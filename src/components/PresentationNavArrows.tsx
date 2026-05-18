@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 import { usePresentationNavigation } from '@/hooks/usePresentationNavigation';
-import { useCurrentPresentation } from '@/hooks/useCurrentPresentation';
 import { theme } from '@/domain/theme';
 import { SPRING, EASE } from '@/lib/motion/curves';
 
