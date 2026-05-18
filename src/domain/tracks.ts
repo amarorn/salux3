@@ -59,8 +59,8 @@ export const tracks: TrackPresentation[] = [
   ),
   makeTrack(
     'dados',
-    {
-      title: 'Gestão',
+    { 
+      title: 'Gestão Pública',
       subtitle: presentationGestaoMeta.subtitle,
       author: presentationGestaoMeta.author,
     },
