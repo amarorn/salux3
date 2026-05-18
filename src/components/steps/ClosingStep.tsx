@@ -351,9 +351,6 @@ export function ClosingStep({ step, active }: Props) {
   const bandIndex = (id: string) => bandKeys.indexOf(id);
   const setEraCfg = usePresentationStore((s) => s.setEraStagedRevealConfig);
   const clearEra = usePresentationStore((s) => s.clearEraStagedReveal);
-  const eraStagedRevealPhase = usePresentationStore((s) =>
-    s.eraStagedRevealStepId === step.id ? s.eraStagedRevealPhase : -1,
-  );
   const stagingLayout = Boolean(active && eraStaging && !reduceMotion);
   const innerMotion = stagingLayout ? {} : { variants: item };
   const outerContainer: Variants = stagingLayout
@@ -385,20 +382,28 @@ export function ClosingStep({ step, active }: Props) {
   ]);
 
   const hero = step.content.heroImage;
-  const ctaBandIdx = bandIndex("cta");
-  const showBannerLogo =
-    !hero &&
-    active &&
-    (!eraStaging || eraStagedRevealPhase >= ctaBandIdx || ctaBandIdx < 0);
+  const showBannerLogo = !hero && active;
+
+  const logoEffects = {
+    assistencial: { shimmer: true,  glowRing: true,  aberration: false },
+    operacoes:    { shimmer: true,  glowRing: false, aberration: true  },
+    receita:      { shimmer: false, glowRing: true,  aberration: true  },
+    gestao:       { shimmer: true,  glowRing: true,  aberration: true  },
+    governanca:   { shimmer: true,  glowRing: false, aberration: false },
+  } as const;
+  const effects = logoEffects[trackId as keyof typeof logoEffects]
+    ?? { shimmer: true, glowRing: true, aberration: true };
 
   const bannerChild = showBannerLogo ? (
-    <SaluxLogo
-      width={280}
-      symbolOnly
-      animate={active}
-      idle={active}
-      effects={{ shimmer: true, glowRing: true, aberration: true }}
-    />
+    <div data-no-click-advance className="flex h-full w-full items-center justify-center">
+      <SaluxLogo
+        width={280}
+        symbolOnly
+        animate={active}
+        idle={active}
+        effects={effects}
+      />
+    </div>
   ) : undefined;
 
   return (

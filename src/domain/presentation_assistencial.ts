@@ -551,11 +551,6 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       headline:
         "O cuidado deixa de depender de reconstrução. E passa a ter continuidade real.",
       cardVisual: "bloom",
-      heroImage: {
-        src: "/intro/salux-simbolo-azul.svg",
-        alt: "Salux",
-
-      },
       bannerPhotoExpandable: false,
       body: "Com uma base coordenada, a jornada deixa de depender de esforço individual de compensação.",
       valueStagesFlat: true,

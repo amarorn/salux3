@@ -8,7 +8,6 @@ import trilha3Slide6Url from "@/assets/presentation/trilha3-slide6.jpg?url";
 import trilha3Slide7Url from "@/assets/presentation/trilha3-slide7.jpg?url";
 import trilha3Slide8Url from "@/assets/presentation/trilha3-slide8.png?url";
 import trilha3Slide9Url from "@/assets/presentation/trilha3-slide9.jpg?url";
-import trilha3Slide10Url from "@/assets/presentation/trilha3-slide10.jpg?url";
 import { steps as baseSteps } from "./presentation";
 
 export const presentationOperacaoMeta = {
@@ -417,11 +416,6 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           headline:
             "Sua instituição está crescendo por arquitetura, ou por acúmulo?",
           cardVisual: "compass",
-          bannerMedia: {
-            videoSrc: "/intro/tecnologia-loop.mp4",
-            posterSrc: trilha3Slide10Url,
-          },
-          omitSidePhoto: true,
           body: "Esse movimento pode começar pelo ponto onde a expansão hoje gera mais atrito.",
           infoCardsGridCols: 3,
           infoCards: [
