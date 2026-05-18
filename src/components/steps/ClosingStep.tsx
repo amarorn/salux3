@@ -19,7 +19,7 @@ import type { PresentationStep } from "@/domain/types";
 import { theme } from "@/domain/theme";
 import { getCardTextVariants } from "./cardTextMotion";
 import { ClosingMaestroCompanion } from "@/components/MaestroOrb";
-import { SaluxLogo } from "@/components/intro/SaluxLogo";
+import { SaluxLogo, SaluxSymbol } from "@/components/intro/SaluxLogo";
 import { BURST_VECTORS, EASE_BURST } from "@/components/intro/logoMotion";
 import { ClosingHighlight, HighlightPhraseList } from "./HighlightBlocks";
 import { resolveContactFormUrl } from "@/config/contact";
@@ -31,11 +31,19 @@ import { ExpandedCardPortal } from "./ExpandedCardPortal";
 
 const CLOSING_FORM_CTA_LABEL = "Ir para o formulário";
 const CLOSING_FORM_CTA_CHARS = CLOSING_FORM_CTA_LABEL.split("");
-const CLOSING_CTA_ASSEMBLY_DELAY = 1.55;
+const CLOSING_CTA_ASSEMBLY_DELAY = 0.95;
 const CLOSING_CTA_CHAR_STAGGER = 0.036;
+const CLOSING_CTA_ARROW_DELAY = 0.12;
+const CLOSING_CTA_ARROW_DURATION = 0.72;
+const CLOSING_LOGO_REVEAL_DELAY =
+  CLOSING_CTA_ASSEMBLY_DELAY +
+  CLOSING_FORM_CTA_CHARS.length * CLOSING_CTA_CHAR_STAGGER +
+  CLOSING_CTA_ARROW_DELAY +
+  CLOSING_CTA_ARROW_DURATION +
+  0.18;
 
-const CLOSING_LOGO_SIZE = 200;
-const CLOSING_MAESTRO_GAP = 72;
+const CLOSING_LOGO_SIZE = 156;
+const CLOSING_MAESTRO_GAP = 52;
 
 function ClosingFormCta({
   href,
@@ -51,7 +59,7 @@ function ClosingFormCta({
   afterLogoFlight: boolean;
 }) {
   const assemblyDelay =
-    CLOSING_CTA_ASSEMBLY_DELAY + (afterLogoFlight ? 0.45 : 0);
+    CLOSING_CTA_ASSEMBLY_DELAY + (afterLogoFlight ? 0.15 : 0);
   const linkClass =
     "pointer-events-auto group inline-flex min-h-[3.25rem] items-center justify-center gap-4 border-0 bg-transparent px-2 py-3 text-[clamp(1.05rem,2.15vw,1.4rem)] font-semibold uppercase tracking-[0.14em] text-white outline-none transition-[color,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-violet-100 focus-visible:ring-2 focus-visible:ring-violet-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#05070d]";
 
@@ -139,8 +147,8 @@ function ClosingFormCta({
               delay:
                 assemblyDelay +
                 CLOSING_FORM_CTA_CHARS.length * CLOSING_CTA_CHAR_STAGGER +
-                0.12,
-              duration: 0.72,
+                CLOSING_CTA_ARROW_DELAY,
+              duration: CLOSING_CTA_ARROW_DURATION,
               ease: EASE_BURST,
             }
       }
@@ -220,7 +228,7 @@ function ClosingLogoDescent({
     >
       <motion.div
         {...innerMotion}
-        className="relative flex h-[min(14rem,28vh)] w-full items-center justify-center overflow-visible"
+        className="relative flex h-[min(10.5rem,18vh)] w-full items-center justify-center overflow-visible"
         aria-hidden
       >
         <div
@@ -321,11 +329,26 @@ export function ClosingStep({ step, active }: Props) {
   const allTextWhite = Boolean(step.content.allTextWhite);
   const benefits = step.content.valueStages ?? [];
   const [selectedBenefit, setSelectedBenefit] = useState<number | null>(null);
+  const [showFloatingLogo, setShowFloatingLogo] = useState(false);
   const benefitRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    if (!active) setSelectedBenefit(null);
-  }, [active]);
+    if (!active) {
+      setSelectedBenefit(null);
+      setShowFloatingLogo(false);
+      return;
+    }
+    if (!step.content.floatingCard) return;
+    if (reduceMotion) {
+      setShowFloatingLogo(true);
+      return;
+    }
+    const id = window.setTimeout(
+      () => setShowFloatingLogo(true),
+      CLOSING_LOGO_REVEAL_DELAY * 1000,
+    );
+    return () => window.clearTimeout(id);
+  }, [active, reduceMotion, step.content.floatingCard]);
 
   useEffect(() => {
     if (selectedBenefit === null) return;
@@ -387,6 +410,7 @@ export function ClosingStep({ step, active }: Props) {
       width={benefits.length >= 4 ? 920 : 640}
       cardVisual={step.content.cardVisual}
       hideValueFlow={true}
+      floatingContent={Boolean(step.content.floatingCard)}
       bannerUnframed
       sidePhotoSrc={hero?.src ?? ""}
       sidePhotoAlt={hero?.alt}
@@ -394,7 +418,11 @@ export function ClosingStep({ step, active }: Props) {
       bannerLightenBlackMatte={Boolean(hero?.lightenBlackMatte)}
     >
       <motion.div
-        className="flex min-h-0 flex-1 flex-col gap-6"
+        className={
+          step.content.floatingCard
+            ? "flex w-full flex-col gap-6"
+            : "flex min-h-0 flex-1 flex-col gap-6"
+        }
         variants={outerContainer}
         initial={reduceMotion ? false : "hidden"}
         animate={active ? "visible" : "hidden"}
@@ -642,7 +670,14 @@ export function ClosingStep({ step, active }: Props) {
             </EraRevealBand>
           )}
 
-        <motion.div className="mt-auto flex w-full max-w-[36rem] flex-col items-center gap-4 self-center pt-3 text-center">
+        <motion.div
+          className={
+            step.content.floatingCard
+              ? "flex w-full max-w-[36rem] flex-col items-center self-center pt-3 text-center"
+              : "mt-auto flex w-full max-w-[36rem] flex-col items-center self-center text-center"
+          }
+          style={{ gap: step.content.closingLogoFlight ? "0.85rem" : "1rem" }}
+        >
           {step.content.closingHighlight && (
             <EraRevealBand
               bandId="closingHighlight"
@@ -710,7 +745,7 @@ export function ClosingStep({ step, active }: Props) {
             >
               <motion.div
                 data-no-click-advance
-                className="flex w-full flex-col items-center justify-center"
+                className="flex w-full shrink-0 flex-col items-center justify-center pt-1"
               >
                 <ClosingFormCta
                   href={formUrl}
@@ -723,6 +758,31 @@ export function ClosingStep({ step, active }: Props) {
                 />
               </motion.div>
             </EraRevealBand>
+          )}
+
+          {step.content.floatingCard && showFloatingLogo && (
+            <motion.div
+              aria-hidden
+              className="flex w-full justify-center pt-3"
+              initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.92 }}
+              animate={
+                active
+                  ? { opacity: 1, y: 0, scale: 1 }
+                  : reduceMotion
+                    ? undefined
+                    : { opacity: 0, y: 18, scale: 0.92 }
+              }
+              transition={{
+                duration: 0.72,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              <div
+                className="pointer-events-none flex items-center justify-center"
+              >
+                <SaluxSymbol width={164} idle={active} className="opacity-[0.96]" />
+              </div>
+            </motion.div>
           )}
         </motion.div>
       </motion.div>

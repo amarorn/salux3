@@ -469,7 +469,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
             "Se você soubesse exatamente onde a receita está vazando agora, o que mudaria na sua operação amanhã?",
           closingHighlight:
             "Ecossistema Salux · A base para uma nova forma de operar a saúde.",
-          closingLogoFlight: true,
+          floatingCard: true,
         },
       };
     }

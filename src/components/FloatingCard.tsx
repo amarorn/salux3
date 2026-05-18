@@ -152,6 +152,8 @@ interface FloatingCardProps {
   onBannerNewsExpand?: (url: string) => void;
   /** Texto do badge e rótulos do card em branco (trilhas com fundo escuro). */
   allTextWhite?: boolean;
+  /** Remove máscara/limites visuais do card e deixa o conteúdo flutuar no palco. */
+  floatingContent?: boolean;
   children: ReactNode;
 }
 
@@ -181,6 +183,7 @@ export function FloatingCard({
   bannerNewsUrls,
   onBannerNewsExpand,
   allTextWhite = false,
+  floatingContent = false,
   children,
 }: FloatingCardProps) {
   const ctx = useContext(FloatingCardContext);
@@ -193,7 +196,6 @@ export function FloatingCard({
   const [bannerVideoOpen, setBannerVideoOpen] = useState(false);
   const [bannerPhotoExpanded, setBannerPhotoExpanded] = useState(false);
   const omitSidePhoto = Boolean(ctx?.omitSidePhoto);
-
   useEffect(() => {
     if (!bannerVideoOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -287,14 +289,15 @@ export function FloatingCard({
     <div
       {...cardEdgeDataAttr("shell")}
       className={clsx(
-        CARD_EDGE_SHELL,
-        "flex min-h-0 items-stretch overflow-hidden",
+        !floatingContent && CARD_EDGE_SHELL,
+        "flex min-h-0 items-stretch",
+        floatingContent ? "overflow-visible" : "overflow-hidden",
         bannerUnframed ? "gap-0" : "gap-3",
         resolvedFlip ? "flex-col-reverse" : "flex-col",
       )}
       style={{
         width: resolvedWidth,
-        maxHeight: cardMaxHeight,
+        maxHeight: floatingContent ? undefined : cardMaxHeight,
       }}
     >
       {!omitSidePhoto && (
@@ -492,9 +495,11 @@ export function FloatingCard({
         animate={layerAnimate}
         className={clsx(
           omitSidePhoto && CARD_EDGE_SHELL,
-          "relative min-h-0 w-full flex-1 overflow-hidden p-8 sm:p-12",
+          "relative min-h-0 w-full flex-1",
+          floatingContent
+            ? "overflow-visible rounded-none p-0"
+            : "overflow-hidden rounded-3xl p-8 sm:p-12",
           "flex flex-col",
-          "rounded-3xl",
           omitSidePhoto
             ? "min-h-[min(420px,55vh)]"
             : bannerHeightClass
@@ -506,46 +511,49 @@ export function FloatingCard({
       >
         {/* ── Luz cenográfica de fundo ── duas elipses defasadas + plano vinheta.
             Sem borda, sem container — o conteúdo "emerge" da escuridão. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -z-10"
-          style={{
-            // expande além das bordas do conteúdo, sem forma fixa
-            inset: "-12% -10% -18% -10%",
-            background: `
-              radial-gradient(58% 42% at 28% 18%, ${accentColor.base}1f 0%, transparent 70%),
-              radial-gradient(68% 48% at 78% 72%, ${accentColor.base}14 0%, transparent 75%)
-            `,
-            filter: "none",
-            opacity: active ? 1 : 0.55,
-            transition: "opacity 500ms ease-out",
-          }}
-        />
-        {/* Camada de "fumaça" sutil — varia a textura sem desenhar bordas */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -z-10"
-          style={{
-            inset: "-4% -6% -12% -6%",
-            background: `radial-gradient(55% 45% at ${20 + (hashStepId(stepId) % 50)}% ${30 + (hashStepId(stepId + "y") % 40)}%, ${accentColor.base}1a 0%, transparent 70%)`,
-            opacity: active ? 0.9 : 0.4,
-            mixBlendMode: "screen",
-            filter: "none",
-          }}
-        />
-        {/* Partículas/grain levíssimo, só pra quebrar planos chapados */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -z-10 opacity-[0.04]"
-          style={{
-            inset: 0,
-            backgroundImage:
-              "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)",
-            backgroundSize: "3px 3px",
-            mixBlendMode: "screen",
-          }}
-        />
-        {!hideWatermarkSvg && (
+        {!floatingContent && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -z-10"
+            style={{
+              inset: "-12% -10% -18% -10%",
+              background: `
+                radial-gradient(58% 42% at 28% 18%, ${accentColor.base}1f 0%, transparent 70%),
+                radial-gradient(68% 48% at 78% 72%, ${accentColor.base}14 0%, transparent 75%)
+              `,
+              filter: "none",
+              opacity: active ? 1 : 0.55,
+              transition: "opacity 500ms ease-out",
+            }}
+          />
+        )}
+        {!floatingContent && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -z-10"
+            style={{
+              inset: "-4% -6% -12% -6%",
+              background: `radial-gradient(55% 45% at ${20 + (hashStepId(stepId) % 50)}% ${30 + (hashStepId(stepId + "y") % 40)}%, ${accentColor.base}1a 0%, transparent 70%)`,
+              opacity: active ? 0.9 : 0.4,
+              mixBlendMode: "screen",
+              filter: "none",
+            }}
+          />
+        )}
+        {!floatingContent && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -z-10 opacity-[0.04]"
+            style={{
+              inset: 0,
+              backgroundImage:
+                "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)",
+              backgroundSize: "3px 3px",
+              mixBlendMode: "screen",
+            }}
+          />
+        )}
+        {!floatingContent && !hideWatermarkSvg && (
           <svg
             aria-hidden
             className="pointer-events-none absolute -z-10"
@@ -591,7 +599,7 @@ export function FloatingCard({
         )}
         <div
           className={clsx(
-            "relative flex h-full flex-col",
+            "relative z-[1] flex h-full flex-col",
             typeof height === "number" && height > 0 && `min-h-[${height}px]`,
           )}
         >
@@ -655,8 +663,13 @@ export function FloatingCard({
                 />
               </div>
             )}
-            <div className="relative flex-1 min-h-0">
-              <AutoFitContent>{children}</AutoFitContent>
+            <div
+              className={clsx(
+                "relative",
+                floatingContent ? "w-full" : "flex-1 min-h-0",
+              )}
+            >
+              {floatingContent ? children : <AutoFitContent>{children}</AutoFitContent>}
             </div>
           </div>
 
