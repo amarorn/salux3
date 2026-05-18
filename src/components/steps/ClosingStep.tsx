@@ -410,6 +410,7 @@ export function ClosingStep({ step, active }: Props) {
   const ctaBandIdx = bandIndex("cta");
   const showBannerLogo =
     !hero &&
+    !step.content.floatingCard &&
     active &&
     (!eraStaging || eraStagedRevealPhase >= ctaBandIdx || ctaBandIdx < 0);
 
