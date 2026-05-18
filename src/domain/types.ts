@@ -50,6 +50,8 @@ export interface NewsItem {
   articleUrl: string;
   title?: string;
   source?: string;
+  embedAsMobile?: boolean;
+  skipEmbedPreview?: boolean;
 }
 
 export interface ContrastItem {
