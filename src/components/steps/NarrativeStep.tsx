@@ -287,6 +287,7 @@ export function NarrativeStep({ step, active }: Props) {
     ? theme.accents[step.content.attentionAccent]
     : accent;
   const allTextWhite = Boolean(step.content.allTextWhite);
+  const whiteText = allTextWhite || Boolean(step.content.whiteTextOnly);
   const ctaFormSlide = Boolean(
     step.content.ctaFormSlide && step.content.closingQuestion,
   );
@@ -477,7 +478,7 @@ export function NarrativeStep({ step, active }: Props) {
         <p
           className={clsx(
             "mx-auto w-full max-w-prose whitespace-pre-line text-center text-[1.05rem] leading-relaxed",
-            allTextWhite ? "text-white" : "text-slate-100/95",
+            whiteText ? "text-white" : "text-slate-100/95",
           )}
           style={{ textShadow: `0 0 18px ${accent.base}1f` }}
         >
@@ -639,10 +640,10 @@ export function NarrativeStep({ step, active }: Props) {
             <span
               className={clsx(
                 "text-[11px] font-semibold uppercase tracking-[0.22em]",
-                allTextWhite && "text-white",
+                whiteText && "text-white",
               )}
               style={
-                allTextWhite ? undefined : { color: stagePal.base, opacity: 0.9 }
+                whiteText ? undefined : { color: stagePal.base, opacity: 0.9 }
               }
             >
               {stage.label}
@@ -652,7 +653,7 @@ export function NarrativeStep({ step, active }: Props) {
             <p
               className={clsx(
                 "mt-2 text-center text-[0.94rem] leading-relaxed",
-                allTextWhite ? "text-white/95" : "text-slate-100/90",
+                whiteText ? "text-white/95" : "text-slate-100/90",
               )}
             >
               {stage.description}
@@ -662,7 +663,7 @@ export function NarrativeStep({ step, active }: Props) {
             <p
               className={clsx(
                 "mt-2 text-center text-[0.96rem] leading-relaxed",
-                allTextWhite ? "text-white/95" : "text-slate-100/92",
+                whiteText ? "text-white/95" : "text-slate-100/92",
               )}
             >
               {stage.mediaUrl && <>(Vídeo)</>}
@@ -672,10 +673,10 @@ export function NarrativeStep({ step, active }: Props) {
             <span
               className={clsx(
                 "mt-2 block text-[10px] font-semibold uppercase tracking-[0.2em]",
-                allTextWhite && "text-white/45",
+                whiteText && "text-white/45",
               )}
               style={
-                allTextWhite ? undefined : { color: stagePal.base, opacity: 0.42 }
+                whiteText ? undefined : { color: stagePal.base, opacity: 0.42 }
               }
             >
               {stage.news ? "Clique para ver a matéria" : "Clique para ampliar"}
@@ -1076,7 +1077,7 @@ export function NarrativeStep({ step, active }: Props) {
       <p
         className={clsx(
           "mx-auto w-full max-w-prose whitespace-pre-line text-center text-[1.05rem] leading-relaxed",
-          allTextWhite ? "text-white" : "text-slate-100/95",
+          whiteText ? "text-white" : "text-slate-100/95",
         )}
         style={{ textShadow: `0 0 18px ${accent.base}1f` }}
       >
@@ -1127,10 +1128,10 @@ export function NarrativeStep({ step, active }: Props) {
                   <span
                     className={clsx(
                       "text-[11px] font-semibold uppercase tracking-[0.22em]",
-                      allTextWhite && "text-white",
+                      whiteText && "text-white",
                     )}
                     style={
-                      allTextWhite ? undefined : { color: stagePal.base, opacity: 0.9 }
+                      whiteText ? undefined : { color: stagePal.base, opacity: 0.9 }
                     }
                   >
                     {card.label}
@@ -1140,7 +1141,7 @@ export function NarrativeStep({ step, active }: Props) {
                   <p
                     className={clsx(
                       "mt-2 text-center text-[0.94rem] leading-relaxed",
-                      allTextWhite ? "text-white/95" : "text-slate-100/90",
+                      whiteText ? "text-white/95" : "text-slate-100/90",
                     )}
                   >
                     {card.description}
@@ -1179,10 +1180,10 @@ export function NarrativeStep({ step, active }: Props) {
           <span
             className={clsx(
               "block text-[10px] font-semibold uppercase tracking-[0.32em]",
-              allTextWhite && "text-white",
+              whiteText && "text-white",
             )}
             style={
-              allTextWhite
+              whiteText
                 ? undefined
                 : { color: accent.base, opacity: 0.85 }
             }
@@ -1192,7 +1193,7 @@ export function NarrativeStep({ step, active }: Props) {
           <h2
             className="presentation-ppt-title max-w-[20ch] text-[clamp(1.9rem,4.2vw,2.9rem)] leading-[1.08]"
             style={{
-              textShadow: allTextWhite
+              textShadow: whiteText
                 ? "0 0 28px rgba(255,255,255,0.15)"
                 : `0 0 28px ${accent.base}22`,
             }}
@@ -1249,7 +1250,7 @@ export function NarrativeStep({ step, active }: Props) {
           {...innerMotion}
           className={clsx(
             "presentation-ppt-body mx-auto w-full max-w-prose whitespace-pre-line text-center",
-            allTextWhite ? "text-white" : "text-slate-100/95",
+            whiteText ? "text-white" : "text-slate-100/95",
           )}
         >
           {clickableWordMedia.length > 0
@@ -1429,7 +1430,7 @@ export function NarrativeStep({ step, active }: Props) {
                   active={active}
                   reducedMotion={Boolean(reduceMotion)}
                   accentColor={accent.base}
-                  textWhite={allTextWhite}
+                  textWhite={whiteText}
                 />
               ) : (
                 <AnimatedNarrativeMetrics
@@ -1437,7 +1438,7 @@ export function NarrativeStep({ step, active }: Props) {
                   active={active}
                   reducedMotion={Boolean(reduceMotion)}
                   accentColor={accent.base}
-                  textWhite={allTextWhite}
+                  textWhite={whiteText}
                 />
               )}
             </motion.div>
@@ -1458,7 +1459,7 @@ export function NarrativeStep({ step, active }: Props) {
               {...innerMotion}
               className={clsx(
                 "presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center",
-                allTextWhite ? "text-white" : "text-slate-100/95",
+                whiteText ? "text-white" : "text-slate-100/95",
               )}
             >
               {step.content.lead}
@@ -1481,7 +1482,10 @@ export function NarrativeStep({ step, active }: Props) {
             >
               <motion.p
                 {...innerMotion}
-                className="presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center text-slate-100/95"
+                className={clsx(
+                  "presentation-ppt-body mx-auto max-w-prose whitespace-pre-line text-center",
+                  whiteText ? "text-white" : "text-slate-100/95",
+                )}
               >
                 {paragraph}
               </motion.p>
@@ -1545,9 +1549,9 @@ export function NarrativeStep({ step, active }: Props) {
                       <span
                         className={clsx(
                           "text-[10px] font-semibold uppercase tracking-[0.32em]",
-                          allTextWhite && "text-white",
+                          whiteText && "text-white",
                         )}
-                        style={allTextWhite ? undefined : { color: c.base }}
+                        style={whiteText ? undefined : { color: c.base }}
                       >
                         {it.label}
                       </span>
@@ -1664,7 +1668,7 @@ export function NarrativeStep({ step, active }: Props) {
                       accentColor={accent.base}
                       active={active}
                       delay={i * 0.45}
-                      textWhite={allTextWhite}
+                      textWhite={whiteText}
                     />
                   );
                 })}
@@ -1872,7 +1876,7 @@ export function NarrativeStep({ step, active }: Props) {
                   <li
                     key={bullet}
                     className={
-                      allTextWhite
+                      whiteText
                         ? "text-[0.96rem] leading-relaxed text-white"
                         : "text-[0.96rem] leading-relaxed text-slate-200"
                     }
@@ -1971,20 +1975,20 @@ export function NarrativeStep({ step, active }: Props) {
                         <span
                           className={clsx(
                             "block text-[11px] font-semibold uppercase tracking-[0.26em]",
-                            allTextWhite && "text-white",
-                          )}
-                          style={
-                            allTextWhite
-                              ? undefined
-                              : { color: rose.base, opacity: 0.9 }
-                          }
+                          whiteText && "text-white",
+                        )}
+                        style={
+                          whiteText
+                            ? undefined
+                            : { color: rose.base, opacity: 0.9 }
+                        }
                         >
                           DE →
                         </span>
                         <p
                           className={clsx(
                             "mt-0.5 text-[0.98rem] leading-relaxed",
-                            allTextWhite ? "text-white/95" : "text-slate-100/92",
+                            whiteText ? "text-white/95" : "text-slate-100/92",
                           )}
                         >
                           {from}
@@ -2008,20 +2012,20 @@ export function NarrativeStep({ step, active }: Props) {
                         <span
                           className={clsx(
                             "block text-[11px] font-semibold uppercase tracking-[0.26em]",
-                            allTextWhite && "text-white",
-                          )}
-                          style={
-                            allTextWhite
+                            whiteText && "text-white",
+                        )}
+                        style={
+                            whiteText
                               ? undefined
                               : { color: emerald.base, opacity: 0.95 }
-                          }
+                        }
                         >
                           PARA →
                         </span>
                         <p
                           className="mt-0.5 text-[0.96rem] font-medium leading-relaxed text-white/95"
                           style={{
-                            textShadow: allTextWhite
+                            textShadow: whiteText
                               ? "0 0 18px rgba(255,255,255,0.12)"
                               : `0 0 18px ${emerald.base}22`,
                           }}
@@ -2089,7 +2093,7 @@ export function NarrativeStep({ step, active }: Props) {
               />
               <p
                 className="relative whitespace-pre-line px-3 text-center text-[clamp(1.05rem,2.4vw,1.22rem)] font-medium italic leading-relaxed"
-                style={{ color: allTextWhite ? "#ffffff" : attentionAccent.base }}
+                style={{ color: whiteText ? "#ffffff" : attentionAccent.base }}
               >
                 “
                 {clickableWordMedia.length > 0

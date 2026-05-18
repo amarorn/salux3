@@ -635,5 +635,12 @@ export const governancaStepsResolved: PresentationStep[] = (() => {
   const closingIdx = _intermediate.findIndex((s) => s.id === 'closing');
   const before =
     closingIdx >= 0 ? _intermediate.slice(0, closingIdx) : _intermediate;
-  return [...before, ...extras].map((s, i) => ({ ...s, index: i }));
+  return [...before, ...extras].map((s, i) => ({
+    ...s,
+    index: i,
+    content: {
+      ...s.content,
+      whiteTextOnly: true,
+    },
+  }));
 })();

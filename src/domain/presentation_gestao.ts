@@ -450,12 +450,13 @@ const gestaoResultsStep: PresentationStep = {
   },
 };
 
-/** Sequência final — insere `gestao-results` (card 9) antes do closing. */
+/** Sequência final — remove `roadmap` e mantém 9 slides no total. */
 export const gestaoSteps: PresentationStep[] = (() => {
-  const closingIdx = gestaoBaseSteps.findIndex((s) => s.id === "closing");
-  if (closingIdx < 0) return gestaoBaseSteps;
-  const before = gestaoBaseSteps.slice(0, closingIdx);
-  const closing = gestaoBaseSteps[closingIdx];
+  const filteredSteps = gestaoBaseSteps.filter((s) => s.id !== "roadmap");
+  const closingIdx = filteredSteps.findIndex((s) => s.id === "closing");
+  if (closingIdx < 0) return filteredSteps;
+  const before = filteredSteps.slice(0, closingIdx);
+  const closing = filteredSteps[closingIdx];
   return [...before, gestaoResultsStep, closing].map((s, i) => ({
     ...s,
     index: i,
