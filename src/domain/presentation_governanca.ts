@@ -12,7 +12,6 @@ import governancaTrilha5Slide8NoticiaIa from '@/assets/presentation/governanca-t
 import governancaTrilha5Slide9Horizon from '@/assets/presentation/governanca-trilha5-slide9-horizon.png?url';
 import governancaTrilha5Slide10Lobby from '@/assets/presentation/governanca-trilha5-slide10-lobby.png?url';
 import governancaTrilha5Slide12Executivo from '@/assets/presentation/governanca-trilha5-slide12-executivo.png?url';
-import governancaTrilha5Slide13HospitalRede from '@/assets/presentation/governanca-trilha5-slide13-hospital-rede.png?url';
 import governancaWhyAgentsBannerUrl from '@/assets/presentation/governanca-why-agents-banner.png?url';
 
 export const presentationGovernancaMeta = {
@@ -531,24 +530,28 @@ const governancaValueDimensionsStep: PresentationStep = {
       {
         number: '💰',
         label: 'Valor econômico',
+        mediaUrl: '/intro/predicao-glosa-ciclo-receita-3.mp4',
         description:
           'Proteção de receita. Redução de glosas. Menos retrabalho. Mais previsibilidade financeira.',
       },
       {
         number: '🩺',
         label: 'Valor assistencial',
+        mediaUrl: '/intro/prescricao-ia.png',
         description:
           'Contexto clínico contínuo. Alertas relevantes. Diagnóstico integrado. Cuidado além da alta.',
       },
       {
         number: '⚙️',
         label: 'Valor operacional',
+        mediaUrl: '/intro/tela-de-escalas.png',
         description:
           'Gargalos antecipados. Escalas mais coordenadas. Melhor uso da capacidade instalada. Produtividade com controle.',
       },
       {
         number: '🌐',
         label: 'Valor sistêmico',
+        mediaUrl: '/intro/assistencial-prontuario-ambulatorial.png',
         description:
           'Redes mais coordenadas. Filas priorizadas por contexto. Crônicos monitorados. Acesso ampliado com mais inteligência de gestão.',
       },
@@ -601,23 +604,29 @@ const governancaPassageStep: PresentationStep = {
   subtitle: 'Encerramento de racional e CTA',
   position: { x: 0, y: 5640 },
   scale: 1.2,
-  kind: 'narrative',
+  kind: 'closing',
   accent: 'violet',
   content: {
-    headline: 'Próximo salto',
-    cardVisual: 'portal',
-    heroImage: {
-      src: governancaTrilha5Slide13HospitalRede,
-      alt:
-        'Hospital conectado em rede — ecossistema integrado de saúde com dados, finanças e assistência',
-    },
-    lead:
-      'Depois da digitalização, o próximo salto será transformar dados, processos e inteligência em capacidade real de execução.',
+    headline:
+      'A era agêntica marca a passagem da operação digital para a operação coordenada por inteligência.',
+    cardVisual: 'compass',
+    body: 'Depois da digitalização, o próximo salto será transformar dados, processos e inteligência em capacidade real de execução.',
+    infoCardsGridCols: 3,
+    infoCards: [
+      { number: '✓', label: 'Mais clareza para decidir no momento certo' },
+      { number: '✓', label: 'Menos fricção entre dados, sistemas e ação' },
+      { number: '✓', label: 'Mais contexto contínuo ao longo da jornada' },
+      { number: '✓', label: 'Menos dependência de esforço manual de coordenação' },
+      { number: '✓', label: 'Mais capacidade de priorizar e agir com governança' },
+      { number: '✓', label: 'Operação preparada para transformar inteligência em execução' },
+    ],
     attentionPhrase:
-      'Não é sobre ter mais IA. É sobre ter uma operação que sabe o que fazer com ela.',
-    closingQuestionLabel: 'CTA · Pergunta-gatilho',
+      'Com uma base operacional coordenada, a inteligência deixa de ser pontual e passa a sustentar decisão, fluxo e continuidade na operação.',
+    closingHighlight:
+      'Ecossistema Salux · A base para uma nova forma de operar a saúde.',
     closingQuestion:
-      'Sua operação está preparada para a era agêntica? Vamos mapear juntos os próximos passos.',
+      'Se a sua operação já tem dados, sistemas e automações — o que ainda está impedindo ela de agir?',
+    highlightPhrases: [],
   },
 };
 
