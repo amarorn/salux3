@@ -52,16 +52,22 @@ button {
   font-family: inherit;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
 ::selection {
   background: rgba(124, 58, 237, 0.18);
   color: #1e1b4b;
 }
 
+/* Reduced motion — preserva feedback de hover/active mas desliga o teatro. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
+    animation-duration: 0.1ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.2s !important;
+    transition-duration: 0.15s !important;
+    scroll-behavior: auto !important;
   }
 }
 

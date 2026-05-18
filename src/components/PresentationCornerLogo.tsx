@@ -4,6 +4,7 @@ import { SaluxSymbol } from './intro/SaluxLogo';
 import { useCurrentPresentation } from '@/hooks/useCurrentPresentation';
 import { usePresentationLogoTraction } from '@/hooks/usePresentationLogoTraction';
 import { usePresentationStore } from '@/store/presentationStore';
+import { SPRING } from '@/lib/motion/curves';
 
 interface Props {
   /** Mesma condição de visibilidade do bloco do canto (inclui após escolher trilha e após entrar). */
@@ -52,10 +53,13 @@ export function PresentationCornerLogo({ visible }: Props) {
               className="drop-shadow-[0_12px_28px_-8px_rgba(124,58,237,0.35)]"
             >
               {hasEntered ? (
-                <button
+                <motion.button
                   type="button"
                   data-no-click-advance
-                  className="pointer-events-auto cursor-pointer rounded-xl border-0 bg-transparent p-0 outline-none transition-opacity hover:opacity-95 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#05070d]"
+                  whileHover={reduceMotion ? undefined : { scale: 1.04, y: -1 }}
+                  whileTap={reduceMotion ? undefined : { scale: 0.96 }}
+                  transition={SPRING.snappy}
+                  className="pointer-events-auto cursor-pointer rounded-xl border-0 bg-transparent p-0 outline-none transition-opacity hover:opacity-95 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#05070d] will-change-transform"
                   aria-label="Voltar à escolha de trilhas"
                   onClick={(e) => {
                     e.preventDefault();
@@ -64,7 +68,7 @@ export function PresentationCornerLogo({ visible }: Props) {
                   }}
                 >
                   <SaluxSymbol width={60} idle />
-                </button>
+                </motion.button>
               ) : (
                 <SaluxSymbol width={60} idle />
               )}

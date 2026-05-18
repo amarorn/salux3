@@ -174,13 +174,14 @@ export function EvidenceMetricCard({
           />
         ))}
         <motion.div
-          className="absolute inset-y-0 left-0 rounded-full"
+          className="absolute inset-y-0 left-0 origin-left rounded-full will-change-transform"
           style={{
+            width: `${fillPct}%`,
             background: `linear-gradient(90deg, ${accentColor}99, ${accentColor})`,
             boxShadow: `0 0 18px ${accentColor}aa`,
           }}
-          initial={reduce ? false : { width: '0%' }}
-          animate={active ? { width: `${fillPct}%` } : reduce ? undefined : { width: '0%' }}
+          initial={reduce ? false : { scaleX: 0 }}
+          animate={active ? { scaleX: 1 } : reduce ? undefined : { scaleX: 0 }}
           transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], delay: 0.55 + delay }}
         />
         {/* marcador no fim */}

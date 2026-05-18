@@ -500,10 +500,23 @@ export function ClosingStep({ step, active }: Props) {
                 }}
               >
                 {infoCards.map((row, i) => (
-                  <div
+                  <motion.div
                     key={`${row.label}-${i}`}
                     data-no-click-advance
-                    className="presentation-card-chip relative overflow-hidden rounded-xl border px-3.5 py-3 outline-none"
+                    initial={reduceMotion ? false : { opacity: 0, y: 18, filter: "blur(8px)" }}
+                    animate={
+                      active
+                        ? { opacity: 1, y: 0, filter: "blur(0px)" }
+                        : reduceMotion
+                          ? undefined
+                          : { opacity: 0, y: 18, filter: "blur(8px)" }
+                    }
+                    transition={{
+                      duration: reduceMotion ? 0 : 0.55,
+                      delay: reduceMotion ? 0 : 0.08 + i * 0.06,
+                      ease: [0.32, 0.72, 0, 1],
+                    }}
+                    className="presentation-card-chip relative overflow-hidden rounded-xl border px-3.5 py-3 outline-none will-change-transform"
                     style={{
                       borderColor: `${accent.base}55`,
                       background: `linear-gradient(135deg, ${accent.base}1c 0%, rgba(255,255,255,0.02) 70%)`,
@@ -558,7 +571,7 @@ export function ClosingStep({ step, active }: Props) {
                         )}
                       </p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>

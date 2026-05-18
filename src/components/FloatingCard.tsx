@@ -327,6 +327,9 @@ export function FloatingCard({
             bannerUnframed ? "mt-0" : "mt-5 rounded-3xl duration-500 ease-out",
             !bannerHeightClass && !resolvedBannerHeightPx && "h-[460px]",
             !bannerUnframed &&
+              // ring-1 ring-inset white/15 — "metal escovado" sutil que separa a imagem do fundo
+              "ring-1 ring-inset ring-white/12",
+            !bannerUnframed &&
             (active
               ? "border border-transparent shadow-[0_30px_80px_-24px_rgba(0,0,0,0.7)]"
               : "border border-transparent shadow-[0_22px_60px_-24px_rgba(0,0,0,0.58)] group-hover:-translate-y-1"),

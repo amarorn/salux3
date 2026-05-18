@@ -135,7 +135,7 @@ export function TransitionMorph({ onComplete }: Props) {
               delay: 0.55,
               duration: 1.55,
               times: [0, 0.18, 0.38, 0.58, 0.78, 1],
-              ease: 'easeInOut',
+              ease: [0.22, 1, 0.36, 1],
             }}
           >
             <SaluxLogo
@@ -176,6 +176,19 @@ export function TransitionMorph({ onComplete }: Props) {
           transition={{ delay: 1.0, duration: 0.4 }}
         />
       </motion.div>
+
+      <motion.button
+        type="button"
+        aria-label="Pular abertura"
+        onClick={onComplete}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        whileHover={{ opacity: 1, scale: 1.04 }}
+        className="absolute bottom-6 right-6 z-50 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/40 transition-colors hover:text-white/85 focus:outline-none focus-visible:text-white sm:bottom-8 sm:right-8"
+      >
+        Pular abertura →
+      </motion.button>
     </motion.div>
   );
 }
