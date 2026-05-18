@@ -28,7 +28,6 @@ import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildClosingBandKeys } from "@/lib/eraAgenticaRevealBands";
 import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
 import { ExpandedCardPortal } from "./ExpandedCardPortal";
-import saluxSymbolUrl from "@/assets/intro/salux-simbolo-azul.svg?url";
 
 const CLOSING_FORM_CTA_LABEL = "Ir para o formulário";
 const CLOSING_FORM_CTA_CHARS = CLOSING_FORM_CTA_LABEL.split("");
@@ -865,26 +864,6 @@ export function ClosingStep({ step, active }: Props) {
                   reduceMotion={reduceMotion}
                   afterLogoFlight={Boolean(step.content.closingLogoFlight)}
                 />
-                {!step.content.floatingCard && (
-                  <motion.img
-                    src={saluxSymbolUrl}
-                    alt="Salux"
-                    className="h-28 w-28 md:h-36 md:w-36 object-contain"
-                    initial={reduceMotion ? false : { opacity: 0, y: 20, scale: 0.8 }}
-                    animate={
-                      active
-                        ? { opacity: 1, y: 0, scale: 1 }
-                        : reduceMotion
-                          ? undefined
-                          : { opacity: 0, y: 20, scale: 0.8 }
-                    }
-                    transition={
-                      reduceMotion
-                        ? { duration: 0.01 }
-                        : { delay: 0.6, duration: 0.7, ease: [0.22, 1, 0.36, 1] }
-                    }
-                  />
-                )}
               </motion.div>
             </EraRevealBand>
           )}
