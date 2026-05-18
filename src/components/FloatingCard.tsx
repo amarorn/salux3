@@ -253,10 +253,10 @@ export function FloatingCard({
   const bannerPhotoExpandable = ctx?.bannerPhotoExpandable !== false;
   const canExpandBannerPhoto = Boolean(
     bannerPhotoExpandable &&
-      sidePhotoSrc &&
-      photoSrc &&
-      !hasBannerNews &&
-      !resolvedVideoSrc,
+    sidePhotoSrc &&
+    photoSrc &&
+    !hasBannerNews &&
+    !resolvedVideoSrc,
   );
 
   const wrapBannerPhotoExpand = (node: ReactNode) => {
@@ -308,12 +308,12 @@ export function FloatingCard({
             "relative w-full shrink-0 overflow-hidden",
             bannerUnframed ? "mt-0" : "mt-5 rounded-3xl duration-500 ease-out",
             !bannerHeightClass &&
-              !resolvedBannerHeightPx &&
-              "h-[460px]",
+            !resolvedBannerHeightPx &&
+            "h-[460px]",
             !bannerUnframed &&
-              (active
-                ? "border border-transparent shadow-[0_30px_80px_-24px_rgba(0,0,0,0.7)]"
-                : "border border-transparent shadow-[0_22px_60px_-24px_rgba(0,0,0,0.58)] group-hover:-translate-y-1"),
+            (active
+              ? "border border-transparent shadow-[0_30px_80px_-24px_rgba(0,0,0,0.7)]"
+              : "border border-transparent shadow-[0_22px_60px_-24px_rgba(0,0,0,0.58)] group-hover:-translate-y-1"),
           )}
           style={
             !bannerHeightClass && resolvedBannerHeightPx
@@ -335,14 +335,14 @@ export function FloatingCard({
                   className={clsx(
                     "relative h-full min-h-0 w-full overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none",
                     onBannerNewsExpand &&
-                      "cursor-zoom-in transition-transform duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white/45",
+                    "cursor-zoom-in transition-transform duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white/45",
                   )}
                   onClick={
                     onBannerNewsExpand
                       ? (e) => {
-                          e.stopPropagation();
-                          onBannerNewsExpand(url);
-                        }
+                        e.stopPropagation();
+                        onBannerNewsExpand(url);
+                      }
                       : undefined
                   }
                 >
@@ -622,20 +622,20 @@ export function FloatingCard({
                   style={
                     allTextWhite
                       ? {
-                          background: "rgba(255,255,255,0.08)",
-                          border: "1px solid rgba(255,255,255,0.35)",
-                          boxShadow: active
-                            ? "0 0 18px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.08)"
-                            : undefined,
-                        }
+                        background: "rgba(255,255,255,0.08)",
+                        border: "1px solid rgba(255,255,255,0.35)",
+                        boxShadow: active
+                          ? "0 0 18px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.08)"
+                          : undefined,
+                      }
                       : {
-                          background: `${accentColor.base}1a`,
-                          color: accentColor.base,
-                          border: `1px solid ${accentColor.base}55`,
-                          boxShadow: active
-                            ? `0 0 18px ${accentColor.base}40, inset 0 1px 0 rgba(255,255,255,0.08)`
-                            : undefined,
-                        }
+                        background: `${accentColor.base}1a`,
+                        color: accentColor.base,
+                        border: `1px solid ${accentColor.base}55`,
+                        boxShadow: active
+                          ? `0 0 18px ${accentColor.base}40, inset 0 1px 0 rgba(255,255,255,0.08)`
+                          : undefined,
+                      }
                   }
                 >
                   <span
