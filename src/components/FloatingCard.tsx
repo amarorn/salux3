@@ -45,7 +45,13 @@ const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
 /** Reduz proporcionalmente o conteúdo quando excede a altura disponível,
  * para nada ser cortado dentro do card. */
-function AutoFitContent({ children }: { children: ReactNode }) {
+function AutoFitContent({
+  children,
+  parentScale = 1,
+}: {
+  children: ReactNode;
+  parentScale?: number;
+}) {
   const outerRef = useRef<HTMLDivElement | null>(null);
   const innerRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
@@ -59,7 +65,10 @@ function AutoFitContent({ children }: { children: ReactNode }) {
       const availableH = outer.clientHeight;
       const naturalH = inner.scrollHeight;
       if (availableH <= 0 || naturalH <= 0) return;
-      const next = Math.min(1, availableH / naturalH);
+      const next = Math.min(
+        1,
+        availableH / Math.max(parentScale, 0.01) / naturalH,
+      );
       setScale((prev) => (Math.abs(prev - next) < 0.002 ? prev : next));
     };
 
@@ -68,15 +77,18 @@ function AutoFitContent({ children }: { children: ReactNode }) {
     ro.observe(outer);
     ro.observe(inner);
     return () => ro.disconnect();
-  }, []);
+  }, [parentScale]);
 
   return (
-    <div ref={outerRef} className="relative flex h-full w-full items-center justify-center">
+    <div
+      ref={outerRef}
+      className="relative flex h-full w-full items-end justify-center"
+    >
       <div
         ref={innerRef}
         style={{
           transform: `scale(${scale})`,
-          transformOrigin: "center center",
+          transformOrigin: "bottom center",
           width: "100%",
         }}
       >
@@ -152,6 +164,10 @@ interface FloatingCardProps {
   onBannerNewsExpand?: (url: string) => void;
   /** Texto do badge e rótulos do card em branco (trilhas com fundo escuro). */
   allTextWhite?: boolean;
+  /** Remove máscara/limites visuais do card e deixa o conteúdo flutuar no palco. */
+  floatingContent?: boolean;
+  /** Componente customizado no lugar do banner (imagem/vídeo). */
+  bannerChildren?: ReactNode;
   children: ReactNode;
 }
 
@@ -181,6 +197,8 @@ export function FloatingCard({
   bannerNewsUrls,
   onBannerNewsExpand,
   allTextWhite = false,
+  floatingContent = false,
+  bannerChildren,
   children,
 }: FloatingCardProps) {
   const ctx = useContext(FloatingCardContext);
@@ -193,7 +211,6 @@ export function FloatingCard({
   const [bannerVideoOpen, setBannerVideoOpen] = useState(false);
   const [bannerPhotoExpanded, setBannerPhotoExpanded] = useState(false);
   const omitSidePhoto = Boolean(ctx?.omitSidePhoto);
-
   useEffect(() => {
     if (!bannerVideoOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -253,10 +270,10 @@ export function FloatingCard({
   const bannerPhotoExpandable = ctx?.bannerPhotoExpandable !== false;
   const canExpandBannerPhoto = Boolean(
     bannerPhotoExpandable &&
-      sidePhotoSrc &&
-      photoSrc &&
-      !hasBannerNews &&
-      !resolvedVideoSrc,
+    sidePhotoSrc &&
+    photoSrc &&
+    !hasBannerNews &&
+    !resolvedVideoSrc,
   );
 
   const wrapBannerPhotoExpand = (node: ReactNode) => {
@@ -287,14 +304,15 @@ export function FloatingCard({
     <div
       {...cardEdgeDataAttr("shell")}
       className={clsx(
-        CARD_EDGE_SHELL,
-        "flex min-h-0 items-stretch overflow-hidden",
+        !floatingContent && CARD_EDGE_SHELL,
+        "flex min-h-0 items-stretch",
+        floatingContent ? "overflow-visible" : "overflow-hidden",
         bannerUnframed ? "gap-0" : "gap-3",
         resolvedFlip ? "flex-col-reverse" : "flex-col",
       )}
       style={{
         width: resolvedWidth,
-        maxHeight: cardMaxHeight,
+        maxHeight: floatingContent ? undefined : cardMaxHeight,
       }}
     >
       {!omitSidePhoto && (
@@ -307,13 +325,11 @@ export function FloatingCard({
             CARD_EDGE_BANNER,
             "relative w-full shrink-0 overflow-hidden",
             bannerUnframed ? "mt-0" : "mt-5 rounded-3xl duration-500 ease-out",
-            !bannerHeightClass &&
-              !resolvedBannerHeightPx &&
-              "h-[460px]",
+            !bannerHeightClass && !resolvedBannerHeightPx && "h-[460px]",
             !bannerUnframed &&
-              (active
-                ? "border border-transparent shadow-[0_30px_80px_-24px_rgba(0,0,0,0.7)]"
-                : "border border-transparent shadow-[0_22px_60px_-24px_rgba(0,0,0,0.58)] group-hover:-translate-y-1"),
+            (active
+              ? "border border-transparent shadow-[0_30px_80px_-24px_rgba(0,0,0,0.7)]"
+              : "border border-transparent shadow-[0_22px_60px_-24px_rgba(0,0,0,0.58)] group-hover:-translate-y-1"),
           )}
           style={
             !bannerHeightClass && resolvedBannerHeightPx
@@ -321,40 +337,99 @@ export function FloatingCard({
               : undefined
           }
         >
-          {hasBannerNews ? (
-            <motion.div
-              data-no-click-advance
-              className="absolute inset-0 grid grid-cols-3 gap-2 bg-[#05070d] p-2"
-            >
-              {bannerNewsUrls!.map((url, index) => (
-                <button
-                  key={`banner-news-${index}`}
-                  type="button"
-                  data-no-click-advance
-                  aria-label="Expandir imagem"
-                  className={clsx(
-                    "relative h-full min-h-0 w-full overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none",
-                    onBannerNewsExpand &&
-                      "cursor-zoom-in transition-transform duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white/45",
-                  )}
-                  onClick={
-                    onBannerNewsExpand
-                      ? (e) => {
-                          e.stopPropagation();
-                          onBannerNewsExpand(url);
-                        }
-                      : undefined
-                  }
-                >
-                  <img
-                    src={url}
-                    alt=""
-                    draggable={false}
-                    className="pointer-events-none h-full w-full object-cover object-top"
-                  />
-                </button>
-              ))}
-            </motion.div>
+          {bannerChildren ? (
+            <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+              {bannerChildren}
+            </div>
+          ) : hasBannerNews ? (
+            bannerNewsUrls!.length === 3 ? (
+              <motion.div
+                data-no-click-advance
+                className="absolute inset-0 p-3 md:p-5"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                  gridTemplateRows: "1fr 1fr 1fr 1fr",
+                  gap: "12px",
+                  gridTemplateAreas: `
+                    "q0 q0 .  ."
+                    "q0 q0 q2 q2"
+                    "q1 q1 q2 q2"
+                    "q1 q1 q2 q2"
+                  `,
+                }}
+              >
+                {bannerNewsUrls!.map((url, index) => {
+                  const areas = ["q0", "q1", "q2"];
+                  return (
+                    <button
+                      key={`banner-news-${index}`}
+                      type="button"
+                      data-no-click-advance
+                      aria-label="Expandir imagem"
+                      className={clsx(
+                        "group relative h-full min-h-0 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0a101c] p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.55)] outline-none transition-[border-color,box-shadow] duration-300",
+                        onBannerNewsExpand &&
+                          "cursor-zoom-in hover:border-white/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.7)] focus-visible:ring-2 focus-visible:ring-white/45",
+                      )}
+                      style={{ gridArea: areas[index] }}
+                      onClick={
+                        onBannerNewsExpand
+                          ? (e) => {
+                              e.stopPropagation();
+                              onBannerNewsExpand(url);
+                            }
+                          : undefined
+                      }
+                    >
+                      <div className="relative h-full w-full overflow-hidden rounded-lg">
+                        <img
+                          src={url}
+                          alt=""
+                          draggable={false}
+                          className="pointer-events-none h-full w-full object-cover object-top"
+                        />
+                        <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-white/[0.04]" />
+                      </div>
+                    </button>
+                  );
+                })}
+              </motion.div>
+            ) : (
+              <motion.div
+                data-no-click-advance
+                className="absolute inset-0 grid grid-cols-3 gap-2 bg-[#05070d] p-2"
+              >
+                {bannerNewsUrls!.map((url, index) => (
+                  <button
+                    key={`banner-news-${index}`}
+                    type="button"
+                    data-no-click-advance
+                    aria-label="Expandir imagem"
+                    className={clsx(
+                      "relative h-full min-h-0 w-full overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none",
+                      onBannerNewsExpand &&
+                        "cursor-zoom-in transition-transform duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white/45",
+                    )}
+                    onClick={
+                      onBannerNewsExpand
+                        ? (e) => {
+                            e.stopPropagation();
+                            onBannerNewsExpand(url);
+                          }
+                        : undefined
+                    }
+                  >
+                    <img
+                      src={url}
+                      alt=""
+                      draggable={false}
+                      className="pointer-events-none h-full w-full object-cover object-top"
+                    />
+                  </button>
+                ))}
+              </motion.div>
+            )
           ) : resolvedVideoSrc && resolvedVideoPlayOnClick ? (
             <button
               type="button"
@@ -492,9 +567,11 @@ export function FloatingCard({
         animate={layerAnimate}
         className={clsx(
           omitSidePhoto && CARD_EDGE_SHELL,
-          "relative min-h-0 w-full flex-1 overflow-hidden p-8 sm:p-12",
-          "flex flex-col",
-          "rounded-3xl",
+          "relative min-h-0 w-full flex-1",
+          floatingContent
+            ? "overflow-visible rounded-none p-0"
+            : "overflow-hidden rounded-3xl px-8 pt-8 pb-10 sm:px-12 sm:pt-12 sm:pb-28",
+          floatingContent ? "flex flex-col" : "flex flex-col justify-end",
           omitSidePhoto
             ? "min-h-[min(420px,55vh)]"
             : bannerHeightClass
@@ -506,46 +583,49 @@ export function FloatingCard({
       >
         {/* ── Luz cenográfica de fundo ── duas elipses defasadas + plano vinheta.
             Sem borda, sem container — o conteúdo "emerge" da escuridão. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -z-10"
-          style={{
-            // expande além das bordas do conteúdo, sem forma fixa
-            inset: "-12% -10% -18% -10%",
-            background: `
-              radial-gradient(58% 42% at 28% 18%, ${accentColor.base}1f 0%, transparent 70%),
-              radial-gradient(68% 48% at 78% 72%, ${accentColor.base}14 0%, transparent 75%)
-            `,
-            filter: "none",
-            opacity: active ? 1 : 0.55,
-            transition: "opacity 500ms ease-out",
-          }}
-        />
-        {/* Camada de "fumaça" sutil — varia a textura sem desenhar bordas */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -z-10"
-          style={{
-            inset: "-4% -6% -12% -6%",
-            background: `radial-gradient(55% 45% at ${20 + (hashStepId(stepId) % 50)}% ${30 + (hashStepId(stepId + "y") % 40)}%, ${accentColor.base}1a 0%, transparent 70%)`,
-            opacity: active ? 0.9 : 0.4,
-            mixBlendMode: "screen",
-            filter: "none",
-          }}
-        />
-        {/* Partículas/grain levíssimo, só pra quebrar planos chapados */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -z-10 opacity-[0.04]"
-          style={{
-            inset: 0,
-            backgroundImage:
-              "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)",
-            backgroundSize: "3px 3px",
-            mixBlendMode: "screen",
-          }}
-        />
-        {!hideWatermarkSvg && (
+        {!floatingContent && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -z-10"
+            style={{
+              inset: "-12% -10% -18% -10%",
+              background: `
+                radial-gradient(58% 42% at 28% 18%, ${accentColor.base}1f 0%, transparent 70%),
+                radial-gradient(68% 48% at 78% 72%, ${accentColor.base}14 0%, transparent 75%)
+              `,
+              filter: "none",
+              opacity: active ? 1 : 0.55,
+              transition: "opacity 500ms ease-out",
+            }}
+          />
+        )}
+        {!floatingContent && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -z-10"
+            style={{
+              inset: "-4% -6% -12% -6%",
+              background: `radial-gradient(55% 45% at ${20 + (hashStepId(stepId) % 50)}% ${30 + (hashStepId(stepId + "y") % 40)}%, ${accentColor.base}1a 0%, transparent 70%)`,
+              opacity: active ? 0.9 : 0.4,
+              mixBlendMode: "screen",
+              filter: "none",
+            }}
+          />
+        )}
+        {!floatingContent && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -z-10 opacity-[0.04]"
+            style={{
+              inset: 0,
+              backgroundImage:
+                "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)",
+              backgroundSize: "3px 3px",
+              mixBlendMode: "screen",
+            }}
+          />
+        )}
+        {!floatingContent && !hideWatermarkSvg && (
           <svg
             aria-hidden
             className="pointer-events-none absolute -z-10"
@@ -561,7 +641,11 @@ export function FloatingCard({
                 x2="1"
                 y2="1"
               >
-                <stop offset="0%" stopColor={accentColor.base} stopOpacity="0" />
+                <stop
+                  offset="0%"
+                  stopColor={accentColor.base}
+                  stopOpacity="0"
+                />
                 <stop
                   offset="50%"
                   stopColor={accentColor.base}
@@ -591,7 +675,7 @@ export function FloatingCard({
         )}
         <div
           className={clsx(
-            "relative flex h-full flex-col",
+            "relative z-[1] flex h-full flex-col",
             typeof height === "number" && height > 0 && `min-h-[${height}px]`,
           )}
         >
@@ -622,20 +706,20 @@ export function FloatingCard({
                   style={
                     allTextWhite
                       ? {
-                          background: "rgba(255,255,255,0.08)",
-                          border: "1px solid rgba(255,255,255,0.35)",
-                          boxShadow: active
-                            ? "0 0 18px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.08)"
-                            : undefined,
-                        }
+                        background: "rgba(255,255,255,0.08)",
+                        border: "1px solid rgba(255,255,255,0.35)",
+                        boxShadow: active
+                          ? "0 0 18px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.08)"
+                          : undefined,
+                      }
                       : {
-                          background: `${accentColor.base}1a`,
-                          color: accentColor.base,
-                          border: `1px solid ${accentColor.base}55`,
-                          boxShadow: active
-                            ? `0 0 18px ${accentColor.base}40, inset 0 1px 0 rgba(255,255,255,0.08)`
-                            : undefined,
-                        }
+                        background: `${accentColor.base}1a`,
+                        color: accentColor.base,
+                        border: `1px solid ${accentColor.base}55`,
+                        boxShadow: active
+                          ? `0 0 18px ${accentColor.base}40, inset 0 1px 0 rgba(255,255,255,0.08)`
+                          : undefined,
+                      }
                   }
                 >
                   <span
@@ -655,8 +739,17 @@ export function FloatingCard({
                 />
               </div>
             )}
-            <div className="relative flex-1 min-h-0">
-              <AutoFitContent>{children}</AutoFitContent>
+            <div
+              className={clsx(
+                "relative",
+                floatingContent ? "w-full" : "flex-1 min-h-0",
+              )}
+            >
+              {floatingContent ? children : (
+                <AutoFitContent parentScale={cardTextScale}>
+                  {children}
+                </AutoFitContent>
+              )}
             </div>
           </div>
 
@@ -710,7 +803,7 @@ function BannerPhotoLightbox({
         }}
       />
       <motion.div
-        className="relative z-10 max-h-[86vh] max-w-[90vw] cursor-zoom-out rounded-2xl border border-white/15 bg-[#0a101c] p-3 shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+        className="relative z-10 max-h-[86vh] max-w-[90vw] cursor-zoom-out rounded-2xl border border-white/15 p-3 shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
         initial={reducedMotion ? false : { opacity: 0, scale: 0.94, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={

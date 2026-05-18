@@ -50,6 +50,8 @@ export interface NewsItem {
   articleUrl: string;
   title?: string;
   source?: string;
+  embedAsMobile?: boolean;
+  skipEmbedPreview?: boolean;
 }
 
 export interface ContrastItem {
@@ -207,6 +209,8 @@ export interface StepContent {
   evidenceCard?: EvidenceCard;
   /** Frase de fechamento de tela em destaque ciano (call-out final do card). */
   closingHighlight?: string;
+  /** Remove a moldura/máscara do card para deixar o conteúdo flutuar livremente no palco. */
+  floatingCard?: boolean;
   /** Palavras no título/corpo/bullets que abrem imagem ao clicar (match no texto). */
   clickableWordMedia?: {
     word: string;
@@ -254,6 +258,12 @@ export interface StepContent {
   valueStagesShowDescription?: boolean;
   /** Renderiza valueStages como uma "estrada" curva — cada marco revela por clique e o último tem linha de chegada. */
   valueStagesRoad?: boolean;
+  /** Cards informativos simples — sem modal, sem animação de spotlight. */
+  infoCards?: { number?: string; label: string; description?: string }[];
+  /** Texto curto exibido logo acima da grid de infoCards (lead). */
+  infoCardsLead?: string;
+  /** Número de colunas da grid de infoCards (default = 3). */
+  infoCardsGridCols?: 2 | 3 | 4 | 5;
   /** Cartões de "evidência numérica" — número grande com prefixo, manchete e contexto em itálico. */
   evidenceMetrics?: {
     /** Badge curta acima do número (ex.: "Dado · Evidência"). */

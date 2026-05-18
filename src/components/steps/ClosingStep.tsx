@@ -19,7 +19,7 @@ import type { PresentationStep } from "@/domain/types";
 import { theme } from "@/domain/theme";
 import { getCardTextVariants } from "./cardTextMotion";
 import { ClosingMaestroCompanion } from "@/components/MaestroOrb";
-import { SaluxLogo } from "@/components/intro/SaluxLogo";
+import { SaluxLogo, SaluxSymbol } from "@/components/intro/SaluxLogo";
 import { BURST_VECTORS, EASE_BURST } from "@/components/intro/logoMotion";
 import { ClosingHighlight, HighlightPhraseList } from "./HighlightBlocks";
 import { resolveContactFormUrl } from "@/config/contact";
@@ -28,14 +28,23 @@ import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildClosingBandKeys } from "@/lib/eraAgenticaRevealBands";
 import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
 import { ExpandedCardPortal } from "./ExpandedCardPortal";
+import saluxSymbolUrl from "@/assets/intro/salux-simbolo-azul.svg?url";
 
 const CLOSING_FORM_CTA_LABEL = "Ir para o formulário";
 const CLOSING_FORM_CTA_CHARS = CLOSING_FORM_CTA_LABEL.split("");
-const CLOSING_CTA_ASSEMBLY_DELAY = 1.55;
+const CLOSING_CTA_ASSEMBLY_DELAY = 0.95;
 const CLOSING_CTA_CHAR_STAGGER = 0.036;
+const CLOSING_CTA_ARROW_DELAY = 0.12;
+const CLOSING_CTA_ARROW_DURATION = 0.72;
+const CLOSING_LOGO_REVEAL_DELAY =
+  CLOSING_CTA_ASSEMBLY_DELAY +
+  CLOSING_FORM_CTA_CHARS.length * CLOSING_CTA_CHAR_STAGGER +
+  CLOSING_CTA_ARROW_DELAY +
+  CLOSING_CTA_ARROW_DURATION +
+  0.18;
 
-const CLOSING_LOGO_SIZE = 200;
-const CLOSING_MAESTRO_GAP = 72;
+const CLOSING_LOGO_SIZE = 156;
+const CLOSING_MAESTRO_GAP = 52;
 
 function ClosingFormCta({
   href,
@@ -51,7 +60,7 @@ function ClosingFormCta({
   afterLogoFlight: boolean;
 }) {
   const assemblyDelay =
-    CLOSING_CTA_ASSEMBLY_DELAY + (afterLogoFlight ? 0.45 : 0);
+    CLOSING_CTA_ASSEMBLY_DELAY + (afterLogoFlight ? 0.15 : 0);
   const linkClass =
     "pointer-events-auto group inline-flex min-h-[3.25rem] items-center justify-center gap-4 border-0 bg-transparent px-2 py-3 text-[clamp(1.05rem,2.15vw,1.4rem)] font-semibold uppercase tracking-[0.14em] text-white outline-none transition-[color,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-violet-100 focus-visible:ring-2 focus-visible:ring-violet-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#05070d]";
 
@@ -71,6 +80,27 @@ function ClosingFormCta({
               reduceMotion
                 ? false
                 : {
+                  opacity: 0,
+                  x: v.x * 0.14,
+                  y: v.y * 0.1,
+                  rotate: v.rz * 0.35,
+                  scale: 0.25,
+                  filter: "blur(10px)",
+                }
+            }
+            animate={
+              active
+                ? {
+                  opacity: 1,
+                  x: 0,
+                  y: 0,
+                  rotate: 0,
+                  scale: 1,
+                  filter: "blur(0px)",
+                }
+                : reduceMotion
+                  ? undefined
+                  : {
                     opacity: 0,
                     x: v.x * 0.14,
                     y: v.y * 0.1,
@@ -79,35 +109,14 @@ function ClosingFormCta({
                     filter: "blur(10px)",
                   }
             }
-            animate={
-              active
-                ? {
-                    opacity: 1,
-                    x: 0,
-                    y: 0,
-                    rotate: 0,
-                    scale: 1,
-                    filter: "blur(0px)",
-                  }
-                : reduceMotion
-                  ? undefined
-                  : {
-                      opacity: 0,
-                      x: v.x * 0.14,
-                      y: v.y * 0.1,
-                      rotate: v.rz * 0.35,
-                      scale: 0.25,
-                      filter: "blur(10px)",
-                    }
-            }
             transition={
               reduceMotion
                 ? { duration: 0.01 }
                 : {
-                    delay: assemblyDelay + i * CLOSING_CTA_CHAR_STAGGER,
-                    duration: 0.68,
-                    ease: EASE_BURST,
-                  }
+                  delay: assemblyDelay + i * CLOSING_CTA_CHAR_STAGGER,
+                  duration: 0.68,
+                  ease: EASE_BURST,
+                }
             }
           >
             {isSpace ? "\u00a0" : char}
@@ -139,8 +148,8 @@ function ClosingFormCta({
               delay:
                 assemblyDelay +
                 CLOSING_FORM_CTA_CHARS.length * CLOSING_CTA_CHAR_STAGGER +
-                0.12,
-              duration: 0.72,
+                CLOSING_CTA_ARROW_DELAY,
+              duration: CLOSING_CTA_ARROW_DURATION,
               ease: EASE_BURST,
             }
       }
@@ -220,7 +229,7 @@ function ClosingLogoDescent({
     >
       <motion.div
         {...innerMotion}
-        className="relative flex h-[min(14rem,28vh)] w-full items-center justify-center overflow-visible"
+        className="relative flex h-[min(10.5rem,18vh)] w-full items-center justify-center overflow-visible"
         aria-hidden
       >
         <div
@@ -237,61 +246,61 @@ function ClosingLogoDescent({
               reduceMotion={Boolean(reduceMotion)}
             />
           </motion.div>
-        <motion.div
-          className="relative z-[1] flex items-center justify-center"
-          initial={
-            reduceMotion
-              ? false
-              : { opacity: 0, y: "-44vh", scale: 0.15, filter: "blur(18px)" }
-          }
-          animate={
-            active
-              ? {
+          <motion.div
+            className="relative z-[1] flex items-center justify-center"
+            initial={
+              reduceMotion
+                ? false
+                : { opacity: 0, y: "-44vh", scale: 0.15, filter: "blur(18px)" }
+            }
+            animate={
+              active
+                ? {
                   opacity: 1,
                   y: 0,
                   scale: 1,
                   filter: "blur(0px)",
                 }
-              : reduceMotion
-                ? undefined
-                : { opacity: 0, y: "-44vh", scale: 0.15, filter: "blur(18px)" }
-          }
-          transition={
-            reduceMotion
-              ? { duration: 0.01 }
-              : {
+                : reduceMotion
+                  ? undefined
+                  : { opacity: 0, y: "-44vh", scale: 0.15, filter: "blur(18px)" }
+            }
+            transition={
+              reduceMotion
+                ? { duration: 0.01 }
+                : {
                   opacity: { duration: 0.5, delay: 0.1 },
                   y: { duration: 1.45, ease: [0.12, 1.15, 0.28, 1], delay: 0.08 },
                   scale: { duration: 1.45, ease: [0.12, 1.15, 0.28, 1], delay: 0.08 },
                   filter: { duration: 1.1, delay: 0.2 },
                 }
-          }
-        >
-          <motion.div
-            animate={
-              motionOn
-                ? {
+            }
+          >
+            <motion.div
+              animate={
+                motionOn
+                  ? {
                     y: [0, -14, 0],
                     scale: [1, 1.08, 1],
                   }
-                : undefined
-            }
-            transition={{
-              duration: 4.2,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1.55,
-            }}
-          >
-            <SaluxLogo
-              width={CLOSING_LOGO_SIZE}
-              symbolOnly
-              animate={motionOn}
-              idle={active}
-              effects={{ shimmer: true, glowRing: false, aberration: true }}
-            />
+                  : undefined
+              }
+              transition={{
+                duration: 4.2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1.55,
+              }}
+            >
+              <SaluxLogo
+                width={CLOSING_LOGO_SIZE}
+                symbolOnly
+                animate={motionOn}
+                idle={active}
+                effects={{ shimmer: true, glowRing: false, aberration: true }}
+              />
+            </motion.div>
           </motion.div>
-        </motion.div>
         </div>
       </motion.div>
     </EraRevealBand>
@@ -320,12 +329,29 @@ export function ClosingStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const allTextWhite = Boolean(step.content.allTextWhite);
   const benefits = step.content.valueStages ?? [];
+  const infoCards = step.content.infoCards ?? [];
+  const benefitsClickable = step.content.valueStagesClickable !== false;
   const [selectedBenefit, setSelectedBenefit] = useState<number | null>(null);
+  const [showFloatingLogo, setShowFloatingLogo] = useState(false);
   const benefitRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    if (!active) setSelectedBenefit(null);
-  }, [active]);
+    if (!active) {
+      setSelectedBenefit(null);
+      setShowFloatingLogo(false);
+      return;
+    }
+    if (!step.content.floatingCard) return;
+    if (reduceMotion) {
+      setShowFloatingLogo(true);
+      return;
+    }
+    const id = window.setTimeout(
+      () => setShowFloatingLogo(true),
+      CLOSING_LOGO_REVEAL_DELAY * 1000,
+    );
+    return () => window.clearTimeout(id);
+  }, [active, reduceMotion, step.content.floatingCard]);
 
   useEffect(() => {
     if (selectedBenefit === null) return;
@@ -347,6 +373,9 @@ export function ClosingStep({ step, active }: Props) {
   const bandIndex = (id: string) => bandKeys.indexOf(id);
   const setEraCfg = usePresentationStore((s) => s.setEraStagedRevealConfig);
   const clearEra = usePresentationStore((s) => s.clearEraStagedReveal);
+  const eraStagedRevealPhase = usePresentationStore((s) =>
+    s.eraStagedRevealStepId === step.id ? s.eraStagedRevealPhase : -1,
+  );
   const stagingLayout = Boolean(active && eraStaging && !reduceMotion);
   const innerMotion = stagingLayout ? {} : { variants: item };
   const outerContainer: Variants = stagingLayout
@@ -378,23 +407,46 @@ export function ClosingStep({ step, active }: Props) {
   ]);
 
   const hero = step.content.heroImage;
+  const ctaBandIdx = bandIndex("cta");
+  const showBannerLogo =
+    !hero &&
+    active &&
+    (!eraStaging || eraStagedRevealPhase >= ctaBandIdx || ctaBandIdx < 0);
+
+  const bannerChild = showBannerLogo ? (
+    <SaluxLogo
+      width={280}
+      symbolOnly
+      animate={active}
+      idle={active}
+      effects={{ shimmer: true, glowRing: true, aberration: true }}
+    />
+  ) : undefined;
 
   return (
     <FloatingCard
       accent={step.accent}
       active={active}
       stepId={step.id}
-      width={benefits.length >= 4 ? 920 : 640}
+      width={
+        (infoCards.length >= 4 ? 920 : infoCards.length > 0 ? 640 : benefits.length >= 4 ? 920 : 640)
+      }
       cardVisual={step.content.cardVisual}
       hideValueFlow={true}
+      floatingContent={Boolean(step.content.floatingCard)}
       bannerUnframed
       sidePhotoSrc={hero?.src ?? ""}
       sidePhotoAlt={hero?.alt}
       bannerTransparentCutout={Boolean(hero?.transparentCutout)}
       bannerLightenBlackMatte={Boolean(hero?.lightenBlackMatte)}
+      bannerChildren={bannerChild}
     >
       <motion.div
-        className="flex min-h-0 flex-1 flex-col gap-6"
+        className={
+          step.content.floatingCard
+            ? "flex w-full flex-col gap-6"
+            : "flex min-h-0 flex-1 flex-col gap-6"
+        }
         variants={outerContainer}
         initial={reduceMotion ? false : "hidden"}
         animate={active ? "visible" : "hidden"}
@@ -437,6 +489,99 @@ export function ClosingStep({ step, active }: Props) {
           </EraRevealBand>
         )}
 
+        {infoCards.length > 0 && (
+          <EraRevealBand
+            bandId="infoCards"
+            bandIndex={bandIndex("infoCards")}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion}>
+              {step.content.infoCardsLead && (
+                <p
+                  className={
+                    allTextWhite
+                      ? "mb-3 text-center text-[1.05rem] leading-relaxed text-white"
+                      : "mb-3 text-center text-[1.05rem] leading-relaxed text-slate-100/96"
+                  }
+                >
+                  {step.content.infoCardsLead}
+                </p>
+              )}
+              <div
+                className="grid gap-2.5"
+                style={{
+                  gridTemplateColumns: `repeat(${step.content.infoCardsGridCols ?? Math.min(infoCards.length, 3)}, minmax(0, 1fr))`,
+                }}
+              >
+                {infoCards.map((row, i) => (
+                  <div
+                    key={`${row.label}-${i}`}
+                    data-no-click-advance
+                    className="presentation-card-chip relative overflow-hidden rounded-xl border px-3.5 py-3 outline-none"
+                    style={{
+                      borderColor: `${accent.base}55`,
+                      background: `linear-gradient(135deg, ${accent.base}1c 0%, rgba(255,255,255,0.02) 70%)`,
+                      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05)`,
+                    }}
+                  >
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-3 -top-px h-px"
+                      style={{
+                        background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)`,
+                      }}
+                    />
+                    <div className="flex items-start gap-2.5">
+                      <span
+                        aria-hidden
+                        className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md text-[12px] font-bold"
+                        style={
+                          allTextWhite
+                            ? {
+                                background: "rgba(255,255,255,0.92)",
+                                color: "#0b0f1a",
+                                boxShadow: "0 0 14px rgba(255,255,255,0.35)",
+                              }
+                            : {
+                                background: accent.base,
+                                color: "#0b0f1a",
+                                boxShadow: `0 0 14px ${accent.base}66`,
+                              }
+                        }
+                      >
+                        {row.number || "✓"}
+                      </span>
+                      <p
+                        className={
+                          allTextWhite
+                            ? "text-[1rem] font-medium leading-relaxed text-white"
+                            : "text-[1rem] font-medium leading-relaxed text-white/95"
+                        }
+                      >
+                        {row.label}
+                        {row.description && (
+                          <span
+                            className={
+                              allTextWhite
+                                ? "block text-[0.96rem] font-normal text-white/90"
+                                : "block text-[0.96rem] font-normal text-slate-100/88"
+                            }
+                          >
+                            {row.description}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </EraRevealBand>
+        )}
+
         {benefits.length > 0 && (
           <EraRevealBand
             bandId="benefits"
@@ -454,8 +599,8 @@ export function ClosingStep({ step, active }: Props) {
                 }}
               >
                 {benefits.map((row, i) => {
-                  const isFocused = selectedBenefit === i;
-                  const isDimmed = selectedBenefit !== null && !isFocused;
+                  const isFocused = benefitsClickable && selectedBenefit === i;
+                  const isDimmed = benefitsClickable && selectedBenefit !== null && !isFocused;
                   return (
                     <motion.div
                       ref={(el) => {
@@ -463,11 +608,16 @@ export function ClosingStep({ step, active }: Props) {
                       }}
                       key={`${row.label}-${i}`}
                       data-no-click-advance
-                      role="button"
-                      tabIndex={0}
-                      aria-expanded={isFocused}
-                      aria-label={row.label}
-                      className="presentation-card-chip relative cursor-pointer overflow-hidden rounded-xl border px-3.5 py-3 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
+                      role={benefitsClickable ? "button" : undefined}
+                      tabIndex={benefitsClickable ? 0 : undefined}
+                      aria-expanded={benefitsClickable ? isFocused : undefined}
+                      aria-label={benefitsClickable ? row.label : undefined}
+                      className={
+                        "presentation-card-chip relative overflow-hidden rounded-xl border px-3.5 py-3 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out" +
+                        (benefitsClickable
+                          ? " cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
+                          : " cursor-default")
+                      }
                       style={{
                         borderColor: isFocused
                           ? `${accent.base}aa`
@@ -487,35 +637,43 @@ export function ClosingStep({ step, active }: Props) {
                             : { opacity: 0, y: 10 }
                           : isDimmed
                             ? {
-                                opacity: 0.35,
-                                scale: 0.97,
-                                transition: {
-                                  duration: 0.3,
-                                  ease: [0.22, 1, 0.36, 1],
-                                },
-                              }
+                              opacity: 0.35,
+                              scale: 0.97,
+                              transition: {
+                                duration: 0.3,
+                                ease: [0.22, 1, 0.36, 1],
+                              },
+                            }
                             : {
-                                opacity: 1,
-                                scale: 1,
-                                y: 0,
-                                transition: {
-                                  duration: 0.5,
-                                  ease: [0.22, 1, 0.36, 1],
-                                  delay: 0.4 + i * 0.08,
-                                },
-                              }
+                              opacity: 1,
+                              scale: 1,
+                              y: 0,
+                              transition: {
+                                duration: 0.5,
+                                ease: [0.22, 1, 0.36, 1],
+                                delay: 0.4 + i * 0.08,
+                              },
+                            }
                       }
-                      whileTap={reduceMotion ? undefined : { scale: 0.96 }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedBenefit((s) => (s === i ? null : i));
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          setSelectedBenefit((s) => (s === i ? null : i));
-                        }
-                      }}
+                      whileTap={benefitsClickable && !reduceMotion ? { scale: 0.96 } : undefined}
+                      onClick={
+                        benefitsClickable
+                          ? (e) => {
+                              e.stopPropagation();
+                              setSelectedBenefit((s) => (s === i ? null : i));
+                            }
+                          : undefined
+                      }
+                      onKeyDown={
+                        benefitsClickable
+                          ? (e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setSelectedBenefit((s) => (s === i ? null : i));
+                              }
+                            }
+                          : undefined
+                      }
                     >
                       <span
                         aria-hidden
@@ -531,15 +689,15 @@ export function ClosingStep({ step, active }: Props) {
                           style={
                             allTextWhite
                               ? {
-                                  background: "rgba(255,255,255,0.92)",
-                                  color: "#0b0f1a",
-                                  boxShadow: "0 0 14px rgba(255,255,255,0.35)",
-                                }
+                                background: "rgba(255,255,255,0.92)",
+                                color: "#0b0f1a",
+                                boxShadow: "0 0 14px rgba(255,255,255,0.35)",
+                              }
                               : {
-                                  background: accent.base,
-                                  color: "#0b0f1a",
-                                  boxShadow: `0 0 14px ${accent.base}66`,
-                                }
+                                background: accent.base,
+                                color: "#0b0f1a",
+                                boxShadow: `0 0 14px ${accent.base}66`,
+                              }
                           }
                         >
                           {row.number || "✓"}
@@ -642,7 +800,14 @@ export function ClosingStep({ step, active }: Props) {
             </EraRevealBand>
           )}
 
-        <motion.div className="mt-auto flex w-full max-w-[36rem] flex-col items-center gap-4 self-center pt-3 text-center">
+        <motion.div
+          className={
+            step.content.floatingCard
+              ? "flex w-full max-w-[36rem] flex-col items-center self-center pt-3 text-center"
+              : "mt-auto flex w-full max-w-[36rem] flex-col items-center self-center text-center"
+          }
+          style={{ gap: step.content.closingLogoFlight ? "0.85rem" : "1rem" }}
+        >
           {step.content.closingHighlight && (
             <EraRevealBand
               bandId="closingHighlight"
@@ -710,7 +875,7 @@ export function ClosingStep({ step, active }: Props) {
             >
               <motion.div
                 data-no-click-advance
-                className="flex w-full flex-col items-center justify-center"
+                className="flex w-full shrink-0 flex-col items-center justify-center gap-4 pt-1"
               >
                 <ClosingFormCta
                   href={formUrl}
@@ -721,8 +886,53 @@ export function ClosingStep({ step, active }: Props) {
                   reduceMotion={reduceMotion}
                   afterLogoFlight={Boolean(step.content.closingLogoFlight)}
                 />
+                {!step.content.floatingCard && (
+                  <motion.img
+                    src={saluxSymbolUrl}
+                    alt="Salux"
+                    className="h-28 w-28 md:h-36 md:w-36 object-contain"
+                    initial={reduceMotion ? false : { opacity: 0, y: 20, scale: 0.8 }}
+                    animate={
+                      active
+                        ? { opacity: 1, y: 0, scale: 1 }
+                        : reduceMotion
+                          ? undefined
+                          : { opacity: 0, y: 20, scale: 0.8 }
+                    }
+                    transition={
+                      reduceMotion
+                        ? { duration: 0.01 }
+                        : { delay: 0.6, duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+                    }
+                  />
+                )}
               </motion.div>
             </EraRevealBand>
+          )}
+
+          {step.content.floatingCard && showFloatingLogo && (
+            <motion.div
+              aria-hidden
+              className="flex w-full justify-center pt-3"
+              initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.92 }}
+              animate={
+                active
+                  ? { opacity: 1, y: 0, scale: 1 }
+                  : reduceMotion
+                    ? undefined
+                    : { opacity: 0, y: 18, scale: 0.92 }
+              }
+              transition={{
+                duration: 0.72,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              <div
+                className="pointer-events-none flex items-center justify-center"
+              >
+                <SaluxSymbol width={164} idle={active} className="opacity-[0.96]" />
+              </div>
+            </motion.div>
           )}
         </motion.div>
       </motion.div>
