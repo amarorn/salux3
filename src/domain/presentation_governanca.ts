@@ -475,6 +475,7 @@ const governancaTransformStep: PresentationStep = {
   content: {
     headline: 'Virada agêntica',
     cardVisual: 'phase',
+    allTextWhite: true,
     heroImage: {
       src: governancaTrilha5Slide10Lobby,
       alt:
