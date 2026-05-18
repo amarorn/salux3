@@ -7,7 +7,6 @@ import gestaoSlide2Ecossistema from "@/assets/presentation/gestao-slide2-ecossis
 import gestaoSlide3FilaRede from "@/assets/presentation/gestao-slide3-fila-rede.png?url";
 import gestaoSlide4Comando from "@/assets/presentation/gestao-slide4-comando.png?url";
 import gestaoSemTituloPosterUrl from "@/assets/intro/gestao-sem-titulo-poster.jpg?url";
-import gestao8PosterUrl from "@/assets/intro/gestao-8-poster.jpg?url";
 import gestaoSlide9ResultadoUrl from "@/assets/presentation/gestao-slide9-resultado.png?url";
 
 export const presentationGestaoMeta = {
@@ -368,67 +367,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
     };
   }
 
-  // SLIDE 8 — Pontos de entrada → resposta sistêmica
-  if (s.id === "roadmap") {
-    return {
-      ...s,
-      kind: "narrative",
-      accent: "cyan",
-      title: "O ponto de entrada pode variar. A resposta é sempre sistêmica.",
-      subtitle: "Use este slide para aprofundar a dor específica do visitante",
-      content: {
-        headline: "Pontos de entrada",
-        cardVisual: "spiral",
-        bannerMedia: {
-          videoSrc: "/intro/gestao-8.mp4",
-          posterSrc: gestao8PosterUrl,
-          playOnClick: true,
-        },
-        valueStagesFlat: true,
-        valueStagesGridCols: 3,
-        valueStagesRevealChunkSize: 3,
-        allTextWhite: true,
-        valueStagesClickable: false,
-        valueStages: [
-          {
-            number: "🚦",
-            label: "Fila / Regulação",
-            description: "→ Salux + INITIA + Agentes",
-          },
-          {
-            number: "📈",
-            label: "Leitura da rede",
-            description: "→ Salux + INITIA",
-          },
-          { number: "📡", label: "Capilaridade", description: "→ CloudHealth" },
-          { number: "🔬", label: "Diagnóstico", description: "→ Med.Place" },
-          {
-            number: "👥",
-            label: "Equipe / Cobertura",
-            description: "→ StarGrid",
-          },
-          { number: "📄", label: "Documentação", description: "→ ZeroDox" },
-          {
-            number: "🏥",
-            label: "Áreas críticas",
-            description: "→ VisionPilot / AGCOM + SkyMed",
-          },
-          {
-            number: "💰",
-            label: "Controle econômico",
-            description: "→ TI Hospitalar",
-          },
-        ],
-        closingQuestion:
-          "Qual desses pontos está gerando mais pressão na sua rede agora?",
-        hideContactForm: true,
-        bullets: [],
-        roadmapTransform: false,
-      },
-    };
-  }
-
-  // SLIDE 10 — Encerramento
+  // SLIDE 8 — Encerramento
   if (s.id === "closing") {
     return {
       ...s,
