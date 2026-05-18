@@ -203,6 +203,8 @@ export interface StepContent {
   closingLogoFlight?: boolean;
   /** KPIs, métricas e chips de etapas em branco (números e rótulos). */
   allTextWhite?: boolean;
+  /** Força somente a tipografia principal para branco, preservando cores de ícones, chips e acentos. */
+  whiteTextOnly?: boolean;
   /** Frases curtas a serem renderizadas como blocos de destaque verde (suporte/release). */
   highlightPhrases?: string[];
   /** Card de evidência com glow e métrica. */
