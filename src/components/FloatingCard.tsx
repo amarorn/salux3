@@ -166,6 +166,8 @@ interface FloatingCardProps {
   allTextWhite?: boolean;
   /** Remove máscara/limites visuais do card e deixa o conteúdo flutuar no palco. */
   floatingContent?: boolean;
+  /** Componente customizado no lugar do banner (imagem/vídeo). */
+  bannerChildren?: ReactNode;
   children: ReactNode;
 }
 
@@ -196,6 +198,7 @@ export function FloatingCard({
   onBannerNewsExpand,
   allTextWhite = false,
   floatingContent = false,
+  bannerChildren,
   children,
 }: FloatingCardProps) {
   const ctx = useContext(FloatingCardContext);
@@ -334,40 +337,99 @@ export function FloatingCard({
               : undefined
           }
         >
-          {hasBannerNews ? (
-            <motion.div
-              data-no-click-advance
-              className="absolute inset-0 grid grid-cols-3 gap-2 bg-[#05070d] p-2"
-            >
-              {bannerNewsUrls!.map((url, index) => (
-                <button
-                  key={`banner-news-${index}`}
-                  type="button"
-                  data-no-click-advance
-                  aria-label="Expandir imagem"
-                  className={clsx(
-                    "relative h-full min-h-0 w-full overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none",
-                    onBannerNewsExpand &&
-                    "cursor-zoom-in transition-transform duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white/45",
-                  )}
-                  onClick={
-                    onBannerNewsExpand
-                      ? (e) => {
-                        e.stopPropagation();
-                        onBannerNewsExpand(url);
+          {bannerChildren ? (
+            <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+              {bannerChildren}
+            </div>
+          ) : hasBannerNews ? (
+            bannerNewsUrls!.length === 3 ? (
+              <motion.div
+                data-no-click-advance
+                className="absolute inset-0 p-3 md:p-5"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                  gridTemplateRows: "1fr 1fr 1fr 1fr",
+                  gap: "12px",
+                  gridTemplateAreas: `
+                    "q0 q0 .  ."
+                    "q0 q0 q2 q2"
+                    "q1 q1 q2 q2"
+                    "q1 q1 q2 q2"
+                  `,
+                }}
+              >
+                {bannerNewsUrls!.map((url, index) => {
+                  const areas = ["q0", "q1", "q2"];
+                  return (
+                    <button
+                      key={`banner-news-${index}`}
+                      type="button"
+                      data-no-click-advance
+                      aria-label="Expandir imagem"
+                      className={clsx(
+                        "group relative h-full min-h-0 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0a101c] p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.55)] outline-none transition-[border-color,box-shadow] duration-300",
+                        onBannerNewsExpand &&
+                          "cursor-zoom-in hover:border-white/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.7)] focus-visible:ring-2 focus-visible:ring-white/45",
+                      )}
+                      style={{ gridArea: areas[index] }}
+                      onClick={
+                        onBannerNewsExpand
+                          ? (e) => {
+                              e.stopPropagation();
+                              onBannerNewsExpand(url);
+                            }
+                          : undefined
                       }
-                      : undefined
-                  }
-                >
-                  <img
-                    src={url}
-                    alt=""
-                    draggable={false}
-                    className="pointer-events-none h-full w-full object-cover object-top"
-                  />
-                </button>
-              ))}
-            </motion.div>
+                    >
+                      <div className="relative h-full w-full overflow-hidden rounded-lg">
+                        <img
+                          src={url}
+                          alt=""
+                          draggable={false}
+                          className="pointer-events-none h-full w-full object-cover object-top"
+                        />
+                        <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-white/[0.04]" />
+                      </div>
+                    </button>
+                  );
+                })}
+              </motion.div>
+            ) : (
+              <motion.div
+                data-no-click-advance
+                className="absolute inset-0 grid grid-cols-3 gap-2 bg-[#05070d] p-2"
+              >
+                {bannerNewsUrls!.map((url, index) => (
+                  <button
+                    key={`banner-news-${index}`}
+                    type="button"
+                    data-no-click-advance
+                    aria-label="Expandir imagem"
+                    className={clsx(
+                      "relative h-full min-h-0 w-full overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none",
+                      onBannerNewsExpand &&
+                        "cursor-zoom-in transition-transform duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white/45",
+                    )}
+                    onClick={
+                      onBannerNewsExpand
+                        ? (e) => {
+                            e.stopPropagation();
+                            onBannerNewsExpand(url);
+                          }
+                        : undefined
+                    }
+                  >
+                    <img
+                      src={url}
+                      alt=""
+                      draggable={false}
+                      className="pointer-events-none h-full w-full object-cover object-top"
+                    />
+                  </button>
+                ))}
+              </motion.div>
+            )
           ) : resolvedVideoSrc && resolvedVideoPlayOnClick ? (
             <button
               type="button"
@@ -741,7 +803,7 @@ function BannerPhotoLightbox({
         }}
       />
       <motion.div
-        className="relative z-10 max-h-[86vh] max-w-[90vw] cursor-zoom-out rounded-2xl border border-white/15 bg-[#0a101c] p-3 shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+        className="relative z-10 max-h-[86vh] max-w-[90vw] cursor-zoom-out rounded-2xl border border-white/15 p-3 shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
         initial={reducedMotion ? false : { opacity: 0, scale: 0.94, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={

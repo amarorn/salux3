@@ -330,6 +330,7 @@ export function ClosingStep({ step, active }: Props) {
   const allTextWhite = Boolean(step.content.allTextWhite);
   const benefits = step.content.valueStages ?? [];
   const infoCards = step.content.infoCards ?? [];
+  const benefitsClickable = step.content.valueStagesClickable !== false;
   const [selectedBenefit, setSelectedBenefit] = useState<number | null>(null);
   const [showFloatingLogo, setShowFloatingLogo] = useState(false);
   const benefitRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -372,6 +373,9 @@ export function ClosingStep({ step, active }: Props) {
   const bandIndex = (id: string) => bandKeys.indexOf(id);
   const setEraCfg = usePresentationStore((s) => s.setEraStagedRevealConfig);
   const clearEra = usePresentationStore((s) => s.clearEraStagedReveal);
+  const eraStagedRevealPhase = usePresentationStore((s) =>
+    s.eraStagedRevealStepId === step.id ? s.eraStagedRevealPhase : -1,
+  );
   const stagingLayout = Boolean(active && eraStaging && !reduceMotion);
   const innerMotion = stagingLayout ? {} : { variants: item };
   const outerContainer: Variants = stagingLayout
@@ -403,6 +407,21 @@ export function ClosingStep({ step, active }: Props) {
   ]);
 
   const hero = step.content.heroImage;
+  const ctaBandIdx = bandIndex("cta");
+  const showBannerLogo =
+    !hero &&
+    active &&
+    (!eraStaging || eraStagedRevealPhase >= ctaBandIdx || ctaBandIdx < 0);
+
+  const bannerChild = showBannerLogo ? (
+    <SaluxLogo
+      width={280}
+      symbolOnly
+      animate={active}
+      idle={active}
+      effects={{ shimmer: true, glowRing: true, aberration: true }}
+    />
+  ) : undefined;
 
   return (
     <FloatingCard
@@ -420,6 +439,7 @@ export function ClosingStep({ step, active }: Props) {
       sidePhotoAlt={hero?.alt}
       bannerTransparentCutout={Boolean(hero?.transparentCutout)}
       bannerLightenBlackMatte={Boolean(hero?.lightenBlackMatte)}
+      bannerChildren={bannerChild}
     >
       <motion.div
         className={
@@ -579,8 +599,8 @@ export function ClosingStep({ step, active }: Props) {
                 }}
               >
                 {benefits.map((row, i) => {
-                  const isFocused = selectedBenefit === i;
-                  const isDimmed = selectedBenefit !== null && !isFocused;
+                  const isFocused = benefitsClickable && selectedBenefit === i;
+                  const isDimmed = benefitsClickable && selectedBenefit !== null && !isFocused;
                   return (
                     <motion.div
                       ref={(el) => {
@@ -588,11 +608,16 @@ export function ClosingStep({ step, active }: Props) {
                       }}
                       key={`${row.label}-${i}`}
                       data-no-click-advance
-                      role="button"
-                      tabIndex={0}
-                      aria-expanded={isFocused}
-                      aria-label={row.label}
-                      className="presentation-card-chip relative cursor-pointer overflow-hidden rounded-xl border px-3.5 py-3 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
+                      role={benefitsClickable ? "button" : undefined}
+                      tabIndex={benefitsClickable ? 0 : undefined}
+                      aria-expanded={benefitsClickable ? isFocused : undefined}
+                      aria-label={benefitsClickable ? row.label : undefined}
+                      className={
+                        "presentation-card-chip relative overflow-hidden rounded-xl border px-3.5 py-3 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out" +
+                        (benefitsClickable
+                          ? " cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45"
+                          : " cursor-default")
+                      }
                       style={{
                         borderColor: isFocused
                           ? `${accent.base}aa`
@@ -630,17 +655,25 @@ export function ClosingStep({ step, active }: Props) {
                               },
                             }
                       }
-                      whileTap={reduceMotion ? undefined : { scale: 0.96 }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedBenefit((s) => (s === i ? null : i));
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          setSelectedBenefit((s) => (s === i ? null : i));
-                        }
-                      }}
+                      whileTap={benefitsClickable && !reduceMotion ? { scale: 0.96 } : undefined}
+                      onClick={
+                        benefitsClickable
+                          ? (e) => {
+                              e.stopPropagation();
+                              setSelectedBenefit((s) => (s === i ? null : i));
+                            }
+                          : undefined
+                      }
+                      onKeyDown={
+                        benefitsClickable
+                          ? (e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setSelectedBenefit((s) => (s === i ? null : i));
+                              }
+                            }
+                          : undefined
+                      }
                     >
                       <span
                         aria-hidden
