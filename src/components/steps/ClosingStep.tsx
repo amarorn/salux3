@@ -28,6 +28,7 @@ import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildClosingBandKeys } from "@/lib/eraAgenticaRevealBands";
 import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
 import { ExpandedCardPortal } from "./ExpandedCardPortal";
+import saluxSymbolUrl from "@/assets/intro/salux-simbolo-azul.svg?url";
 
 const CLOSING_FORM_CTA_LABEL = "Ir para o formulário";
 const CLOSING_FORM_CTA_CHARS = CLOSING_FORM_CTA_LABEL.split("");
@@ -328,6 +329,7 @@ export function ClosingStep({ step, active }: Props) {
   const accent = theme.accents[step.accent];
   const allTextWhite = Boolean(step.content.allTextWhite);
   const benefits = step.content.valueStages ?? [];
+  const infoCards = step.content.infoCards ?? [];
   const [selectedBenefit, setSelectedBenefit] = useState<number | null>(null);
   const [showFloatingLogo, setShowFloatingLogo] = useState(false);
   const benefitRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -407,7 +409,9 @@ export function ClosingStep({ step, active }: Props) {
       accent={step.accent}
       active={active}
       stepId={step.id}
-      width={benefits.length >= 4 ? 920 : 640}
+      width={
+        (infoCards.length >= 4 ? 920 : infoCards.length > 0 ? 640 : benefits.length >= 4 ? 920 : 640)
+      }
       cardVisual={step.content.cardVisual}
       hideValueFlow={true}
       floatingContent={Boolean(step.content.floatingCard)}
@@ -462,6 +466,99 @@ export function ClosingStep({ step, active }: Props) {
             >
               {step.content.body}
             </motion.p>
+          </EraRevealBand>
+        )}
+
+        {infoCards.length > 0 && (
+          <EraRevealBand
+            bandId="infoCards"
+            bandIndex={bandIndex("infoCards")}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+          >
+            <motion.div {...innerMotion}>
+              {step.content.infoCardsLead && (
+                <p
+                  className={
+                    allTextWhite
+                      ? "mb-3 text-center text-[1.05rem] leading-relaxed text-white"
+                      : "mb-3 text-center text-[1.05rem] leading-relaxed text-slate-100/96"
+                  }
+                >
+                  {step.content.infoCardsLead}
+                </p>
+              )}
+              <div
+                className="grid gap-2.5"
+                style={{
+                  gridTemplateColumns: `repeat(${step.content.infoCardsGridCols ?? Math.min(infoCards.length, 3)}, minmax(0, 1fr))`,
+                }}
+              >
+                {infoCards.map((row, i) => (
+                  <div
+                    key={`${row.label}-${i}`}
+                    data-no-click-advance
+                    className="presentation-card-chip relative overflow-hidden rounded-xl border px-3.5 py-3 outline-none"
+                    style={{
+                      borderColor: `${accent.base}55`,
+                      background: `linear-gradient(135deg, ${accent.base}1c 0%, rgba(255,255,255,0.02) 70%)`,
+                      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05)`,
+                    }}
+                  >
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-3 -top-px h-px"
+                      style={{
+                        background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)`,
+                      }}
+                    />
+                    <div className="flex items-start gap-2.5">
+                      <span
+                        aria-hidden
+                        className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md text-[12px] font-bold"
+                        style={
+                          allTextWhite
+                            ? {
+                                background: "rgba(255,255,255,0.92)",
+                                color: "#0b0f1a",
+                                boxShadow: "0 0 14px rgba(255,255,255,0.35)",
+                              }
+                            : {
+                                background: accent.base,
+                                color: "#0b0f1a",
+                                boxShadow: `0 0 14px ${accent.base}66`,
+                              }
+                        }
+                      >
+                        {row.number || "✓"}
+                      </span>
+                      <p
+                        className={
+                          allTextWhite
+                            ? "text-[1rem] font-medium leading-relaxed text-white"
+                            : "text-[1rem] font-medium leading-relaxed text-white/95"
+                        }
+                      >
+                        {row.label}
+                        {row.description && (
+                          <span
+                            className={
+                              allTextWhite
+                                ? "block text-[0.96rem] font-normal text-white/90"
+                                : "block text-[0.96rem] font-normal text-slate-100/88"
+                            }
+                          >
+                            {row.description}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </EraRevealBand>
         )}
 
@@ -745,7 +842,7 @@ export function ClosingStep({ step, active }: Props) {
             >
               <motion.div
                 data-no-click-advance
-                className="flex w-full shrink-0 flex-col items-center justify-center pt-1"
+                className="flex w-full shrink-0 flex-col items-center justify-center gap-4 pt-1"
               >
                 <ClosingFormCta
                   href={formUrl}
@@ -756,6 +853,26 @@ export function ClosingStep({ step, active }: Props) {
                   reduceMotion={reduceMotion}
                   afterLogoFlight={Boolean(step.content.closingLogoFlight)}
                 />
+                {!step.content.floatingCard && (
+                  <motion.img
+                    src={saluxSymbolUrl}
+                    alt="Salux"
+                    className="h-28 w-28 md:h-36 md:w-36 object-contain"
+                    initial={reduceMotion ? false : { opacity: 0, y: 20, scale: 0.8 }}
+                    animate={
+                      active
+                        ? { opacity: 1, y: 0, scale: 1 }
+                        : reduceMotion
+                          ? undefined
+                          : { opacity: 0, y: 20, scale: 0.8 }
+                    }
+                    transition={
+                      reduceMotion
+                        ? { duration: 0.01 }
+                        : { delay: 0.6, duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+                    }
+                  />
+                )}
               </motion.div>
             </EraRevealBand>
           )}

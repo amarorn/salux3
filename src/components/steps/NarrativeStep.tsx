@@ -247,7 +247,7 @@ function valueStageOrphanGridPlacement(
     return {
       gridColumn: "1 / -1",
       justifySelf: "center",
-      maxWidth: "11rem",
+      maxWidth: "100%",
       width: "100%",
     };
   }
@@ -1067,12 +1067,99 @@ export function NarrativeStep({ step, active }: Props) {
     );
   };
 
+  const renderInfoCardsSection = (): ReactNode => {
+    const cards = step.content.infoCards;
+    if (!cards?.length) return null;
+    const gridCols = step.content.infoCardsGridCols ?? 3;
+    const cols = gridCols;
+    const leadBlock = step.content.infoCardsLead ? (
+      <p
+        className={clsx(
+          "mx-auto w-full max-w-prose whitespace-pre-line text-center text-[1.05rem] leading-relaxed",
+          allTextWhite ? "text-white" : "text-slate-100/95",
+        )}
+        style={{ textShadow: `0 0 18px ${accent.base}1f` }}
+      >
+        {step.content.infoCardsLead}
+      </p>
+    ) : null;
+
+    return (
+      <div className="relative flex w-full flex-col items-center gap-3">
+        {leadBlock}
+        <div
+          className="grid w-full gap-2"
+          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+        >
+          {cards.map((card, i) => {
+            const stagePal = accentPaletteForValueStage(step.accent, {});
+            const shellClass =
+              "presentation-card-chip relative flex h-full min-h-[5.5rem] w-full flex-col overflow-hidden rounded-xl border px-3.5 py-3 text-center text-slate-100/90 outline-none transition-[border-color,box-shadow,background] duration-300 ease-out";
+            return (
+              <div
+                key={`info-${i}`}
+                data-maestro-anchor
+                data-maestro-anchor-priority="1"
+                data-no-click-advance
+                onPointerDown={(e) => e.stopPropagation()}
+                className={`${shellClass} cursor-default`}
+                style={{
+                  zIndex: 1,
+                  ...valueStageCardGlassStyle(stagePal.base, false),
+                }}
+              >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-3 -top-px h-px"
+                  style={{
+                    background: `linear-gradient(90deg, transparent, ${stagePal.base}, transparent)`,
+                  }}
+                />
+                <div className="flex items-baseline justify-center gap-1.5 text-center">
+                  {card.number && (
+                    <span
+                      className="font-display inline-block text-[1.03rem] font-bold tabular-nums"
+                      style={{ color: allTextWhite ? "#ffffff" : stagePal.base }}
+                    >
+                      {card.number}
+                    </span>
+                  )}
+                  <span
+                    className={clsx(
+                      "text-[11px] font-semibold uppercase tracking-[0.22em]",
+                      allTextWhite && "text-white",
+                    )}
+                    style={
+                      allTextWhite ? undefined : { color: stagePal.base, opacity: 0.9 }
+                    }
+                  >
+                    {card.label}
+                  </span>
+                </div>
+                {card.description && (
+                  <p
+                    className={clsx(
+                      "mt-2 text-center text-[0.94rem] leading-relaxed",
+                      allTextWhite ? "text-white/95" : "text-slate-100/90",
+                    )}
+                  >
+                    {card.description}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   const hero = step.content.heroImage;
 
   const centerTitleAndStagesPanel = Boolean(
     step.content.centerTitleAndValueStagesInPanel &&
-      step.content.valueStages &&
-      step.content.valueStages.length > 0,
+      ((step.content.valueStages && step.content.valueStages.length > 0) ||
+        (step.content.infoCards && step.content.infoCards.length > 0)),
   );
 
   const clickableWordMedia = step.content.clickableWordMedia ?? [];
@@ -1478,10 +1565,38 @@ export function NarrativeStep({ step, active }: Props) {
         {centerTitleAndStagesPanel ? (
           <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5">
             {titleBand}
-            {renderValueStagesSection()}
+            {step.content.infoCards && step.content.infoCards.length > 0
+              ? renderInfoCardsSection()
+              : renderValueStagesSection()}
           </div>
+        ) : step.content.infoCards && step.content.infoCards.length > 0 ? (
+          renderInfoCardsSection()
         ) : (
           renderValueStagesSection()
+        )}
+
+        {step.content.productExamples && step.content.productExamples.length > 0 && (
+          <EraRevealBand
+            bandId="productExamples"
+            bandIndex={b("productExamples")}
+            stepId={step.id}
+            stepIndex={step.index}
+            eraStaging={eraStaging}
+            active={active}
+            className="flex w-full justify-center"
+          >
+            <motion.div {...innerMotion} className="w-full">
+              {step.content.productExamples.map((ex) => (
+                <img
+                  key={ex.imageSrc}
+                  src={ex.imageSrc}
+                  alt={ex.alt ?? ex.caption}
+                  className="mx-auto w-full max-w-full rounded-2xl object-contain"
+                  loading="lazy"
+                />
+              ))}
+            </motion.div>
+          </EraRevealBand>
         )}
 
         {step.content.evidenceMetrics &&
@@ -2112,53 +2227,10 @@ export function NarrativeStep({ step, active }: Props) {
           </EraRevealBand>
         )}
 
-        {step.content.closingQuestion && (
+        {step.content.closingQuestion && !step.content.hideContactForm && (
           <EraRevealBand
             bandId="closingQuestion"
             bandIndex={b("closingQuestion")}
-            stepId={step.id}
-            stepIndex={step.index}
-            eraStaging={eraStaging}
-            active={active}
-          >
-            <motion.div
-              {...innerMotion}
-              data-maestro-anchor
-              data-maestro-anchor-priority="2"
-              className="presentation-card-quote relative mt-2 overflow-hidden rounded-2xl border px-5 py-4"
-              style={{
-                borderColor: `${accent.base}55`,
-                background: `linear-gradient(135deg, ${accent.base}1c 0%, rgba(255,255,255,0.02) 100%)`,
-                boxShadow: `0 0 0 1px ${accent.base}22, 0 0 32px -12px ${accent.base}99`,
-              }}
-            >
-              <motion.span
-                aria-hidden
-                className="pointer-events-none absolute inset-x-6 -top-px h-px"
-                style={{
-                  background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)`,
-                }}
-                animate={
-                  active && !reduceMotion
-                    ? { opacity: [0.6, 1, 0.6] }
-                    : { opacity: 0.6 }
-                }
-                transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-              />
-              <p
-                className="text-[1.08rem] font-semibold leading-snug text-white"
-                style={{ textShadow: `0 0 22px ${accent.base}44` }}
-              >
-                {step.content.closingQuestion}
-              </p>
-            </motion.div>
-          </EraRevealBand>
-        )}
-
-        {step.content.closingQuestion && !step.content.hideContactForm && (
-          <EraRevealBand
-            bandId="contactCta"
-            bandIndex={b("contactCta")}
             stepId={step.id}
             stepIndex={step.index}
             eraStaging={eraStaging}
@@ -2167,32 +2239,66 @@ export function NarrativeStep({ step, active }: Props) {
           >
             <motion.div
               {...innerMotion}
-              data-no-click-advance
-              className="mt-2 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
+              className="flex flex-col items-center gap-4"
             >
-              {formUrl.startsWith("http") || formUrl.startsWith("mailto:") ? (
-                <a
-                  data-no-click-advance
-                  href={formUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className={FORM_BUTTON_CLASS}
+              <motion.div
+                data-maestro-anchor
+                data-maestro-anchor-priority="2"
+                className="presentation-card-quote relative overflow-hidden rounded-2xl border px-5 py-4"
+                style={{
+                  borderColor: `${accent.base}55`,
+                  background: `linear-gradient(135deg, ${accent.base}1c 0%, rgba(255,255,255,0.02) 100%)`,
+                  boxShadow: `0 0 0 1px ${accent.base}22, 0 0 32px -12px ${accent.base}99`,
+                }}
+              >
+                <motion.span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-6 -top-px h-px"
+                  style={{
+                    background: `linear-gradient(90deg, transparent, ${accent.base}, transparent)`,
+                  }}
+                  animate={
+                    active && !reduceMotion
+                      ? { opacity: [0.6, 1, 0.6] }
+                      : { opacity: 0.6 }
+                  }
+                  transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <p
+                  className="text-[1.08rem] font-semibold leading-snug text-white"
+                  style={{ textShadow: `0 0 22px ${accent.base}44` }}
                 >
-                  Ir para o formulário
-                  <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
-                </a>
-              ) : (
-                <Link
-                  data-no-click-advance
-                  to={formUrl}
-                  onClick={(e) => e.stopPropagation()}
-                  className={FORM_BUTTON_CLASS}
-                >
-                  Ir para o formulário
-                  <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
-                </Link>
-              )}
+                  {step.content.closingQuestion}
+                </p>
+              </motion.div>
+              <motion.div
+                data-no-click-advance
+                className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
+              >
+                {formUrl.startsWith("http") || formUrl.startsWith("mailto:") ? (
+                  <a
+                    data-no-click-advance
+                    href={formUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className={FORM_BUTTON_CLASS}
+                  >
+                    Ir para o formulário
+                    <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+                  </a>
+                ) : (
+                  <Link
+                    data-no-click-advance
+                    to={formUrl}
+                    onClick={(e) => e.stopPropagation()}
+                    className={FORM_BUTTON_CLASS}
+                  >
+                    Ir para o formulário
+                    <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+                  </Link>
+                )}
+              </motion.div>
             </motion.div>
           </EraRevealBand>
         )}

@@ -256,6 +256,12 @@ export interface StepContent {
   valueStagesShowDescription?: boolean;
   /** Renderiza valueStages como uma "estrada" curva — cada marco revela por clique e o último tem linha de chegada. */
   valueStagesRoad?: boolean;
+  /** Cards informativos simples — sem modal, sem animação de spotlight. */
+  infoCards?: { number?: string; label: string; description?: string }[];
+  /** Texto curto exibido logo acima da grid de infoCards (lead). */
+  infoCardsLead?: string;
+  /** Número de colunas da grid de infoCards (default = 3). */
+  infoCardsGridCols?: 2 | 3 | 4 | 5;
   /** Cartões de "evidência numérica" — número grande com prefixo, manchete e contexto em itálico. */
   evidenceMetrics?: {
     /** Badge curta acima do número (ex.: "Dado · Evidência"). */
