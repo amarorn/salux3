@@ -207,6 +207,8 @@ export interface StepContent {
   evidenceCard?: EvidenceCard;
   /** Frase de fechamento de tela em destaque ciano (call-out final do card). */
   closingHighlight?: string;
+  /** Remove a moldura/máscara do card para deixar o conteúdo flutuar livremente no palco. */
+  floatingCard?: boolean;
   /** Palavras no título/corpo/bullets que abrem imagem ao clicar (match no texto). */
   clickableWordMedia?: {
     word: string;
