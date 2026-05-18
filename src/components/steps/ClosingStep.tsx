@@ -384,14 +384,26 @@ export function ClosingStep({ step, active }: Props) {
   const hero = step.content.heroImage;
   const showBannerLogo = !hero && active;
 
+  const logoEffects = {
+    assistencial: { shimmer: true,  glowRing: true,  aberration: false },
+    operacoes:    { shimmer: true,  glowRing: false, aberration: true  },
+    receita:      { shimmer: false, glowRing: true,  aberration: true  },
+    gestao:       { shimmer: true,  glowRing: true,  aberration: true  },
+    governanca:   { shimmer: true,  glowRing: false, aberration: false },
+  } as const;
+  const effects = logoEffects[trackId as keyof typeof logoEffects]
+    ?? { shimmer: true, glowRing: true, aberration: true };
+
   const bannerChild = showBannerLogo ? (
-    <SaluxLogo
-      width={280}
-      symbolOnly
-      animate={active}
-      idle={active}
-      effects={{ shimmer: true, glowRing: true, aberration: true }}
-    />
+    <div data-no-click-advance className="flex h-full w-full items-center justify-center">
+      <SaluxLogo
+        width={280}
+        symbolOnly
+        animate={active}
+        idle={active}
+        effects={effects}
+      />
+    </div>
   ) : undefined;
 
   return (
