@@ -152,7 +152,9 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         lead: 'Mesmo com mais sistemas, dados e automações, instituições ainda convivem com:',
         valueStagesFlat: true,
         valueStagesGridCols: 4,
+        allTextWhite: true,
         valueStagesRevealChunkSize: 4,
+
         valueStages: [
           { number: '⚠', label: 'Perdas de receita' },
           { number: '⚠', label: 'Retrabalho' },

@@ -296,8 +296,8 @@ export function NarrativeStep({ step, active }: Props) {
   const trackId = useContext(FloatingCardContext)?.trackId;
   const hasChunkedValueStages = Boolean(
     (step.content.valueStagesRevealChunkSize ?? 0) > 0 &&
-      step.content.valueStages &&
-      step.content.valueStages.length > 0,
+    step.content.valueStages &&
+    step.content.valueStages.length > 0,
   );
   const eraStaging =
     trackUsesEraStagedReveal(trackId) ||
@@ -607,31 +607,31 @@ export function NarrativeStep({ step, active }: Props) {
                     : { opacity: 0, y: 10 }
                   : dimmed
                     ? {
-                        opacity: 0.52,
-                        y: 0,
+                      opacity: 0.52,
+                      y: 0,
+                      transition: {
+                        duration: 0.28,
+                        ease: [0.22, 1, 0.36, 1],
+                      },
+                    }
+                    : reduceMotion
+                      ? {
+                        opacity: 1,
                         transition: {
-                          duration: 0.28,
+                          duration: 0.38,
+                          delay: enterDelay + 0.06,
                           ease: [0.22, 1, 0.36, 1],
                         },
                       }
-                    : reduceMotion
-                      ? {
-                          opacity: 1,
-                          transition: {
-                            duration: 0.38,
-                            delay: enterDelay + 0.06,
-                            ease: [0.22, 1, 0.36, 1],
-                          },
-                        }
                       : {
-                          opacity: 1,
-                          y: 0,
-                          transition: {
-                            duration: 0.42,
-                            delay: enterDelay + 0.07,
-                            ease: [0.22, 1, 0.36, 1],
-                          },
-                        }
+                        opacity: 1,
+                        y: 0,
+                        transition: {
+                          duration: 0.42,
+                          delay: enterDelay + 0.07,
+                          ease: [0.22, 1, 0.36, 1],
+                        },
+                      }
               }
             >
               {stage.number}
@@ -705,14 +705,14 @@ export function NarrativeStep({ step, active }: Props) {
                   ? undefined
                   : { opacity: 0, y: 12 }
                 : {
-                    opacity: 1,
-                    y: 0,
-                    transition: {
-                      duration: 0.55,
-                      ease: [0.22, 1, 0.36, 1],
-                      delay: enterDelay,
-                    },
-                  }
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 0.55,
+                    ease: [0.22, 1, 0.36, 1],
+                    delay: enterDelay,
+                  },
+                }
             }
           >
             {inner}
@@ -747,21 +747,21 @@ export function NarrativeStep({ step, active }: Props) {
                 : { opacity: 0, y: 12 }
               : dimmed
                 ? {
-                    opacity: 0.35,
-                    transition: {
-                      duration: 0.32,
-                      ease: [0.22, 1, 0.36, 1],
-                    },
-                  }
+                  opacity: 0.35,
+                  transition: {
+                    duration: 0.32,
+                    ease: [0.22, 1, 0.36, 1],
+                  },
+                }
                 : {
-                    opacity: 1,
-                    y: 0,
-                    transition: {
-                      duration: 0.55,
-                      ease: [0.22, 1, 0.36, 1],
-                      delay: enterDelay,
-                    },
-                  }
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 0.55,
+                    ease: [0.22, 1, 0.36, 1],
+                    delay: enterDelay,
+                  },
+                }
           }
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
@@ -1224,10 +1224,10 @@ export function NarrativeStep({ step, active }: Props) {
           >
             {clickableWordMedia.length > 0
               ? renderTextWithClickableWords(
-                  step.title,
-                  clickableWordMedia,
-                  accent.base,
-                )
+                step.title,
+                clickableWordMedia,
+                accent.base,
+              )
               : step.title}
           </h2>
         </motion.div>
@@ -1254,10 +1254,10 @@ export function NarrativeStep({ step, active }: Props) {
         >
           {clickableWordMedia.length > 0
             ? renderTextWithClickableWords(
-                step.content.body!,
-                clickableWordMedia,
-                accent.base,
-              )
+              step.content.body!,
+              clickableWordMedia,
+              accent.base,
+            )
             : step.content.body}
         </motion.p>
       </EraRevealBand>
@@ -1384,12 +1384,12 @@ export function NarrativeStep({ step, active }: Props) {
           : step.content.dualStages
             ? 900
             : step.content.valueStagesRevealChunkSize
-            ? 1000
-            : step.content.valueStages && step.content.valueStages.length >= 4
               ? 1000
-              : step.content.valueStages && step.content.valueStages.length > 0
-                ? 760
-                : undefined
+              : step.content.valueStages && step.content.valueStages.length >= 4
+                ? 1000
+                : step.content.valueStages && step.content.valueStages.length > 0
+                  ? 760
+                  : undefined
       }
       badge={
         painPoints
@@ -1890,10 +1890,10 @@ export function NarrativeStep({ step, active }: Props) {
                     <span className="whitespace-pre-line text-center">
                       {clickableWordMedia.length > 0
                         ? renderTextWithClickableWords(
-                            bullet,
-                            clickableWordMedia,
-                            accent.base,
-                          )
+                          bullet,
+                          clickableWordMedia,
+                          accent.base,
+                        )
                         : bullet}
                     </span>
                   </li>
@@ -1929,7 +1929,7 @@ export function NarrativeStep({ step, active }: Props) {
         {step.content.beforeAfter &&
           step.content.beforeAfter.before.length > 0 &&
           step.content.beforeAfter.before.length ===
-            step.content.beforeAfter.after.length && (
+          step.content.beforeAfter.after.length && (
             <EraRevealBand
               bandId="beforeAfter"
               bandIndex={b("beforeAfter")}
@@ -2046,7 +2046,7 @@ export function NarrativeStep({ step, active }: Props) {
             active={active}
             reveal={
               step.content.valueStagesRevealSequentialCards &&
-              step.content.valueStagesRevealOneAtATime
+                step.content.valueStagesRevealOneAtATime
                 ? "single"
                 : "cumulative"
             }
@@ -2087,8 +2087,19 @@ export function NarrativeStep({ step, active }: Props) {
                   repeat: Infinity,
                 }}
               />
-              <p className="relative whitespace-pre-line px-3 text-center text-[clamp(1.05rem,2.4vw,1.22rem)] font-medium italic leading-relaxed text-white">
-                “{step.content.attentionPhrase}”
+              <p
+                className="relative whitespace-pre-line px-3 text-center text-[clamp(1.05rem,2.4vw,1.22rem)] font-medium italic leading-relaxed"
+                style={{ color: allTextWhite ? "#ffffff" : attentionAccent.base }}
+              >
+                “
+                {clickableWordMedia.length > 0
+                  ? renderTextWithClickableWords(
+                    step.content.attentionPhrase,
+                    clickableWordMedia,
+                    attentionAccent.base,
+                  )
+                  : step.content.attentionPhrase}
+                ”
               </p>
             </motion.div>
           </EraRevealBand>
@@ -2117,59 +2128,57 @@ export function NarrativeStep({ step, active }: Props) {
         {step.content.newsUrls &&
           step.content.newsUrls.length > 0 &&
           !step.content.newsItems?.length && (
-          <EraRevealBand
-            bandId="newsUrls"
-            bandIndex={b("newsUrls")}
-            stepId={step.id}
-            stepIndex={step.index}
-            eraStaging={eraStaging}
-            active={active}
-            className="flex w-full justify-center"
-          >
-            <motion.div
-              {...innerMotion}
-              data-no-click-advance
-              className={
-                step.content.newsUrls.length >= 3
-                  ? "grid w-full grid-cols-3 gap-3"
-                  : "grid w-full grid-cols-2 gap-3"
-              }
+            <EraRevealBand
+              bandId="newsUrls"
+              bandIndex={b("newsUrls")}
+              stepId={step.id}
+              stepIndex={step.index}
+              eraStaging={eraStaging}
+              active={active}
+              className="flex w-full justify-center"
             >
-              {step.content.newsUrls.map((url, index) => (
-                <button
-                  key={`news-url-${index}`}
-                  type="button"
-                  data-no-click-advance
-                  aria-label={expandImage ? "Expandir imagem" : undefined}
-                  className={`relative mx-auto h-[280px] w-full overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none ${
-                    step.content.newsUrls!.length >= 3
+              <motion.div
+                {...innerMotion}
+                data-no-click-advance
+                className={
+                  step.content.newsUrls.length >= 3
+                    ? "grid w-full grid-cols-3 gap-3"
+                    : "grid w-full grid-cols-2 gap-3"
+                }
+              >
+                {step.content.newsUrls.map((url, index) => (
+                  <button
+                    key={`news-url-${index}`}
+                    type="button"
+                    data-no-click-advance
+                    aria-label={expandImage ? "Expandir imagem" : undefined}
+                    className={`relative mx-auto h-[280px] w-full overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none ${step.content.newsUrls!.length >= 3
                       ? ""
                       : "max-w-[400px]"
-                  } ${
-                    expandImage
-                      ? "cursor-zoom-in transition-transform duration-300 hover:scale-[1.015] focus-visible:ring-2 focus-visible:ring-white/45"
-                      : ""
-                  }`}
-                  onClick={
-                    expandImage
-                      ? (e) => {
+                      } ${expandImage
+                        ? "cursor-zoom-in transition-transform duration-300 hover:scale-[1.015] focus-visible:ring-2 focus-visible:ring-white/45"
+                        : ""
+                      }`}
+                    onClick={
+                      expandImage
+                        ? (e) => {
                           e.stopPropagation();
                           handleExpandImage(url);
                         }
-                      : undefined
-                  }
-                >
-                  <img
-                    src={url}
-                    alt=""
-                    draggable={false}
-                    className="pointer-events-none h-full w-full object-cover object-top"
-                  />
-                </button>
-              ))}
-            </motion.div>
-          </EraRevealBand>
-        )}
+                        : undefined
+                    }
+                  >
+                    <img
+                      src={url}
+                      alt=""
+                      draggable={false}
+                      className="pointer-events-none h-full w-full object-cover object-top"
+                    />
+                  </button>
+                ))}
+              </motion.div>
+            </EraRevealBand>
+          )}
 
         {step.content.highlightPhrases &&
           step.content.highlightPhrases.length > 0 && (
@@ -2450,23 +2459,23 @@ const BalloonTrigger = forwardRef<HTMLButtonElement, BalloonTriggerProps>(
           reducedMotion || charged || impact
             ? undefined
             : {
-                scale: 1.03,
-                transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] },
-              }
+              scale: 1.03,
+              transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] },
+            }
         }
         whileTap={reducedMotion ? undefined : { scale: 0.97 }}
         animate={
           impact && !reducedMotion
             ? {
-                boxShadow: [chargedShadow, impactShadow, idleShadow],
-                scale: [1, 1.18, 1],
-                x: [0, -3, 3, -2, 2, 0],
-              }
+              boxShadow: [chargedShadow, impactShadow, idleShadow],
+              scale: [1, 1.18, 1],
+              x: [0, -3, 3, -2, 2, 0],
+            }
             : charged && !reducedMotion
               ? {
-                  boxShadow: [idleShadow, chargedShadow, idleShadow],
-                  scale: [1, 1.04, 1],
-                }
+                boxShadow: [idleShadow, chargedShadow, idleShadow],
+                scale: [1, 1.04, 1],
+              }
               : undefined
         }
         transition={
@@ -2790,24 +2799,24 @@ function PainPointsBalloon({
           reducedMotion
             ? { opacity: 0 }
             : {
-                opacity: 0,
-                scale: 0.02,
-                x: origin.dx,
-                y: origin.dy,
-                filter: "none",
-              }
+              opacity: 0,
+              scale: 0.02,
+              x: origin.dx,
+              y: origin.dy,
+              filter: "none",
+            }
         }
         animate={{ opacity: 1, scale: 1, x: 0, y: 0, filter: "none" }}
         exit={
           reducedMotion
             ? { opacity: 0 }
             : {
-                opacity: 0,
-                scale: 0.94,
-                y: 8,
-                filter: "none",
-                transition: { duration: 0.35 },
-              }
+              opacity: 0,
+              scale: 0.94,
+              y: 8,
+              filter: "none",
+              transition: { duration: 0.35 },
+            }
         }
         transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
         className="relative w-full max-w-[820px] overflow-hidden rounded-[28px] border bg-[#0b0f18]/95 p-10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)]"
@@ -3119,13 +3128,13 @@ function PainPointChips({
                   reducedMotion || selected !== null
                     ? undefined
                     : {
-                        y: -2,
-                        scale: 1.015,
-                        transition: {
-                          duration: 0.25,
-                          ease: [0.22, 1, 0.36, 1],
-                        },
-                      }
+                      y: -2,
+                      scale: 1.015,
+                      transition: {
+                        duration: 0.25,
+                        ease: [0.22, 1, 0.36, 1],
+                      },
+                    }
                 }
                 whileTap={reducedMotion ? undefined : { scale: 0.96 }}
                 animate={
@@ -3133,21 +3142,21 @@ function PainPointChips({
                     ? {}
                     : isDimmed
                       ? {
-                          opacity: 0.35,
-                          scale: 0.97,
-                          transition: {
-                            duration: 0.32,
-                            ease: [0.22, 1, 0.36, 1],
-                          },
-                        }
+                        opacity: 0.35,
+                        scale: 0.97,
+                        transition: {
+                          duration: 0.32,
+                          ease: [0.22, 1, 0.36, 1],
+                        },
+                      }
                       : {
-                          opacity: 1,
-                          scale: 1,
-                          transition: {
-                            duration: 0.32,
-                            ease: [0.22, 1, 0.36, 1],
-                          },
-                        }
+                        opacity: 1,
+                        scale: 1,
+                        transition: {
+                          duration: 0.32,
+                          ease: [0.22, 1, 0.36, 1],
+                        },
+                      }
                 }
                 onClick={(e) => {
                   e.stopPropagation();

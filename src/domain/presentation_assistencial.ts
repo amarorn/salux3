@@ -27,10 +27,10 @@ function withStep(
   return (s: PresentationStep): PresentationStep =>
     s.id === id
       ? {
-          ...s,
-          ...patch,
-          content: { ...s.content, ...(patch.content ?? {}) },
-        }
+        ...s,
+        ...patch,
+        content: { ...s.content, ...(patch.content ?? {}) },
+      }
       : s;
 }
 
@@ -93,6 +93,11 @@ const highlightContextStep: PresentationStep = {
         imageSrc: "/intro/assistencial-evolucao-fia.png",
         imageAlt: "Evolução do paciente FIA",
       },
+      {
+        word: "Os agentes não substituem a equipe. Ampliam a capacidade de leitura, priorização e decisão ao longo da jornada.",
+        imageSrc: "/intro/os-agentes-nao-substituem.png",
+        imageAlt: "Os agentes não substituem a equipe.",
+      }
     ],
   },
 };
@@ -102,15 +107,15 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map((s) =>
     s.id === "cover"
       ? {
-          ...s,
-          accent: "emerald" as const,
-          title: "Onde o risco assistencial começa a se formar?",
-          subtitle: "Assistência",
-          content: {
-            ...s.content,
-            omitSidePhoto: true,
-          },
-        }
+        ...s,
+        accent: "emerald" as const,
+        title: "Onde o risco assistencial começa a se formar?",
+        subtitle: "Assistência",
+        content: {
+          ...s.content,
+          omitSidePhoto: true,
+        },
+      }
       : s,
   )
   .map(
@@ -184,6 +189,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
     withContent("cover", {
       headline: "Abertura",
       cardVisual: "ripple",
+      allTextWhite: true,
       lead: "Na gravidade do caso?\nNa complexidade do paciente?\nOu no momento em que o cuidado perde continuidade?",
       contrastPair: {
         left: {
@@ -311,6 +317,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       },
       attentionPhrase:
         "A operação sustenta o cuidado todos os dias. Mas ainda não sustenta continuidade de decisão ao longo da jornada.",
+      allTextWhite: true,
       heroImage: {
         src: trilha2RedeUrl,
         alt: "Rede assistencial conectada a um centro de comando clínico",
@@ -369,7 +376,6 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       lead: "Cada etapa parece resolvida isoladamente. Mas o cuidado não acontece em etapas isoladas.",
       valueStagesFlat: true,
       valueStagesGridCols: 3,
-      valueStagesRevealChunkSize: 3,
       valueStages: [
         { number: "01", label: "Admissão" },
         { number: "02", label: "Atendimento" },
@@ -486,7 +492,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
                 "Exame, laudo e contexto conectados à linha do cuidado.",
               tagline:
                 "Diagnóstico como infraestrutura crítica da jornada — não serviço apartado.",
-              productImage: "/intro/assistencial-diagnostico-integrado.mp4",
+              productImage: "/intro/diagnostico-integrado.mp4",
             },
             {
               name: "Cuidado conectado",
@@ -546,8 +552,9 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
         "O cuidado deixa de depender de reconstrução. E passa a ter continuidade real.",
       cardVisual: "bloom",
       heroImage: {
-        src: "/intro/TELA_INICIAL_INITIA.png",
-        alt: "Tela inicial INITIA — plataforma Salux",
+        src: "/intro/salux-simbolo-azul.svg",
+        alt: "Salux",
+
       },
       bannerPhotoExpandable: false,
       body: "Com uma base coordenada, a jornada deixa de depender de esforço individual de compensação.",
@@ -575,6 +582,8 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
         "O valor não está em registrar melhor. Está em sustentar o cuidado com contexto vivo ao longo da jornada.",
       closingHighlight:
         "Ecossistema Salux · A base para uma nova forma de operar a saúde.",
+      closingQuestion:
+        "Qual foi a última vez que uma decisão clínica na sua instituição dependeu de alguém lembrar de algo que deveria estar registrado?",
       bullets: [],
     }),
   );

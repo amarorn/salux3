@@ -80,6 +80,27 @@ function ClosingFormCta({
               reduceMotion
                 ? false
                 : {
+                  opacity: 0,
+                  x: v.x * 0.14,
+                  y: v.y * 0.1,
+                  rotate: v.rz * 0.35,
+                  scale: 0.25,
+                  filter: "blur(10px)",
+                }
+            }
+            animate={
+              active
+                ? {
+                  opacity: 1,
+                  x: 0,
+                  y: 0,
+                  rotate: 0,
+                  scale: 1,
+                  filter: "blur(0px)",
+                }
+                : reduceMotion
+                  ? undefined
+                  : {
                     opacity: 0,
                     x: v.x * 0.14,
                     y: v.y * 0.1,
@@ -88,35 +109,14 @@ function ClosingFormCta({
                     filter: "blur(10px)",
                   }
             }
-            animate={
-              active
-                ? {
-                    opacity: 1,
-                    x: 0,
-                    y: 0,
-                    rotate: 0,
-                    scale: 1,
-                    filter: "blur(0px)",
-                  }
-                : reduceMotion
-                  ? undefined
-                  : {
-                      opacity: 0,
-                      x: v.x * 0.14,
-                      y: v.y * 0.1,
-                      rotate: v.rz * 0.35,
-                      scale: 0.25,
-                      filter: "blur(10px)",
-                    }
-            }
             transition={
               reduceMotion
                 ? { duration: 0.01 }
                 : {
-                    delay: assemblyDelay + i * CLOSING_CTA_CHAR_STAGGER,
-                    duration: 0.68,
-                    ease: EASE_BURST,
-                  }
+                  delay: assemblyDelay + i * CLOSING_CTA_CHAR_STAGGER,
+                  duration: 0.68,
+                  ease: EASE_BURST,
+                }
             }
           >
             {isSpace ? "\u00a0" : char}
@@ -246,61 +246,61 @@ function ClosingLogoDescent({
               reduceMotion={Boolean(reduceMotion)}
             />
           </motion.div>
-        <motion.div
-          className="relative z-[1] flex items-center justify-center"
-          initial={
-            reduceMotion
-              ? false
-              : { opacity: 0, y: "-44vh", scale: 0.15, filter: "blur(18px)" }
-          }
-          animate={
-            active
-              ? {
+          <motion.div
+            className="relative z-[1] flex items-center justify-center"
+            initial={
+              reduceMotion
+                ? false
+                : { opacity: 0, y: "-44vh", scale: 0.15, filter: "blur(18px)" }
+            }
+            animate={
+              active
+                ? {
                   opacity: 1,
                   y: 0,
                   scale: 1,
                   filter: "blur(0px)",
                 }
-              : reduceMotion
-                ? undefined
-                : { opacity: 0, y: "-44vh", scale: 0.15, filter: "blur(18px)" }
-          }
-          transition={
-            reduceMotion
-              ? { duration: 0.01 }
-              : {
+                : reduceMotion
+                  ? undefined
+                  : { opacity: 0, y: "-44vh", scale: 0.15, filter: "blur(18px)" }
+            }
+            transition={
+              reduceMotion
+                ? { duration: 0.01 }
+                : {
                   opacity: { duration: 0.5, delay: 0.1 },
                   y: { duration: 1.45, ease: [0.12, 1.15, 0.28, 1], delay: 0.08 },
                   scale: { duration: 1.45, ease: [0.12, 1.15, 0.28, 1], delay: 0.08 },
                   filter: { duration: 1.1, delay: 0.2 },
                 }
-          }
-        >
-          <motion.div
-            animate={
-              motionOn
-                ? {
+            }
+          >
+            <motion.div
+              animate={
+                motionOn
+                  ? {
                     y: [0, -14, 0],
                     scale: [1, 1.08, 1],
                   }
-                : undefined
-            }
-            transition={{
-              duration: 4.2,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1.55,
-            }}
-          >
-            <SaluxLogo
-              width={CLOSING_LOGO_SIZE}
-              symbolOnly
-              animate={motionOn}
-              idle={active}
-              effects={{ shimmer: true, glowRing: false, aberration: true }}
-            />
+                  : undefined
+              }
+              transition={{
+                duration: 4.2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1.55,
+              }}
+            >
+              <SaluxLogo
+                width={CLOSING_LOGO_SIZE}
+                symbolOnly
+                animate={motionOn}
+                idle={active}
+                effects={{ shimmer: true, glowRing: false, aberration: true }}
+              />
+            </motion.div>
           </motion.div>
-        </motion.div>
         </div>
       </motion.div>
     </EraRevealBand>
@@ -612,23 +612,23 @@ export function ClosingStep({ step, active }: Props) {
                             : { opacity: 0, y: 10 }
                           : isDimmed
                             ? {
-                                opacity: 0.35,
-                                scale: 0.97,
-                                transition: {
-                                  duration: 0.3,
-                                  ease: [0.22, 1, 0.36, 1],
-                                },
-                              }
+                              opacity: 0.35,
+                              scale: 0.97,
+                              transition: {
+                                duration: 0.3,
+                                ease: [0.22, 1, 0.36, 1],
+                              },
+                            }
                             : {
-                                opacity: 1,
-                                scale: 1,
-                                y: 0,
-                                transition: {
-                                  duration: 0.5,
-                                  ease: [0.22, 1, 0.36, 1],
-                                  delay: 0.4 + i * 0.08,
-                                },
-                              }
+                              opacity: 1,
+                              scale: 1,
+                              y: 0,
+                              transition: {
+                                duration: 0.5,
+                                ease: [0.22, 1, 0.36, 1],
+                                delay: 0.4 + i * 0.08,
+                              },
+                            }
                       }
                       whileTap={reduceMotion ? undefined : { scale: 0.96 }}
                       onClick={(e) => {
@@ -656,15 +656,15 @@ export function ClosingStep({ step, active }: Props) {
                           style={
                             allTextWhite
                               ? {
-                                  background: "rgba(255,255,255,0.92)",
-                                  color: "#0b0f1a",
-                                  boxShadow: "0 0 14px rgba(255,255,255,0.35)",
-                                }
+                                background: "rgba(255,255,255,0.92)",
+                                color: "#0b0f1a",
+                                boxShadow: "0 0 14px rgba(255,255,255,0.35)",
+                              }
                               : {
-                                  background: accent.base,
-                                  color: "#0b0f1a",
-                                  boxShadow: `0 0 14px ${accent.base}66`,
-                                }
+                                background: accent.base,
+                                color: "#0b0f1a",
+                                boxShadow: `0 0 14px ${accent.base}66`,
+                              }
                           }
                         >
                           {row.number || "✓"}

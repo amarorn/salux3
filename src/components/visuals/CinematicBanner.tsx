@@ -65,6 +65,8 @@ export function CinematicBanner({
     ? { mixBlendMode: "lighten" }
     : undefined;
 
+  const isSaluxLogo = src.includes("salux-simbolo-azul.svg");
+
   if (transparentCutout) {
     return (
       <motion.div className="absolute inset-0 flex items-center justify-center p-3">
@@ -72,7 +74,11 @@ export function CinematicBanner({
           src={src}
           alt={alt ?? ""}
           {...(!alt ? { "aria-hidden": true as const } : {})}
-          className="max-h-full max-w-full object-contain object-center"
+          className={
+            isSaluxLogo
+              ? "max-h-[140px] max-w-[140px] object-contain object-center"
+              : "max-h-full max-w-full object-contain object-center"
+          }
           style={matteImgStyle}
         />
       </motion.div>
@@ -86,7 +92,11 @@ export function CinematicBanner({
           src={src}
           alt={alt ?? ""}
           {...(!alt ? { "aria-hidden": true as const } : {})}
-          className="max-h-full max-w-full object-contain object-center"
+          className={
+            isSaluxLogo
+              ? "max-h-[140px] max-w-[140px] object-contain object-center"
+              : "max-h-full max-w-full object-contain object-center"
+          }
           style={matteImgStyle}
         />
       </div>
@@ -103,10 +113,10 @@ export function CinematicBanner({
           reduceMotion
             ? undefined
             : {
-                scale: [1.0, 1.06, 1.02, 1.05, 1.0],
-                x: ['0%', '-1.5%', '0.5%', '-1%', '0%'],
-                y: ['0%', '0.8%', '-0.5%', '1%', '0%'],
-              }
+              scale: [1.0, 1.06, 1.02, 1.05, 1.0],
+              x: ['0%', '-1.5%', '0.5%', '-1%', '0%'],
+              y: ['0%', '0.8%', '-0.5%', '1%', '0%'],
+            }
         }
         transition={{
           duration: 28,
@@ -134,8 +144,8 @@ export function CinematicBanner({
           reduceMotion
             ? { opacity: active ? 0.3 : 0.15 }
             : {
-                opacity: active ? [0.25, 0.42, 0.28, 0.4, 0.25] : 0.15,
-              }
+              opacity: active ? [0.25, 0.42, 0.28, 0.4, 0.25] : 0.15,
+            }
         }
         transition={{ duration: 9, ease: 'easeInOut', repeat: Infinity }}
         style={{
@@ -185,11 +195,11 @@ export function CinematicBanner({
               reduceMotion
                 ? { opacity: p.opacity * 0.4, scale: 1 }
                 : {
-                    x: [`${p.x0}%`, `${p.x1}%`, `${p.x2}%`, `${p.x0}%`],
-                    y: [`${p.y0}%`, `${p.y1}%`, `${p.y2}%`, `${p.y0}%`],
-                    opacity: [0, p.opacity, p.opacity * 0.6, p.opacity, 0],
-                    scale: [0.5, 1, 0.85, 1.1, 0.5],
-                  }
+                  x: [`${p.x0}%`, `${p.x1}%`, `${p.x2}%`, `${p.x0}%`],
+                  y: [`${p.y0}%`, `${p.y1}%`, `${p.y2}%`, `${p.y0}%`],
+                  opacity: [0, p.opacity, p.opacity * 0.6, p.opacity, 0],
+                  scale: [0.5, 1, 0.85, 1.1, 0.5],
+                }
             }
             transition={{
               duration: p.duration,
