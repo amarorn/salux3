@@ -45,7 +45,13 @@ const CARD_BACKGROUND = INTRO_ASSIST_COVER_URL;
 
 /** Reduz proporcionalmente o conteúdo quando excede a altura disponível,
  * para nada ser cortado dentro do card. */
-function AutoFitContent({ children }: { children: ReactNode }) {
+function AutoFitContent({
+  children,
+  parentScale = 1,
+}: {
+  children: ReactNode;
+  parentScale?: number;
+}) {
   const outerRef = useRef<HTMLDivElement | null>(null);
   const innerRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
@@ -59,7 +65,10 @@ function AutoFitContent({ children }: { children: ReactNode }) {
       const availableH = outer.clientHeight;
       const naturalH = inner.scrollHeight;
       if (availableH <= 0 || naturalH <= 0) return;
-      const next = Math.min(1, availableH / naturalH);
+      const next = Math.min(
+        1,
+        availableH / Math.max(parentScale, 0.01) / naturalH,
+      );
       setScale((prev) => (Math.abs(prev - next) < 0.002 ? prev : next));
     };
 
@@ -68,13 +77,20 @@ function AutoFitContent({ children }: { children: ReactNode }) {
     ro.observe(outer);
     ro.observe(inner);
     return () => ro.disconnect();
-  }, []);
+  }, [parentScale]);
 
   return (
-    <div ref={outerRef} className="relative flex h-full w-full items-end justify-center">
+    <div
+      ref={outerRef}
+      className="relative flex h-full w-full items-end justify-center"
+    >
       <div
         ref={innerRef}
-        style={{ transform: `scale(${scale})`, transformOrigin: "bottom center", width: "100%" }}
+        style={{
+          transform: `scale(${scale})`,
+          transformOrigin: "bottom center",
+          width: "100%",
+        }}
       >
         {children}
       </div>
@@ -249,10 +265,10 @@ export function FloatingCard({
   const bannerPhotoExpandable = ctx?.bannerPhotoExpandable !== false;
   const canExpandBannerPhoto = Boolean(
     bannerPhotoExpandable &&
-      sidePhotoSrc &&
-      photoSrc &&
-      !hasBannerNews &&
-      !resolvedVideoSrc,
+    sidePhotoSrc &&
+    photoSrc &&
+    !hasBannerNews &&
+    !resolvedVideoSrc,
   );
 
   const wrapBannerPhotoExpand = (node: ReactNode) => {
@@ -303,9 +319,7 @@ export function FloatingCard({
             CARD_EDGE_BANNER,
             "relative w-full shrink-0 overflow-hidden",
             bannerUnframed ? "mt-0" : "mt-5 rounded-3xl duration-500 ease-out",
-            !bannerHeightClass &&
-              !resolvedBannerHeightPx &&
-              "h-[460px]",
+            !bannerHeightClass && !resolvedBannerHeightPx && "h-[460px]",
             !bannerUnframed &&
               (active
                 ? "border border-transparent shadow-[0_30px_80px_-24px_rgba(0,0,0,0.7)]"
@@ -488,7 +502,7 @@ export function FloatingCard({
         animate={layerAnimate}
         className={clsx(
           omitSidePhoto && CARD_EDGE_SHELL,
-          "relative min-h-0 w-full flex-1 overflow-hidden p-8 sm:p-12",
+          "relative min-h-0 w-full flex-1 overflow-hidden px-8 pt-8 pb-10 sm:px-12 sm:pt-12 sm:pb-28",
           "flex flex-col justify-end",
           "rounded-3xl",
           omitSidePhoto
@@ -557,7 +571,11 @@ export function FloatingCard({
                 x2="1"
                 y2="1"
               >
-                <stop offset="0%" stopColor={accentColor.base} stopOpacity="0" />
+                <stop
+                  offset="0%"
+                  stopColor={accentColor.base}
+                  stopOpacity="0"
+                />
                 <stop
                   offset="50%"
                   stopColor={accentColor.base}
@@ -652,7 +670,9 @@ export function FloatingCard({
               </div>
             )}
             <div className="relative flex-1 min-h-0">
-              <AutoFitContent>{children}</AutoFitContent>
+              <AutoFitContent parentScale={cardTextScale}>
+                {children}
+              </AutoFitContent>
             </div>
           </div>
 

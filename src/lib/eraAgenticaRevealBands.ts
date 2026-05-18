@@ -165,6 +165,7 @@ export function buildCapacitiesBandKeys(content: StepContent): string[] {
 export function buildClosingBandKeys(stepContent: StepContent): string[] {
   const keys: string[] = ['headline'];
   if (stepContent.body) keys.push('body');
+  if (stepContent.infoCards && stepContent.infoCards.length > 0) keys.push('infoCards');
   if (stepContent.valueStages && stepContent.valueStages.length > 0) keys.push('benefits');
   if (stepContent.attentionPhrase) keys.push('attention');
   if (stepContent.highlightPhrases && stepContent.highlightPhrases.length > 0) keys.push('highlights');
