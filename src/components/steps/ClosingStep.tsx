@@ -19,7 +19,7 @@ import type { PresentationStep } from "@/domain/types";
 import { theme } from "@/domain/theme";
 import { getCardTextVariants } from "./cardTextMotion";
 import { ClosingMaestroCompanion } from "@/components/MaestroOrb";
-import { SaluxLogo, SaluxSymbol } from "@/components/intro/SaluxLogo";
+import { SaluxLogo } from "@/components/intro/SaluxLogo";
 import { BURST_VECTORS, EASE_BURST } from "@/components/intro/logoMotion";
 import { ClosingHighlight, HighlightPhraseList } from "./HighlightBlocks";
 import { resolveContactFormUrl } from "@/config/contact";
@@ -28,7 +28,6 @@ import { EraRevealBand } from "@/components/motion/EraAgenticaReveal";
 import { buildClosingBandKeys } from "@/lib/eraAgenticaRevealBands";
 import { trackUsesEraStagedReveal } from "@/lib/trackEraStaging";
 import { ExpandedCardPortal } from "./ExpandedCardPortal";
-import saluxSymbolUrl from "@/assets/intro/salux-simbolo-azul.svg?url";
 
 const CLOSING_FORM_CTA_LABEL = "Ir para o formulário";
 const CLOSING_FORM_CTA_CHARS = CLOSING_FORM_CTA_LABEL.split("");
@@ -36,12 +35,6 @@ const CLOSING_CTA_ASSEMBLY_DELAY = 0.95;
 const CLOSING_CTA_CHAR_STAGGER = 0.036;
 const CLOSING_CTA_ARROW_DELAY = 0.12;
 const CLOSING_CTA_ARROW_DURATION = 0.72;
-const CLOSING_LOGO_REVEAL_DELAY =
-  CLOSING_CTA_ASSEMBLY_DELAY +
-  CLOSING_FORM_CTA_CHARS.length * CLOSING_CTA_CHAR_STAGGER +
-  CLOSING_CTA_ARROW_DELAY +
-  CLOSING_CTA_ARROW_DURATION +
-  0.18;
 
 const CLOSING_LOGO_SIZE = 156;
 const CLOSING_MAESTRO_GAP = 52;
@@ -332,26 +325,11 @@ export function ClosingStep({ step, active }: Props) {
   const infoCards = step.content.infoCards ?? [];
   const benefitsClickable = step.content.valueStagesClickable !== false;
   const [selectedBenefit, setSelectedBenefit] = useState<number | null>(null);
-  const [showFloatingLogo, setShowFloatingLogo] = useState(false);
   const benefitRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    if (!active) {
-      setSelectedBenefit(null);
-      setShowFloatingLogo(false);
-      return;
-    }
-    if (!step.content.floatingCard) return;
-    if (reduceMotion) {
-      setShowFloatingLogo(true);
-      return;
-    }
-    const id = window.setTimeout(
-      () => setShowFloatingLogo(true),
-      CLOSING_LOGO_REVEAL_DELAY * 1000,
-    );
-    return () => window.clearTimeout(id);
-  }, [active, reduceMotion, step.content.floatingCard]);
+    if (!active) setSelectedBenefit(null);
+  }, [active]);
 
   useEffect(() => {
     if (selectedBenefit === null) return;
@@ -886,54 +864,10 @@ export function ClosingStep({ step, active }: Props) {
                   reduceMotion={reduceMotion}
                   afterLogoFlight={Boolean(step.content.closingLogoFlight)}
                 />
-                {!step.content.floatingCard && (
-                  <motion.img
-                    src={saluxSymbolUrl}
-                    alt="Salux"
-                    className="h-28 w-28 md:h-36 md:w-36 object-contain"
-                    initial={reduceMotion ? false : { opacity: 0, y: 20, scale: 0.8 }}
-                    animate={
-                      active
-                        ? { opacity: 1, y: 0, scale: 1 }
-                        : reduceMotion
-                          ? undefined
-                          : { opacity: 0, y: 20, scale: 0.8 }
-                    }
-                    transition={
-                      reduceMotion
-                        ? { duration: 0.01 }
-                        : { delay: 0.6, duration: 0.7, ease: [0.22, 1, 0.36, 1] }
-                    }
-                  />
-                )}
               </motion.div>
             </EraRevealBand>
           )}
 
-          {step.content.floatingCard && showFloatingLogo && (
-            <motion.div
-              aria-hidden
-              className="flex w-full justify-center pt-3"
-              initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.92 }}
-              animate={
-                active
-                  ? { opacity: 1, y: 0, scale: 1 }
-                  : reduceMotion
-                    ? undefined
-                    : { opacity: 0, y: 18, scale: 0.92 }
-              }
-              transition={{
-                duration: 0.72,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-            >
-              <div
-                className="pointer-events-none flex items-center justify-center"
-              >
-                <SaluxSymbol width={164} idle={active} className="opacity-[0.96]" />
-              </div>
-            </motion.div>
-          )}
         </motion.div>
       </motion.div>
     </FloatingCard>

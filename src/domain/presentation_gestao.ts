@@ -123,6 +123,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
         },
         closingQuestion:
           "Qual é o % de capacidade instalada que sua rede usa de forma desigual hoje?",
+        hideContactForm: true,
         heroImage: {
           src: gestaoSlide3FilaRede,
           alt: "Fila e pressão na rede de saúde — demanda versus capacidade de coordenação",
