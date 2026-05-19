@@ -23,9 +23,13 @@ export function useCameraTransform({ step, isOverview, viewport }: UseCameraTran
   }, [isOverview, step, steps, viewport]);
 
   useEffect(() => {
+    /**
+     * Spring com leve overshoot — dá "peso" à câmera, como uma dolly real
+     * que desacelera passando do ponto antes de assentar. ~2% de over no scale.
+     */
     const transition = reduceMotion
       ? { type: 'tween' as const, duration: 0.2, ease: 'easeOut' as const }
-      : { type: 'spring' as const, stiffness: 70, damping: 22, mass: 1.1 };
+      : { type: 'spring' as const, stiffness: 52, damping: 17, mass: 1.35 };
 
     isAnimating.current = true;
     const controls = [

@@ -377,9 +377,9 @@ function LoadingBar({ ready }: { ready: boolean }) {
       <span>{ready ? 'Pronto' : 'Carregando'}</span>
       <span className="relative block h-px w-32 overflow-hidden bg-white/[0.08]">
         <motion.span
-          className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#54c1ed] to-[#4a9cfa]"
-          initial={{ width: '0%' }}
-          animate={{ width: ready ? '100%' : '40%' }}
+          className="absolute inset-y-0 left-0 w-full origin-left bg-gradient-to-r from-[#54c1ed] to-[#4a9cfa] will-change-transform"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: ready ? 1 : 0.4 }}
           transition={{ duration: ready ? 0.55 : 1.6, ease: [0.22, 1, 0.36, 1] }}
         />
       </span>

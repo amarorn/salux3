@@ -262,14 +262,15 @@ function RangeVisual({
         ))}
         {/* Faixa preenchida */}
         <motion.span
-          className="absolute top-0 h-full rounded-full"
+          className="absolute top-0 h-full origin-left rounded-full will-change-transform"
           style={{
             left: `${fromPct}%`,
+            width: `${toPct - fromPct}%`,
             background: `linear-gradient(90deg, ${color}99, ${color})`,
             boxShadow: `0 0 14px ${color}, inset 0 1px 0 rgba(255,255,255,0.25)`,
           }}
-          initial={{ width: 0 }}
-          animate={{ width: active || reduce ? `${toPct - fromPct}%` : 0 }}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: active || reduce ? 1 : 0 }}
           transition={{ duration: reduce ? 0 : 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
         />
         {/* Marcadores */}

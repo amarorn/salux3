@@ -2658,23 +2658,28 @@ function ImpactBurst({ targetRef, accentColor }: ImpactBurstProps) {
       />
 
       {/* Ondas de choque */}
-      {ripples.map((delay, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full border-2"
-          style={{
-            top: pos.y,
-            left: pos.x,
-            translate: "-50% -50%",
-            borderColor: accentColor,
-            boxShadow: `0 0 24px ${accentColor}, inset 0 0 16px ${accentColor}55`,
-          }}
-          initial={{ width: 8, height: 8, opacity: 0.9 }}
-          animate={{ width: 360 + i * 80, height: 360 + i * 80, opacity: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.7, delay, ease: [0.2, 0.8, 0.2, 1] }}
-        />
-      ))}
+      {ripples.map((delay, i) => {
+        const finalSize = 360 + i * 80;
+        return (
+          <motion.div
+            key={i}
+            className="absolute rounded-full border-2 will-change-transform"
+            style={{
+              top: pos.y,
+              left: pos.x,
+              width: finalSize,
+              height: finalSize,
+              translate: "-50% -50%",
+              borderColor: accentColor,
+              boxShadow: `0 0 24px ${accentColor}, inset 0 0 16px ${accentColor}55`,
+            }}
+            initial={{ scale: 8 / finalSize, opacity: 0.9 }}
+            animate={{ scale: 1, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.7, delay, ease: [0.2, 0.8, 0.2, 1] }}
+          />
+        );
+      })}
 
       {/* Estilhaços/raios curtos */}
       {Array.from({ length: 8 }).map((_, i) => {

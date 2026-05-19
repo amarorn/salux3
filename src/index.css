@@ -42,6 +42,7 @@ html {
 
 body.presentation-body {
   overscroll-behavior: none;
+  cursor: none;
 }
 
 body.landing-body {
@@ -52,16 +53,22 @@ button {
   font-family: inherit;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
 ::selection {
   background: rgba(124, 58, 237, 0.18);
   color: #1e1b4b;
 }
 
+/* Reduced motion — preserva feedback de hover/active mas desliga o teatro. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
+    animation-duration: 0.1ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.2s !important;
+    transition-duration: 0.15s !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -83,6 +90,13 @@ button {
   100% {
     transform: translateX(220%) skewX(-12deg);
   }
+}
+
+.form-field-input:focus {
+  border-color: color-mix(in srgb, var(--fa) 60%, transparent);
+  background-color: color-mix(in srgb, var(--fa) 8%, transparent);
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--fa) 28%, transparent);
 }
 
 @media (prefers-reduced-motion: no-preference) {

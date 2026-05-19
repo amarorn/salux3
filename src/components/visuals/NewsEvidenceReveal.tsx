@@ -16,7 +16,7 @@ export function NewsEvidenceReveal({
   items,
   active,
   accentColor,
-  staggerMs = 520,
+  staggerMs = 140,
 }: NewsEvidenceRevealProps) {
   const reduceMotion = useReducedMotion();
   const [preview, setPreview] = useState<NewsItem | null>(null);

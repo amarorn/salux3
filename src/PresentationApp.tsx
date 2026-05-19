@@ -9,6 +9,7 @@ import { IntroBackground } from "./components/intro/IntroBackground";
 import { PresentationCornerLogo } from "./components/PresentationCornerLogo";
 import { MaestroOrb } from "./components/MaestroOrb";
 import { PresentationNavArrows } from "./components/PresentationNavArrows";
+import { PresentationCursor } from "./components/PresentationCursor";
 import { TransitionMorph } from "./components/intro/TransitionMorph";
 import { Stage } from "./components/Stage";
 import "./styles/presentationHierarchy.css";
@@ -71,6 +72,8 @@ export function PresentationApp() {
           <PresentationNavArrows />
         )}
       </main>
+
+      <PresentationCursor />
     </Stage>
   );
 }

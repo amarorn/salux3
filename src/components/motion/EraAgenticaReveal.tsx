@@ -85,6 +85,21 @@ const REVEAL_PRESETS: RevealPreset[] = [
     },
     transition: { duration: 0.72, ease: [0.1, 0.98, 0.22, 1] },
   },
+  /**
+   * Sigmoid (EASE.ui) — quebra a monotonia da família burst.
+   * Não tem overshoot; deslocamento curto + blur dissolve. Sensação "calma".
+   * ~20% dos bands cai aqui via hash seeded — variedade sem regressão.
+   */
+  {
+    initial: { opacity: 0, y: 16, filter: "blur(6px)" },
+    animate: { opacity: 1, y: 0, filter: "blur(0px)" },
+    transition: { duration: 0.62, ease: [0.32, 0.72, 0, 1] },
+  },
+  {
+    initial: { opacity: 0, x: -12, scale: 0.98, filter: "blur(4px)" },
+    animate: { opacity: 1, x: 0, scale: 1, filter: "blur(0px)" },
+    transition: { duration: 0.66, ease: [0.32, 0.72, 0, 1] },
+  },
 ];
 
 function presetIndex(
