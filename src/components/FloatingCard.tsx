@@ -162,6 +162,8 @@ interface FloatingCardProps {
   /** Grelha de capturas de notícia no topo (substitui foto/vídeo do banner). */
   bannerNewsUrls?: string[];
   onBannerNewsExpand?: (url: string) => void;
+  /** Callback customizado ao clicar na foto do banner (sobrescreve lightbox padrão). */
+  onBannerPhotoClick?: () => void;
   /** Texto do badge e rótulos do card em branco (trilhas com fundo escuro). */
   allTextWhite?: boolean;
   /** Remove máscara/limites visuais do card e deixa o conteúdo flutuar no palco. */
@@ -196,6 +198,7 @@ export function FloatingCard({
   stepIndex = 0,
   bannerNewsUrls,
   onBannerNewsExpand,
+  onBannerPhotoClick,
   allTextWhite = false,
   floatingContent = false,
   bannerChildren,
@@ -293,7 +296,11 @@ export function FloatingCard({
           )}
           onClick={(e) => {
             e.stopPropagation();
-            setBannerPhotoExpanded(true);
+            if (onBannerPhotoClick) {
+              onBannerPhotoClick();
+            } else {
+              setBannerPhotoExpanded(true);
+            }
           }}
         />
       </motion.div>

@@ -3,6 +3,9 @@ import { steps as baseSteps } from "./presentation";
 import gestaoSlide1NoticiaCnn from "@/assets/presentation/gestao-slide1-noticia-cnn.png?url";
 import gestaoSlide1NoticiaSobrasp from "@/assets/presentation/gestao-slide1-noticia-sobrasp.png?url";
 import gestaoSlide1NoticiaDefato from "@/assets/presentation/gestao-slide1-noticia-defato.png?url";
+import gestaoSlide1PreviewCnn from "@/assets/presentation/assistncia-sade-em-2025.png?url";
+import gestaoSlide1PreviewSobrasp from "@/assets/presentation/brasil-registra-quase-300-mil.png?url";
+import gestaoSlide1PreviewDefato from "@/assets/presentation/saude-em-criancas.png?url";
 import gestaoSlide2Ecossistema from "@/assets/presentation/gestao-slide2-ecossistema.png?url";
 import gestaoSlide3FilaRede from "@/assets/presentation/gestao-slide3-fila-rede.png?url";
 import gestaoSlide4Comando from "@/assets/presentation/gestao-slide4-comando.png?url";
@@ -57,6 +60,11 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
           gestaoSlide1NoticiaCnn,
           gestaoSlide1NoticiaSobrasp,
           gestaoSlide1NoticiaDefato,
+        ],
+        bannerNewsPreviewUrls: [
+          gestaoSlide1PreviewSobrasp,
+          gestaoSlide1PreviewDefato,
+          gestaoSlide1PreviewCnn,
         ],
         attentionPhrase:
           "O desafio não é atender mais. É coordenar melhor o que a rede já precisa sustentar.",

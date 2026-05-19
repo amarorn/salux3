@@ -205,7 +205,6 @@ export function NewsArticlePreview({
   onClose: () => void;
   reducedMotion: boolean;
 }) {
-  const [showEmbed, setShowEmbed] = useState(false);
   const host =
     typeof document !== "undefined"
       ? document.getElementById("salux-stage")
@@ -236,7 +235,7 @@ export function NewsArticlePreview({
         role="dialog"
         aria-modal="true"
         aria-labelledby="news-preview-title"
-        className="presentation-glass-chip relative z-[1] flex max-h-[min(88vh,920px)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border shadow-2xl"
+        className="presentation-glass-chip relative z-[1] flex max-h-[min(130vh,960px)] w-auto max-w-[min(92vw,620px)] flex-col overflow-hidden rounded-2xl border shadow-2xl"
         style={{
           borderColor: `${accentColor}44`,
           boxShadow: `0 32px 80px -20px rgba(0,0,0,0.85), 0 0 60px -12px ${accentColor}55`,
@@ -286,67 +285,17 @@ export function NewsArticlePreview({
         </motion.div>
 
         <motion.div className="relative min-h-0 flex-1 overflow-y-auto">
-          <PreviewHero item={item} accentColor={accentColor} maxHeightClass={item.skipEmbedPreview ? "max-h-[64vh]" : "max-h-[38vh]"} />
-          {!item.skipEmbedPreview && showEmbed ? (
-            item.embedAsMobile ? (
-              <div className="flex justify-center border-t border-white/10 bg-[#0a0c12] py-6">
-                <div
-                  className="relative overflow-hidden rounded-[2rem] border-[6px] border-[#1a1a1a] bg-black shadow-2xl"
-                  style={{ width: 375, maxWidth: "90vw" }}
-                >
-                  <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-6 bg-[#1a1a1a]" />
-                  <iframe
-                    title={item.title ?? "Prévia da matéria"}
-                    src={item.articleUrl}
-                    className="h-[min(52vh,560px)] w-[375px] max-w-full border-0 bg-white"
-                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-                  />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-1 bg-[#1a1a1a]" />
-                </div>
-              </div>
-            ) : (
-              <iframe
-                title={item.title ?? "Prévia da matéria"}
-                src={item.articleUrl}
-                className="h-[min(52vh,560px)] w-full border-0 border-t border-white/10 bg-[#0a0c12]"
-                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-              />
-            )
-          ) : null}
+          <PreviewHero
+            item={item}
+            accentColor={accentColor}
+            simulateMobileScroll
+          />
         </motion.div>
 
-        <motion.div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-white/10 px-5 py-3.5">
-          {!item.skipEmbedPreview && (
-            <button
-              type="button"
-              data-no-click-advance
-              className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/50 transition-colors hover:text-white/85"
-              onClick={() => setShowEmbed((v) => !v)}
-            >
-              {showEmbed ? "Ocultar prévia do site" : "Tentar prévia do site"}
-            </button>
-          )}
-          {item.skipEmbedPreview ? (
-            <span className="text-[11px] font-medium tracking-[0.12em] text-white/40">
-              {item.articleUrl}
-            </span>
-          ) : (
-            <a
-              data-no-click-advance
-              href={item.articleUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/90 transition-colors hover:text-white"
-              style={{
-                borderColor: `${accentColor}55`,
-                background: `${accentColor}18`,
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              Abrir matéria completa
-              <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-            </a>
-          )}
+        <motion.div className="flex shrink-0 items-center justify-center border-t border-white/10 px-5 py-3.5">
+          <span className="text-center text-[11px] font-medium tracking-[0.12em] text-white/40">
+            Fonte oficial: {item.articleUrl}
+          </span>
         </motion.div>
       </motion.div>
     </motion.div>,
@@ -358,11 +307,41 @@ function PreviewHero({
   item,
   accentColor,
   maxHeightClass = "max-h-[38vh]",
+  simulateMobileScroll = false,
 }: {
   item: NewsItem;
   accentColor: string;
   maxHeightClass?: string;
+  simulateMobileScroll?: boolean;
 }) {
+  if (simulateMobileScroll) {
+    return (
+      <motion.div
+        className="relative"
+        initial={{ opacity: 0, scale: 1.02 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="flex justify-center">
+          <div
+            className="relative"
+            style={{
+              width: 560,
+              maxWidth: "90vw",
+            }}
+          >
+            <img
+              src={item.imageUrl}
+              alt=""
+              className="w-full"
+              style={{ height: "auto", display: "block" }}
+            />
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       className="relative overflow-hidden"
@@ -379,7 +358,10 @@ function PreviewHero({
         <img
           src={item.imageUrl}
           alt=""
-          className={clsx("h-full w-full object-cover object-top", maxHeightClass)}
+          className={clsx(
+            "h-full w-full object-cover object-top",
+            maxHeightClass,
+          )}
         />
         <span
           aria-hidden
