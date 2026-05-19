@@ -94,7 +94,7 @@ const highlightContextStep: PresentationStep = {
         imageAlt: "Evolução do paciente FIA",
       },
       {
-        word: "Os agentes não substituem a equipe. Ampliam a capacidade de leitura, priorização e decisão ao longo da jornada.",
+        word: "Acompanham",
         imageSrc: "/intro/os-agentes-nao-substituem.png",
         imageAlt: "Os agentes não substituem a equipe.",
       },

@@ -67,7 +67,7 @@ export function InlineMediaTrigger({
           e.stopPropagation();
           setOpen(true);
         }}
-        className="inline cursor-pointer border-0 bg-transparent p-0 font-inherit text-inherit underline decoration-dotted underline-offset-[0.2em] outline-none transition-[color,text-shadow] duration-200 hover:decoration-solid focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50"
+        className="inline cursor-pointer rounded-md border border-current/40 bg-transparent px-1 py-0 font-inherit text-inherit outline-none transition-[color,text-shadow,border-color] duration-200 hover:border-current/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50"
         style={{
           textShadow: `0 0 20px ${accentColor}55`,
         }}
