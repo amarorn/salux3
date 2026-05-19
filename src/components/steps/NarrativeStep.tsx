@@ -415,6 +415,7 @@ export function NarrativeStep({ step, active }: Props) {
   const handleExpandImage = (url: string) => {
     const bannerUrls = step.content.bannerNewsUrls;
     const bannerPreviewUrls = step.content.bannerNewsPreviewUrls;
+    const bannerOfflinePageUrls = step.content.bannerNewsOfflinePageUrls;
     if (bannerUrls && bannerPreviewUrls && bannerUrls.includes(url)) {
       const idx = bannerUrls.indexOf(url);
       const previewUrl = bannerPreviewUrls[idx];
@@ -423,6 +424,7 @@ export function NarrativeStep({ step, active }: Props) {
           item: {
             imageUrl: previewUrl,
             articleUrl: "",
+            offlinePageUrl: bannerOfflinePageUrls?.[idx],
             title: step.title,
             source: step.subtitle,
           },

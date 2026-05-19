@@ -274,6 +274,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
                 description:
                   "Teleatendimento, acompanhamento remoto e cuidado híbrido.",
                 tagline: "Alcance sem expansão física linear.",
+                productImage: "/GESTAO_PUBLICA_6/capilaridade_case_publico.png",
               },
               {
                 name: "Diagnóstico",
@@ -295,7 +296,6 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
                 description:
                   "Escala, cobertura e alocação conforme demanda e criticidade.",
                 tagline: "Capacidade instalada em movimento.",
-                productImage: "/GESTAO_PUBLICA_6/equipe.png",
               },
               {
                 name: "Governança documental",
@@ -303,6 +303,7 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
                 description:
                   "Rastreabilidade, conformidade e continuidade operacional.",
                 tagline: "Sustentar sem fragilidade.",
+                productImage: "/GESTAO_PUBLICA_6/video_painel_gestor_produtividade.mkv",
               },
               {
                 name: "Áreas críticas",
@@ -318,7 +319,6 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
                 description:
                   "Previsibilidade sobre demanda, produção e uso de recursos.",
                 tagline: "Decisão pública com base em dados.",
-                productImage: "/GESTAO_PUBLICA_6/governança_documental.mkv",
               },
             ],
           },
@@ -365,6 +365,18 @@ const gestaoBaseSteps: PresentationStep[] = cloneSteps(baseSteps).map((s) => {
           "Organizam encaminhamentos entre níveis assistenciais",
           "Apoiam decisões regulatórias com base em contexto",
           "Antecipam pontos de tensão antes que virem crise",
+        ],
+        clickableWordMedia: [
+          {
+            word: "Analisam",
+            imageSrc: "/GESTAO_PUBLICA_7/analisam_initia.png",
+            imageAlt: "Tela do INITIA com pergunta para IA na gestão",
+          },
+          {
+            word: "Organizam",
+            imageSrc: "/GESTAO_PUBLICA_7/organizam_lista_pacientes.png",
+            imageAlt: "Lista de pacientes em atendimento para organização de fluxo",
+          },
         ],
         attentionPhrase:
           "Os agentes não substituem o gestor. Ampliam sua capacidade de leitura, priorização e decisão.",

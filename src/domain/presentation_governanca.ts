@@ -5,14 +5,12 @@ import governancaTrilha5NoticiaIa from '@/assets/presentation/governanca-trilha5
 import governancaTrilha5AiTech from '@/assets/presentation/governanca-trilha5-ai-tech.png?url';
 import governancaTrilha5TransformacaoOps from '@/assets/presentation/governanca-trilha5-transformacao-ops.png?url';
 import governancaTrilha5Slide4Intervalo from '@/assets/presentation/governanca-trilha5-slide4-intervalo.png?url';
-import governancaTrilha5Slide5Dashboard from '@/assets/presentation/governanca-trilha5-slide5-dashboard.png?url';
 import governancaTrilha5Slide6Dna from '@/assets/presentation/governanca-trilha5-slide6-dna.png?url';
 import governancaTrilha5Slide7Maturidade from '@/assets/presentation/governanca-trilha5-slide7-maturidade.png?url';
 import governancaTrilha5Slide8NoticiaIa from '@/assets/presentation/governanca-trilha5-slide8-noticia-ia.png?url';
 import governancaTrilha5Slide9Horizon from '@/assets/presentation/governanca-trilha5-slide9-horizon.png?url';
 import governancaTrilha5Slide10Lobby from '@/assets/presentation/governanca-trilha5-slide10-lobby.png?url';
 import governancaTrilha5Slide12Executivo from '@/assets/presentation/governanca-trilha5-slide12-executivo.png?url';
-import governancaWhyAgentsBannerUrl from '@/assets/presentation/governanca-why-agents-banner.png?url';
 
 export const presentationGovernancaMeta = {
   title: 'IA agêntica',
@@ -143,9 +141,9 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         headline: 'Limite tecnológico',
         cardVisual: 'scatter',
         heroImage: {
-          src: governancaWhyAgentsBannerUrl,
+          src: '/intro/governanca-slide3-initia.png',
           alt:
-            'Ilustração de saúde digital: telemóvel com ícone clínico e estetoscópio azul sobre fundo escuro',
+            'Tela do INITIA com módulos hospitalares e assistente de IA à direita',
         },
         bannerUnframed: true,
         hideFloatingWatermarkSvg: true,
@@ -234,10 +232,6 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
       content: {
         headline: 'Limite da IA isolada',
         cardVisual: 'shatter',
-        heroImage: {
-          src: governancaTrilha5Slide5Dashboard,
-          alt: 'Painel digital futurista com monitoramento de dados, gráficos e indicadores em tempo real',
-        },
         attentionPhrase:
           'Automatizar um processo ruim não cria eficiência. Apenas escala a ineficiência.',
         body: 'Quatro condições que tornam a IA ineficaz:',
@@ -545,7 +539,7 @@ const governancaValueDimensionsStep: PresentationStep = {
       {
         number: '⚙️',
         label: 'Valor operacional',
-        mediaUrl: '/intro/tela-de-escalas.png',
+        mediaUrl: '/intro/tela-de-escalas-assistenciais.png',
         description:
           'Gargalos antecipados. Escalas mais coordenadas. Melhor uso da capacidade instalada. Produtividade com controle.',
       },

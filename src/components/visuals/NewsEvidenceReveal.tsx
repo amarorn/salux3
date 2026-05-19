@@ -294,7 +294,7 @@ export function NewsArticlePreview({
 
         <motion.div className="flex shrink-0 items-center justify-center border-t border-white/10 px-5 py-3.5">
           <span className="text-center text-[11px] font-medium tracking-[0.12em] text-white/40">
-            Fonte oficial: {item.articleUrl}
+            Prévia local disponível offline
           </span>
         </motion.div>
       </motion.div>
@@ -314,6 +314,34 @@ function PreviewHero({
   maxHeightClass?: string;
   simulateMobileScroll?: boolean;
 }) {
+  if (item.offlinePageUrl) {
+    return (
+      <motion.div
+        className="relative"
+        initial={{ opacity: 0, scale: 1.02 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="flex justify-center">
+          <div
+            className="overflow-hidden rounded-[20px] border border-slate-300/80 bg-white shadow-[0_24px_80px_-26px_rgba(0,0,0,0.55)]"
+            style={{
+              width: 560,
+              maxWidth: "90vw",
+              boxShadow: `0 20px 56px -24px ${accentColor}44`,
+            }}
+          >
+            <iframe
+              src={item.offlinePageUrl}
+              title={item.title ?? "Prévia offline da matéria"}
+              className="block h-[520px] w-full bg-white"
+            />
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
   if (simulateMobileScroll) {
     return (
       <motion.div

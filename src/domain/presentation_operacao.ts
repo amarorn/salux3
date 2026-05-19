@@ -1,5 +1,4 @@
 import type { PresentationStep } from "./types";
-import trilha3Slide1Url from "@/assets/presentation/trilha3-slide1.jpg?url";
 import trilha3Slide2Url from "@/assets/presentation/trilha3-slide2.jpg?url";
 import trilha3Slide3Url from "@/assets/presentation/trilha3-slide3.jpg?url";
 import trilha3Slide4Url from "@/assets/presentation/trilha3-slide4.jpg?url";
@@ -44,54 +43,51 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           valueStagesFlat: true,
           valueStagesGridCols: 3,
           valueStagesRevealChunkSize: 3,
+          valueStagesClickable: false,
           valueStages: [
             {
-              number: "🏗",
+              number: "",
               label: "Abertura de novas unidades",
-              news: {
-                imageUrl: "/intro/operacao-news/operacao-news-1.jpg",
-                articleUrl:
-                  "https://www.anahp.com.br/noticias/hospitais-reduzem-expansao-por-falta-de-recursos-financeiros/",
-                source: "ANAHp",
-                title:
-                  "Hospitais reduzem expansão por falta de recursos financeiros",
-              },
             },
             {
-              number: "🔗",
+              number: "",
               label: "Integrações que precisam ser costuradas",
-              news: {
-                imageUrl: "/intro/operacao-news/operacao-news-2.jpg",
-                articleUrl:
-                  "https://www.uai.com.br/app/noticia/mundo-corporativo/2026/03/09/noticia-mundo-corporativo,379154/gestao-hospitalar-avanca-mas-custos-seguem-como-desafio.shtml",
-                source: "UAI",
-                title:
-                  "Gestão hospitalar avança, mas custos seguem como desafio",
-              },
             },
             {
-              number: "👥",
+              number: "",
               label: "Equipe não acompanha demanda",
-              news: {
-                imageUrl: "/intro/operacao-news/operacao-news-3.jpg",
-                articleUrl: "https://medicinasa.com.br/saude-desconectada/",
-                source: "Medicina SA",
-                title: "Saúde desconectada",
-              },
             },
-            { number: "🔬", label: "Diagnóstico que vira gargalo" },
+            { number: "", label: "Diagnóstico que vira gargalo" },
             {
-              number: "📉",
+              number: "",
               label: "Perda de previsibilidade econômica com o crescimento",
             },
             {
-              number: "🏛",
+              number: "",
               label: "Expansão física que exige mais estrutura e mais custo",
             },
           ],
+          bannerNewsUrls: [
+            "/intro/operacao-news/operacao-news-1.jpg",
+            "/intro/operacao-news/operacao-news-2.jpg",
+            "/intro/operacao-news/operacao-news-3.jpg",
+          ],
+          bannerNewsPreviewUrls: [
+            "/intro/operacao-news/operacao-news-1.jpg",
+            "/intro/operacao-news/operacao-news-2.jpg",
+            "/intro/operacao-news/operacao-news-3.jpg",
+          ],
+          bannerNewsOfflinePageUrls: [
+            "/offline-articles/anahp-hospitais-reduzem-expansao.html",
+            "/offline-articles/uai-gestao-hospitalar-avanca-custos.html",
+          ],
+          bannerNewsArticleUrls: [
+            "https://www.anahp.com.br/noticias/hospitais-reduzem-expansao-por-falta-de-recursos-financeiros/",
+            "https://www.uai.com.br/app/noticia/mundo-corporativo/2026/03/09/noticia-mundo-corporativo,379154/gestao-hospitalar-avanca-mas-custos-seguem-como-desafio.shtml",
+            "https://medicinasa.com.br/saude-desconectada/",
+          ],
           bullets: [],
           painPointsLayout: false,
-          heroImage: { src: trilha3Slide1Url, alt: "Trilha 3 — Slide 1" },
         },
       };
     }
@@ -276,7 +272,7 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
                   subtitle: "Núcleo operacional",
                   description: "Organiza dados, processos e fluxos críticos.",
                   tagline: "Coordenação desde a origem.",
-                  productImage: "/operacao_4/Base_Clinica.png",
+                  productImage: "/operacao_4/lista_de_pacientes.png",
                 },
                 {
                   name: "Capilaridade assistencial",
@@ -299,7 +295,6 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
                   description:
                     "Coordena demanda, cobertura, absenteísmo e custo.",
                   tagline: "Equipe como capacidade instalada.",
-                  productImage: "/operacao_4/forca_de_trabalho.png",
                 },
               ],
             },
@@ -364,32 +359,28 @@ const baseOperacao: PresentationStep[] = cloneSteps(baseSteps)
           valueStagesLead: "O que os Agentes fazem na operação:",
           valueStagesFlat: true,
           valueStagesGridCols: 2,
+          valueStagesClickable: false,
           valueStages: [
             {
               number: "01",
               label: "Identificam gargalos e interpretam capacidade disponível",
-              mediaUrl: "/operacao_7/IDENTIFICAM_GARGALOS.png",
             },
             {
               number: "02",
               label: "Organizam contexto e priorizam fluxos operacionais",
-              mediaUrl: "/operacao_7/organizam_contexto_priorizam_fluxo.png",
             },
             {
               number: "03",
               label:
                 "Apoiam alocação de equipes conforme demanda e criticidade",
-              mediaUrl: "/operacao_7/apoiam_alocacao.png",
             },
             {
               number: "04",
               label: "Sinalizam riscos antes que virem problema",
-              mediaUrl: "/operacao_7/sinalizam_riscos.png",
             },
             {
               number: "05",
               label: "Recomendam ações e executam tarefas sob governança",
-              mediaUrl: "/operacao_7/recomendam_acoes.png",
             },
           ],
           bullets: [],

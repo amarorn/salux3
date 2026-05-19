@@ -50,6 +50,7 @@ export interface NewsItem {
   articleUrl: string;
   title?: string;
   source?: string;
+  offlinePageUrl?: string;
   embedAsMobile?: boolean;
   skipEmbedPreview?: boolean;
 }
@@ -177,6 +178,10 @@ export interface StepContent {
   bannerNewsUrls?: string[];
   /** Versões grandes das imagens do banner, exibidas na modal ao clicar. */
   bannerNewsPreviewUrls?: string[];
+  /** Links oficiais das matérias do banner, no mesmo índice de `bannerNewsUrls`. */
+  bannerNewsArticleUrls?: string[];
+  /** Páginas HTML locais offline das matérias do banner, no mesmo índice de `bannerNewsUrls`. */
+  bannerNewsOfflinePageUrls?: string[];
   /** Highlight step: insere visual "camadas acumuladas → base coordenada" antes da frase de atenção. */
   layersToBase?: boolean;
   /** Trilha Operação: headline grande + bullets como chips animados (pain points). */

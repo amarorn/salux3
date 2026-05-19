@@ -405,6 +405,40 @@ export function FloatingCard({
                   );
                 })}
               </motion.div>
+            ) : bannerNewsUrls!.length === 6 ? (
+              <motion.div
+                data-no-click-advance
+                className="absolute inset-0 grid grid-cols-2 grid-rows-3 gap-2 bg-[#05070d] p-2"
+              >
+                {bannerNewsUrls!.map((url, index) => (
+                  <button
+                    key={`banner-news-${index}`}
+                    type="button"
+                    data-no-click-advance
+                    aria-label="Expandir imagem"
+                    className={clsx(
+                      "relative h-full min-h-0 w-full overflow-hidden rounded-lg border border-white/10 bg-gray-800/50 p-0 shadow-inner outline-none",
+                      onBannerNewsExpand &&
+                        "cursor-zoom-in transition-transform duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white/45",
+                    )}
+                    onClick={
+                      onBannerNewsExpand
+                        ? (e) => {
+                            e.stopPropagation();
+                            onBannerNewsExpand(url);
+                          }
+                        : undefined
+                    }
+                  >
+                    <img
+                      src={url}
+                      alt=""
+                      draggable={false}
+                      className="pointer-events-none h-full w-full object-cover object-top"
+                    />
+                  </button>
+                ))}
+              </motion.div>
             ) : (
               <motion.div
                 data-no-click-advance
