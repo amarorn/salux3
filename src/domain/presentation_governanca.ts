@@ -44,6 +44,7 @@ export const governancaSteps: PresentationStep[] = cloneSteps(baseSteps).map((s)
         heroImage: {
           src: governancaTrilha5NoticiaIa,
           alt: 'Uso de IA na saúde — evidência (Agência Brasil)',
+          previewSrc: '/intro/uso-de-ia-18.png',
         },
         valueStagesRoad: true,
         valueStagesFlat: true,

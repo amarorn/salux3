@@ -3,6 +3,7 @@ import { steps as baseSteps } from "./presentation";
 
 import news1Url from "@/assets/presentation/news-1.png?url";
 import news2Url from "@/assets/presentation/news-2.png?url";
+import news2PreviewUrl from "@/assets/presentation/glosas-e-atrasos-de-pagamento.png?url";
 
 export const presentationReceitaMeta = {
   title: "Proteção econômica da operação em saúde",
@@ -96,6 +97,7 @@ const baseMapped: PresentationStep[] = cloneSteps(baseSteps).map(
           attentionPhrase:
             "Não se trata apenas de ineficiência. É valor que deixa de se converter ao longo da operação.",
           newsUrls: [news1Url, news2Url],
+          newsPreviewUrls: ["", news2PreviewUrl],
         },
       };
     }

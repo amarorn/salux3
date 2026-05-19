@@ -383,6 +383,14 @@ export function NarrativeStep({ step, active }: Props) {
     null,
   );
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
+  const [bannerPreviewItem, setBannerPreviewItem] = useState<{
+    item: import("@/domain/types").NewsItem;
+    accentColor: string;
+  } | null>(null);
+  const [heroPreviewItem, setHeroPreviewItem] = useState<{
+    item: import("@/domain/types").NewsItem;
+    accentColor: string;
+  } | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const stageRefs = useRef<(HTMLElement | null)[]>([]);
@@ -399,10 +407,48 @@ export function NarrativeStep({ step, active }: Props) {
       setImpactActive(false);
       setValueStageSpotlight(null);
       setExpandedImage(null);
+      setBannerPreviewItem(null);
+      setHeroPreviewItem(null);
     }
   }, [active]);
 
   const handleExpandImage = (url: string) => {
+    const bannerUrls = step.content.bannerNewsUrls;
+    const bannerPreviewUrls = step.content.bannerNewsPreviewUrls;
+    if (bannerUrls && bannerPreviewUrls && bannerUrls.includes(url)) {
+      const idx = bannerUrls.indexOf(url);
+      const previewUrl = bannerPreviewUrls[idx];
+      if (previewUrl) {
+        setBannerPreviewItem({
+          item: {
+            imageUrl: previewUrl,
+            articleUrl: "",
+            title: step.title,
+            source: step.subtitle,
+          },
+          accentColor: theme.accents[step.accent].base,
+        });
+        return;
+      }
+    }
+    const newsUrls = step.content.newsUrls;
+    const newsPreviewUrls = step.content.newsPreviewUrls;
+    if (newsUrls && newsPreviewUrls && newsUrls.includes(url)) {
+      const idx = newsUrls.indexOf(url);
+      const previewUrl = newsPreviewUrls[idx];
+      if (previewUrl) {
+        setBannerPreviewItem({
+          item: {
+            imageUrl: previewUrl,
+            articleUrl: "",
+            title: step.title,
+            source: step.subtitle,
+          },
+          accentColor: theme.accents[step.accent].base,
+        });
+        return;
+      }
+    }
     setExpandedImage(url);
   };
 
@@ -1371,6 +1417,20 @@ export function NarrativeStep({ step, active }: Props) {
       stepIndex={step.index}
       bannerNewsUrls={step.content.bannerNewsUrls}
       onBannerNewsExpand={expandImage ? handleExpandImage : undefined}
+      onBannerPhotoClick={
+        hero?.previewSrc
+          ? () =>
+              setHeroPreviewItem({
+                item: {
+                  imageUrl: hero.previewSrc!,
+                  articleUrl: "",
+                  title: hero.alt || step.title,
+                  source: step.subtitle,
+                },
+                accentColor: theme.accents[step.accent].base,
+              })
+          : undefined
+      }
       bannerHeightClass={
         step.content.bannerHeightClass ??
         (step.content.valueStagesRevealSequentialCards ? "h-[300px]" : undefined)
@@ -2374,6 +2434,28 @@ export function NarrativeStep({ step, active }: Props) {
             alt="Imagem ampliada"
             reducedMotion={Boolean(reduceMotion)}
             onClose={handleCloseExpandedImage}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {bannerPreviewItem && (
+          <NewsArticlePreview
+            item={bannerPreviewItem.item}
+            accentColor={bannerPreviewItem.accentColor}
+            onClose={() => setBannerPreviewItem(null)}
+            reducedMotion={Boolean(reduceMotion)}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {heroPreviewItem && (
+          <NewsArticlePreview
+            item={heroPreviewItem.item}
+            accentColor={heroPreviewItem.accentColor}
+            onClose={() => setHeroPreviewItem(null)}
+            reducedMotion={Boolean(reduceMotion)}
           />
         )}
       </AnimatePresence>

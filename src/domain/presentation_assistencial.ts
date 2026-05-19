@@ -27,10 +27,10 @@ function withStep(
   return (s: PresentationStep): PresentationStep =>
     s.id === id
       ? {
-        ...s,
-        ...patch,
-        content: { ...s.content, ...(patch.content ?? {}) },
-      }
+          ...s,
+          ...patch,
+          content: { ...s.content, ...(patch.content ?? {}) },
+        }
       : s;
 }
 
@@ -97,7 +97,7 @@ const highlightContextStep: PresentationStep = {
         word: "Os agentes não substituem a equipe. Ampliam a capacidade de leitura, priorização e decisão ao longo da jornada.",
         imageSrc: "/intro/os-agentes-nao-substituem.png",
         imageAlt: "Os agentes não substituem a equipe.",
-      }
+      },
     ],
   },
 };
@@ -107,15 +107,15 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
   .map((s) =>
     s.id === "cover"
       ? {
-        ...s,
-        accent: "emerald" as const,
-        title: "Onde o risco assistencial começa a se formar?",
-        subtitle: "Assistência",
-        content: {
-          ...s.content,
-          omitSidePhoto: true,
-        },
-      }
+          ...s,
+          accent: "emerald" as const,
+          title: "Onde o risco assistencial começa a se formar?",
+          subtitle: "Assistência",
+          content: {
+            ...s.content,
+            omitSidePhoto: true,
+          },
+        }
       : s,
   )
   .map(
@@ -208,7 +208,7 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
       body: "Em saúde, o risco nem sempre nasce de um evento isolado. Muitas vezes, ele se forma aos poucos — e em silêncio.",
       newsItems: [
         {
-          imageUrl: "/intro/assistencial-news/assistencial-news-1.jpg",
+          imageUrl: "/intro/assistencial-news/assistencial-news-1.png",
           articleUrl:
             "https://g1.globo.com/pi/piaui/noticia/2025/06/02/evasao-de-pacientes-e-lesoes-mais-de-9-mil-falhas-na-assistencia-a-saude-sao-registradas-no-pi-diz-levantamento.ghtml",
           source: "G1 · Piauí",
@@ -216,18 +216,17 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
             "Evasão de pacientes e lesões: mais de 9 mil falhas na assistência à saúde no PI",
         },
         {
-          imageUrl: "/intro/assistencial-news/assistencial-news-2.jpg",
+          imageUrl: "/intro/assistencial-news/assistencial-news-2.png",
           articleUrl: "https://medicinasa.com.br/eventos-adversos-ibsp/",
           source: "Medicina SA",
           title: "Eventos adversos e falhas na assistência — levantamento IBSP",
         },
         {
-          imageUrl: "/intro/assistencial-news/assistencial-news-3.jpg",
+          imageUrl: "/intro/assistencial-news/assistencial-news-3.png",
           articleUrl:
             "https://tribunadonorte.com.br/natal/rn-registrou-7-845-falhas-na-assistencia-a-saude-em-2025/",
           source: "Tribuna do Norte",
-          title:
-            "RN registrou 7.845 falhas na assistência à saúde em 2025",
+          title: "RN registrou 7.845 falhas na assistência à saúde em 2025",
         },
       ],
       attentionPhrase:
@@ -587,7 +586,9 @@ const assistencialBaseSteps: PresentationStep[] = baseSteps
  * Insere o card de transição (`highlight-context`) imediatamente antes do
  * `closing` e re-indexa o array para manter `step.index` sequencial.
  */
-function withNonExpandableBannerPhoto(step: PresentationStep): PresentationStep {
+function withNonExpandableBannerPhoto(
+  step: PresentationStep,
+): PresentationStep {
   if (!step.content.heroImage) return step;
   return {
     ...step,

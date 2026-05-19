@@ -148,6 +148,8 @@ export interface StepContent {
     alt?: string;
     transparentCutout?: boolean;
     lightenBlackMatte?: boolean;
+    /** Imagem grande exibida na modal ao clicar no banner. */
+    previewSrc?: string;
   };
   /** Trilha assistencial: oculta diagrama de camadas; foco em texto e evidência. */
   architectureMinimal?: boolean;
@@ -169,8 +171,12 @@ export interface StepContent {
   newsItems?: NewsItem[];
   /** Trilha de ruptura acumulada: URLs de notícias relacionadas. */
   newsUrls?: string[];
+  /** Versões grandes das imagens de newsUrls, exibidas na modal ao clicar. */
+  newsPreviewUrls?: string[];
   /** Notícias no banner superior (em vez da foto padrão); não duplicar em `newsUrls`. */
   bannerNewsUrls?: string[];
+  /** Versões grandes das imagens do banner, exibidas na modal ao clicar. */
+  bannerNewsPreviewUrls?: string[];
   /** Highlight step: insere visual "camadas acumuladas → base coordenada" antes da frase de atenção. */
   layersToBase?: boolean;
   /** Trilha Operação: headline grande + bullets como chips animados (pain points). */
