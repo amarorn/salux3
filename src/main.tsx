@@ -9,7 +9,7 @@ if (!container) throw new Error('Root container not found');
 
 createRoot(container).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || undefined}>
       <App />
     </BrowserRouter>
   </StrictMode>,
